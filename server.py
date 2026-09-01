@@ -3,7 +3,7 @@
 from http.server import ThreadingHTTPServer, SimpleHTTPRequestHandler
 from pathlib import Path
 from urllib.parse import unquote
-import os, json, threading, secrets, time, hashlib, hmac, re, shutil
+import os, json, threading, secrets, time, hashlib, hmac, re, shutil, mimetypes
 
 ROOT = Path(__file__).resolve().parent
 HOST = os.getenv("HOST", "0.0.0.0")
@@ -349,13 +349,48 @@ class F1Handler(SimpleHTTPRequestHandler):
                     self._json_response(404, {"error": "Файл не найден"})
                     return
                 mime = mimetypes.guess_type(file_path.name)[0] or "application/octet-stream"
-                data = file_path.read_bytes()
-                self.send_response(200)
+                size = file_path.stat().st_size
+                range_header = self.headers.get("Range")
+                start, end = 0, size - 1
+                status = 200
+                if range_header and range_header.startswith("bytes="):
+                    try:
+                        spec = range_header[6:].split(",", 1)[0].strip()
+                        if "-" in spec:
+                            a, b = spec.split("-", 1)
+                            if a:
+                                start = int(a)
+                                end = int(b) if b else size - 1
+                            else:
+                                length = int(b)
+                                start = max(0, size - length)
+                            end = min(end, size - 1)
+                            if start > end or start >= size:
+                                self.send_response(416)
+                                self.send_header("Content-Range", f"bytes */{size}")
+                                self.end_headers()
+                                return
+                            status = 206
+                    except ValueError:
+                        start, end, status = 0, size - 1, 200
+                length = end - start + 1
+                self.send_response(status)
                 self.send_header("Content-Type", mime)
-                self.send_header("Content-Length", str(len(data)))
+                self.send_header("Content-Length", str(length))
+                self.send_header("Accept-Ranges", "bytes")
                 self.send_header("Cache-Control", "private, max-age=300")
+                if status == 206:
+                    self.send_header("Content-Range", f"bytes {start}-{end}/{size}")
                 self.end_headers()
-                self.wfile.write(data)
+                with file_path.open("rb") as fh:
+                    fh.seek(start)
+                    remaining = length
+                    while remaining:
+                        chunk = fh.read(min(1024 * 1024, remaining))
+                        if not chunk:
+                            break
+                        self.wfile.write(chunk)
+                        remaining -= len(chunk)
             except OSError:
                 self._json_response(404, {"error": "Файл не найден"})
             return
