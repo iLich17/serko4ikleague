@@ -1,0 +1,316 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1.0">
+<title>F1 League — Season 2</title>
+<style>
+*{box-sizing:border-box;margin:0;padding:0}body{font-family:Arial,Helvetica,sans-serif;background:#07070a;color:#fff}header{position:sticky;top:0;z-index:100;background:#101014;border-bottom:1px solid #292930;padding:15px 4vw;display:flex;align-items:center;gap:42px}.logo{font-size:25px;font-weight:950;white-space:nowrap;cursor:pointer}.logo span,.red{color:#e10600}nav{display:flex;gap:6px;overflow-x:auto}nav button{border:0;background:transparent;color:#9999a2;padding:11px 15px;border-radius:7px;font-weight:800;cursor:pointer;white-space:nowrap}nav button:hover{background:#1c1c22;color:#fff}nav button.active{background:#e10600;color:#fff}main{max-width:1500px;margin:auto;padding:42px 4vw}.page{display:none}.page.active{display:block;animation:fade .22s ease}@keyframes fade{from{opacity:0;transform:translateY(7px)}to{opacity:1;transform:none}}h1{font-size:44px;line-height:1;margin-bottom:9px}.sub{color:#85858d;margin-bottom:30px}.hero{padding:50px;border-radius:18px;background:linear-gradient(110deg,#1d1d23,#0c0c10);border:1px solid #292930;margin-bottom:25px}.hero h2{font-size:48px;margin:10px 0}.hero p{color:#aaa;max-width:700px;line-height:1.6}.stats{display:grid;grid-template-columns:repeat(4,1fr);gap:15px}.stat{background:#15151a;border:1px solid #292930;border-radius:14px;padding:22px}.stat small{color:#777;text-transform:uppercase}.stat b{display:block;font-size:30px;margin-top:8px}.team-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:20px}.team-card{position:relative;overflow:hidden;border-radius:17px;border:1px solid #292930;background:#15151a;transition:.22s;box-shadow:0 10px 30px #0004;cursor:pointer;min-height:130px}.team-card:hover{transform:translateY(-5px);border-color:#777}.team-card img{width:100%;height:auto;display:block;opacity:.8}.score{position:absolute;right:14px;bottom:13px;background:#09090ccc;border:1px solid #ffffff22;border-radius:8px;padding:7px 11px;text-align:right;backdrop-filter:blur(5px)}.score small{display:block;font-size:9px;color:#aaa;text-transform:uppercase}.score b{font-size:19px}.team-header{position:relative;overflow:hidden;min-height:190px;display:flex;align-items:flex-end;padding:35px;border-radius:18px;background:linear-gradient(90deg,#15151a 0%,#101014cc 55%,#10101400 100%),#15151a;border:1px solid #292930;margin-bottom:30px}.team-header h2{font-size:48px;margin-bottom:8px}.team-header p{color:#999}.back-button{border:0;background:#25252b;color:#fff;padding:9px 14px;border-radius:7px;cursor:pointer;font-weight:700;margin-bottom:20px}.back-button:hover{background:#e10600}.section-title{font-size:28px;margin:35px 0 18px}.driver-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:18px}.driver-card{background:#15151a;border:1px solid #292930;border-radius:15px;padding:20px;min-height:120px}.driver-name{font-size:22px;font-weight:900}.driver-team{color:#999;margin-top:6px}.table-wrap{overflow:auto;background:#15151a;border:1px solid #292930;border-radius:14px}table{width:100%;border-collapse:collapse}th,td{padding:15px 18px;border-bottom:1px solid #292930;text-align:left}th{font-size:11px;color:#777;text-transform:uppercase}tr:last-child td{border:0}.position{font-weight:900}.status-dns{color:#777;font-weight:900}.status-dnf,.status-dsq{color:#e10600;font-weight:900}.filterbar{display:flex;gap:10px;flex-wrap:wrap;margin-bottom:18px}.filterbar button{border:1px solid #292930;background:#15151a;color:#aaa;padding:9px 12px;border-radius:8px;cursor:pointer}.filterbar button.active{background:#e10600;color:#fff;border-color:#e10600}.muted{color:#777}.race-title{font-weight:900}.badge{display:inline-block;margin-left:8px;padding:3px 7px;border-radius:6px;background:#25252b;color:#aaa;font-size:10px;text-transform:uppercase}.leader{font-size:14px;color:#aaa;margin-bottom:22px}footer{text-align:center;color:#606069;border-top:1px solid #292930;padding:28px;margin-top:30px}@media(max-width:850px){header{flex-direction:column;align-items:flex-start;gap:12px}.team-grid{grid-template-columns:1fr}.stats{grid-template-columns:repeat(2,1fr)}.driver-grid{grid-template-columns:repeat(2,1fr)}h1{font-size:36px}.hero h2,.team-header h2{font-size:36px}}@media(max-width:520px){main{padding:28px 16px}.stats,.team-grid,.driver-grid{grid-template-columns:1fr}.team-header{padding:22px}.team-header h2{font-size:32px}}
+</style></head>
+<body>
+<header><div class="logo" onclick="showPage('home')">F1<span>LEAGUE</span></div><nav>
+<button class="active" data-page="home">Главная</button><button data-page="teams">Команды</button><button data-page="drivers">Пилоты</button><button data-page="results">Результаты гонок</button><button data-page="calendar">Календарь</button><button data-page="championship">Чемпионат</button><button data-page="urgent-news">Новости</button>
+</nav><div id="accountBox" style="margin-left:auto;display:flex;align-items:center;gap:8px;font-size:12px;color:#aaa"><span id="accountNick"></span><button id="accountLogout" style="border:1px solid #292930;background:#15151a;color:#fff;border-radius:8px;padding:8px 10px;cursor:pointer;font-weight:800">Выйти</button></div></header>
+<main>
+<section id="home" class="page active"><div class="hero"><div class="red">F1 LEAGUE • SEASON 2</div><h2>Реальные данные твоего чемпионата</h2><p>Все страницы сайта строятся из одного results.json: результаты, пилоты, команды, очки и чемпионат больше не расходятся между собой.</p></div><div class="stats"><div class="stat"><small>Сессий</small><b id="stat-races">—</b></div><div class="stat"><small>Команд</small><b id="stat-teams">—</b></div><div class="stat"><small>Пилотов</small><b id="stat-drivers">—</b></div><div class="stat"><small>Лидер</small><b id="stat-leader">—</b></div></div></section>
+<section id="teams" class="page"><h1>Команды</h1><p class="sub">Очки и состав автоматически рассчитаны из результатов.</p><div id="team-grid" class="team-grid"></div></section>
+<section id="team-page" class="page"><button class="back-button" onclick="showPage('teams')">← Все команды</button><div class="team-header"><div><div class="red" id="team-country">F1 TEAM</div><h2 id="team-title">—</h2><p id="team-description">—</p></div></div><h2 class="section-title">Пилоты</h2><div id="team-drivers" class="driver-grid"></div><h2 class="section-title">Результаты команды</h2><div class="table-wrap"><table><thead><tr><th>Этап</th><th>Гран-при</th><th>Сессия</th><th>Пилот</th><th>Позиция</th><th>Очки</th></tr></thead><tbody id="team-results"></tbody></table></div></section>
+<section id="drivers" class="page"><h1>Пилоты</h1><p class="sub">Личный зачёт, рассчитанный непосредственно из results.json.</p><div class="table-wrap"><table><thead><tr><th>Поз.</th><th>Пилот</th><th>Команда</th><th>Победы</th><th>Подиумы</th><th>Очки</th></tr></thead><tbody id="drivers-body"></tbody></table></div></section>
+<section id="results" class="page"><h1>Результаты гонок</h1><p class="sub">Все доступные этапы и спринты.</p><div id="race-filters" class="filterbar"></div><div id="results-list"></div></section>
+<section id="calendar" class="page"><h1>Календарь</h1><p class="sub">Этапы, для которых предоставлены результаты.</p><div class="table-wrap"><table><thead><tr><th>Этап</th><th>Гран-при</th><th>Формат</th><th>Участников</th></tr></thead><tbody id="calendar-body"></tbody></table></div></section>
+<section id="championship" class="page"><h1>Чемпионат</h1><p class="sub">Текущее положение в личном зачёте.</p><div class="leader" id="championship-note"></div><div class="table-wrap"><table><thead><tr><th>Поз.</th><th>Пилот</th><th>Команда</th><th>Победы</th><th>Подиумы</th><th>Очки</th><th>Отставание</th></tr></thead><tbody id="championship-body"></tbody></table></div></section>
+
+
+<script>
+window.URGENT_NEWS = [
+  {id:1,date:"2026-09-01",time:"18:30",title:"Срочные новости",text:"Следите за последними обновлениями F1 League.",tag:"F1 LEAGUE",images:[]}
+];
+</script>
+
+<script>
+const EMBEDDED_RESULTS = {"races":[{"round":1,"grandPrix":"Австралия","session":"race","results":[{"driver":"Zayats Burmaldayats","team":"Haas","position":1,"points":25,"gap":"GAP"},{"driver":"Sam Baker","team":"Williams","position":2,"points":18,"gap":"+5.291"},{"driver":"Sergey Nabokov","team":"Ferrari","position":3,"points":15,"gap":"+20.895"},{"driver":"Antonio Londyx","team":"Alpine","position":4,"points":12,"gap":"+25.864"},{"driver":"Bogdan Strolov","team":"Williams","position":5,"points":10,"gap":"+35.600"},{"driver":"Banana Leclerc","team":"Aston Martin","position":6,"points":8,"gap":"+39.333"},{"driver":"Oscar Piastri","team":"McLaren","position":7,"points":6,"gap":"+49.920"},{"driver":"Yan Morel","team":"Alpine","position":8,"points":4,"gap":"+1.08.346"},{"driver":"Steven Lindbald","team":"Red Bull Racing","position":9,"points":2,"gap":"+1.16.811"},{"driver":"Wang Kim","team":"McLaren","position":10,"points":1,"gap":"+2 Laps"}]},{"round":2,"grandPrix":"Китай","session":"sprint","results":[{"driver":"Jorginho Ferreira","team":"Haas","position":1,"points":8,"gap":"GAP"},{"driver":"Sam Baker","team":"Williams","position":2,"points":7,"gap":"+1.477"},{"driver":"Bogdan Strolov","team":"Williams","position":3,"points":6,"gap":"+6.304"},{"driver":"Banana Leclerc","team":"Aston Martin","position":4,"points":5,"gap":"+7.138"},{"driver":"Sergey Nabokov","team":"Ferrari","position":5,"points":4,"gap":"+31.433"},{"driver":"Mark Freynem","team":"Aston Martin","position":6,"points":3,"gap":"+37.031"},{"driver":"Steven Lindbald","team":"Red Bull Racing","position":7,"points":2,"gap":"+45.747"},{"driver":"Antonio Londyx","team":"Alpine","position":8,"points":1,"gap":"+47.272"},{"driver":"Zayats Burmaldayats","team":"Haas","position":9,"points":0,"gap":"+49.579"},{"driver":"Bruno Guimaraes","team":"Ferrari","position":10,"points":0,"gap":"+1.04.325"},{"driver":"Yan Morel","team":"Alpine","position":11,"points":0,"gap":"+1.42.763"}]},{"round":3,"grandPrix":"Китай","session":"race","results":[{"driver":"Sam Baker","team":"Williams","position":1,"points":25,"gap":"GAP"},{"driver":"Jorginho Ferreira","team":"Haas","position":2,"points":18,"gap":"+4.086"},{"driver":"Vova Scott","team":"Kick Sauber","position":3,"points":15,"gap":"+4.324"},{"driver":"Bruno Guimaraes","team":"Ferrari","position":4,"points":12,"gap":"+10.357"},{"driver":"Antonio Londyx","team":"Alpine","position":5,"points":10,"gap":"+12.863"},{"driver":"Max Raze","team":"Mercedes","position":6,"points":8,"gap":"+12.881"},{"driver":"Banana Leclerc","team":"Aston Martin","position":7,"points":6,"gap":"+20.116"},{"driver":"Oscar Piastri","team":"McLaren","position":8,"points":4,"gap":"+22.876"},{"driver":"Sergey Nabokov","team":"Ferrari","position":9,"points":2,"gap":"+29.181"},{"driver":"Bogdan Strolov","team":"Williams","position":10,"points":1,"gap":"+2.21.421"},{"driver":"Wang Kim","team":"McLaren","position":11,"points":0,"gap":"+2.21.846"},{"driver":"Timur Zaripov","team":"Visa Cash App RB","position":"DNF","points":0,"gap":"DNF"}]},{"round":4,"grandPrix":"Япония","session":"race","results":[{"driver":"Jorginho Ferreira","team":"Haas","position":1,"points":25,"gap":"GAP"},{"driver":"Zayats Burmaldayats","team":"Haas","position":2,"points":18,"gap":"+15.442"},{"driver":"Sam Baker","team":"Williams","position":3,"points":15,"gap":"+23.366"},{"driver":"Banana Leclerc","team":"Aston Martin","position":4,"points":12,"gap":"+26.462"},{"driver":"Sergey Nabokov","team":"Ferrari","position":5,"points":10,"gap":"+31.099"},{"driver":"Timur Zaripov","team":"Visa Cash App RB","position":6,"points":8,"gap":"+40.700"},{"driver":"Antonio Londyx","team":"Alpine","position":7,"points":6,"gap":"+53.842"},{"driver":"Shishka Hamilton","team":"Visa Cash App RB","position":8,"points":4,"gap":"+59.122"},{"driver":"Bruno Guimaraes","team":"Ferrari","position":9,"points":2,"gap":"+1 Lap"},{"driver":"Hasan Tigiev","team":"Red Bull Racing","position":10,"points":1,"gap":"+1 Lap"},{"driver":"Yan Morel","team":"Alpine","position":11,"points":0,"gap":"+1 Lap"},{"driver":"Oscar Piastri","team":"McLaren","position":12,"points":0,"gap":"+1 Lap"},{"driver":"Wang Kim","team":"McLaren","position":13,"points":0,"gap":"+2 Laps"},{"driver":"Mark Freynem","team":"Aston Martin","position":"DNF","points":0,"gap":"DNF"}]},{"round":5,"grandPrix":"Бахрейн","session":"race","results":[{"driver":"Jorginho Ferreira","team":"Haas","position":1,"points":25,"gap":"GAP"},{"driver":"Banana Leclerc","team":"Aston Martin","position":2,"points":18,"gap":"+3.746"},{"driver":"Antonio Londyx","team":"Alpine","position":3,"points":15,"gap":"+10.875"},{"driver":"Sergey Nabokov","team":"Ferrari","position":4,"points":12,"gap":"+19.360"},{"driver":"Sam Baker","team":"Williams","position":5,"points":10,"gap":"+44.059"},{"driver":"Bogdan Strolov","team":"Williams","position":6,"points":8,"gap":"+46.351"},{"driver":"Yan Morel","team":"Alpine","position":7,"points":6,"gap":"+47.825"},{"driver":"Esteban Ocon","team":"Red Bull Racing","position":8,"points":4,"gap":"+48.323"},{"driver":"Wang Kim","team":"McLaren","position":9,"points":2,"gap":"+1.42.681"},{"driver":"Bruno Guimaraes","team":"Ferrari","position":10,"points":1,"gap":"+1.45.279"},{"driver":"Cristiano Ronaldo","team":"Haas","position":"DNF","points":0,"gap":"DNF"},{"driver":"Vova Scott","team":"Kick Sauber","position":"DNF","points":0,"gap":"DNF"},{"driver":"Timur Zaripov","team":"Visa Cash App RB","position":"DNF","points":0,"gap":"DNF"},{"driver":"Oscar Piastri","team":"McLaren","position":"DNF","points":0,"gap":"DNF"},{"driver":"Mark Freynem","team":"Aston Martin","position":"DNF","points":0,"gap":"DNF"},{"driver":"Ayrton Senna","team":"Mercedes","position":"DSQ","points":0,"gap":"DSQ"}]},{"round":6,"grandPrix":"Майами","session":"race","results":[{"driver":"Sam Baker","team":"Williams","position":1,"points":25,"gap":"GAP"},{"driver":"Antonio Londyx","team":"Alpine","position":2,"points":18,"gap":"+1.912"},{"driver":"Bogdan Strolov","team":"Williams","position":3,"points":15,"gap":"+8.372"},{"driver":"Banana Leclerc","team":"Aston Martin","position":4,"points":12,"gap":"+9.450"},{"driver":"Sergey Nabokov","team":"Ferrari","position":5,"points":10,"gap":"+31.459"},{"driver":"Lewis Hamilton","team":"Visa Cash App RB","position":6,"points":8,"gap":"+35.397"},{"driver":"Vova Scott","team":"Kick Sauber","position":7,"points":6,"gap":"+39.578"},{"driver":"Wang Kim","team":"McLaren","position":8,"points":4,"gap":"+48.262"},{"driver":"Cristiano Ronaldo","team":"Kick Sauber","position":9,"points":2,"gap":"+1.04.934"},{"driver":"Yan Morel","team":"Alpine","position":10,"points":1,"gap":"+1.10.835"},{"driver":"Bruno Guimaraes","team":"Ferrari","position":11,"points":0,"gap":"+1.20.808"},{"driver":"Timur Zaripov","team":"Visa Cash App RB","position":12,"points":0,"gap":"+1.31.090"},{"driver":"Dmitry Shelepa","team":"Aston Martin","position":"DNF","points":0,"gap":"DNF"},{"driver":"Hasan Tigiev","team":"Red Bull Racing","position":"DNF","points":0,"gap":"DNF"},{"driver":"Esteban Ocon","team":"Red Bull Racing","position":"DNF","points":0,"gap":"DNF"}]},{"round":7,"grandPrix":"Канада","session":"sprint","results":[{"driver":"Jorginho Ferreira","team":"Haas","position":1,"points":8,"gap":"GAP"},{"driver":"Sam Baker","team":"Williams","position":2,"points":7,"gap":"+15.883"},{"driver":"Mark Freynem","team":"Aston Martin","position":3,"points":6,"gap":"+19.691"},{"driver":"Antonio Londyx","team":"Alpine","position":4,"points":5,"gap":"+25.066"},{"driver":"Timur Zaripov","team":"Visa Cash App RB","position":5,"points":4,"gap":"+31.240"},{"driver":"Zayats Burmaldayats","team":"Haas","position":6,"points":3,"gap":"+40.660"},{"driver":"Esteban Ocon","team":"Kick Sauber","position":7,"points":2,"gap":"+46.853"},{"driver":"Rock Johnson","team":"Alpine","position":8,"points":1,"gap":"+57.108"},{"driver":"Bruno Guimaraes","team":"Ferrari","position":9,"points":0,"gap":"+1.23.423"},{"driver":"Bogdan Strolov","team":"Williams","position":10,"points":0,"gap":"+1 Lap"},{"driver":"Cristiano Ronaldo","team":"Haas","position":"DNF","points":0,"gap":"DNF"},{"driver":"Sergey Nabokov","team":"Ferrari","position":"DNF","points":0,"gap":"DNF"},{"driver":"Banana Leclerc","team":"Aston Martin","position":"DNF","points":0,"gap":"DNF"}]},{"round":8,"grandPrix":"Канада","session":"race","results":[{"driver":"Zayats Burmaldayats","team":"Haas","position":1,"points":25,"gap":"GAP"},{"driver":"Sam Baker","team":"Williams","position":2,"points":18,"gap":"+0.050"},{"driver":"Sergey Nabokov","team":"Ferrari","position":3,"points":15,"gap":"+10.526"},{"driver":"Jorginho Ferreira","team":"Haas","position":4,"points":12,"gap":"+14.111"},{"driver":"Antonio Londyx","team":"Alpine","position":5,"points":10,"gap":"+16.874"},{"driver":"Banana Leclerc","team":"Aston Martin","position":6,"points":8,"gap":"+21.256"},{"driver":"Vova Scott","team":"Kick Sauber","position":7,"points":6,"gap":"+35.005"},{"driver":"Lewis Hamilton","team":"Visa Cash App RB","position":8,"points":4,"gap":"+35.388"},{"driver":"Yan Morel","team":"Alpine","position":9,"points":2,"gap":"No Time - Dohuya Shtrafov"},{"driver":"Timur Zaripov","team":"Visa Cash App RB","position":"DNF","points":0,"gap":"DNF"},{"driver":"Mark Freynem","team":"Aston Martin","position":"DNF","points":0,"gap":"DNF"},{"driver":"Oscar Piastri","team":"McLaren","position":"DNF","points":0,"gap":"DNF"},{"driver":"Max Raze","team":"Mercedes","position":"DNF","points":0,"gap":"DNF"},{"driver":"Bruno Guimaraes","team":"Ferrari","position":"DNF","points":0,"gap":"DNF"}]},{"round":9,"grandPrix":"Эмилия-Романья","session":"race","results":[{"driver":"Lewis Hamilton","team":"Visa Cash App RB","position":1,"points":25,"gap":"GAP"},{"driver":"Jorginho Ferreira","team":"Haas","position":2,"points":18,"gap":"+5.542"},{"driver":"Sam Baker","team":"Williams","position":3,"points":15,"gap":"+6.101"},{"driver":"Antonio Londyx","team":"Alpine","position":4,"points":12,"gap":"+6.524"},{"driver":"Mark Freynem","team":"Aston Martin","position":5,"points":10,"gap":"+6.912"},{"driver":"Ayrton Senna","team":"Mercedes","position":6,"points":8,"gap":"+7.093"},{"driver":"Timur Zaripov","team":"Visa Cash App RB","position":7,"points":6,"gap":"+8.009"},{"driver":"Vova Scott","team":"Kick Sauber","position":8,"points":4,"gap":"+22.843"},{"driver":"Bruno Guimaraes","team":"Ferrari","position":9,"points":2,"gap":"+30.784"},{"driver":"Bogdan Strolov","team":"Williams","position":10,"points":1,"gap":"+36.092"},{"driver":"Alexander Frame","team":"Ferrari","position":11,"points":0,"gap":"+1.01.074"},{"driver":"Zayats Burmaldayats","team":"Haas","position":12,"points":0,"gap":"+1 Lap"},{"driver":"Steven Lindbald","team":"Red Bull Racing","position":13,"points":0,"gap":"+4 Laps"},{"driver":"Max Raze","team":"Mercedes","position":"DNF","points":0,"gap":"DNF"},{"driver":"Banana Leclerc","team":"Aston Martin","position":"DNF","points":0,"gap":"DNF"},{"driver":"Wang Kim","team":"McLaren","position":"DNF","points":0,"gap":"DNF"}]},{"round":10,"grandPrix":"Монако","session":"race","results":[{"driver":"Jorginho Ferreira","team":"Haas","position":1,"points":25,"gap":"GAP"},{"driver":"Timur Zaripov","team":"Visa Cash App RB","position":2,"points":18,"gap":"+23.950"},{"driver":"Zayats Burmaldayats","team":"Haas","position":3,"points":15,"gap":"+27.728"},{"driver":"Banana Leclerc","team":"Aston Martin","position":4,"points":12,"gap":"+44.942"},{"driver":"Sam Baker","team":"Williams","position":5,"points":10,"gap":"+46.318"},{"driver":"Vova Scott","team":"Kick Sauber","position":6,"points":8,"gap":"+47.750"},{"driver":"Steven Lindbald","team":"Red Bull Racing","position":7,"points":6,"gap":"+1 lap"},{"driver":"Alexander Frame","team":"Ferrari","position":8,"points":4,"gap":"+2 laps"},{"driver":"Oscar Piastri","team":"McLaren","position":9,"points":2,"gap":"+2 laps"},{"driver":"Yan Morel","team":"Alpine","position":"DNF","points":0,"gap":"DNF"},{"driver":"Bruno Guimaraes","team":"Ferrari","position":"DNF","points":0,"gap":"DNF"},{"driver":"Mark Freynem","team":"Aston Martin","position":"DNF","points":0,"gap":"DNF"},{"driver":"Gleb Becker","team":"Williams","position":"DNF","points":0,"gap":"DNF"},{"driver":"Ayrton Senna","team":"Mercedes","position":"DNF","points":0,"gap":"DNF"}]},{"round":11,"grandPrix":"Барселона","session":"race","results":[{"driver":"Jorginho Ferreira","team":"Haas","position":1,"points":25,"gap":"GAP"},{"driver":"Gleb Becker","team":"Williams","position":2,"points":18,"gap":"+7.301"},{"driver":"Banana Leclerc","team":"Aston Martin","position":3,"points":15,"gap":"+8.832"},{"driver":"Sergey Nabokov","team":"Ferrari","position":4,"points":12,"gap":"+12.264"},{"driver":"Rock Johnson","team":"Alpine","position":5,"points":10,"gap":"+13.612"},{"driver":"Ayrton Senna","team":"Mercedes","position":6,"points":8,"gap":"+14.214"},{"driver":"Zayats Burmaldayats","team":"Haas","position":7,"points":6,"gap":"+15.644"},{"driver":"Steven Lindbald","team":"Red Bull Racing","position":8,"points":4,"gap":"+17.946"},{"driver":"Vova Scott","team":"Kick Sauber","position":9,"points":2,"gap":"+19.996"},{"driver":"Yan Morel","team":"Alpine","position":10,"points":1,"gap":"+21.081"},{"driver":"Max Raze","team":"Mercedes","position":11,"points":0,"gap":"+34.470"},{"driver":"Esteban Ocon","team":"Kick Sauber","position":12,"points":0,"gap":"+35.730"},{"driver":"Sam Baker","team":"Williams","position":13,"points":0,"gap":"+36.986"},{"driver":"Bruno Guimaraes","team":"Ferrari","position":14,"points":0,"gap":"+49.358"},{"driver":"Wang Kim","team":"McLaren","position":15,"points":0,"gap":"+1:18.914"},{"driver":"Oscar Piastri","team":"McLaren","position":"DNF","points":0,"gap":"DNF"},{"driver":"Lewis Hamilton","team":"Visa Cash App RB","position":"DNF","points":0,"gap":"DNF"},{"driver":"Timur Zaripov","team":"Visa Cash App RB","position":"DNF","points":0,"gap":"DNF"}]},{"round":12,"grandPrix":"Австрия","session":"race","results":[{"driver":"Sam Baker","team":"Williams","position":1,"points":25,"gap":"GAP"},{"driver":"Jorginho Ferreira","team":"Haas","position":2,"points":18,"gap":"+1.324"},{"driver":"Alexander Frame","team":"Red Bull Racing","position":3,"points":15,"gap":"+1.561"},{"driver":"Vova Scott","team":"Kick Sauber","position":4,"points":12,"gap":"+2.104"},{"driver":"Timur Zaripov","team":"Visa Cash App RB","position":5,"points":10,"gap":"+5.690"},{"driver":"Ayrton Senna","team":"Mercedes","position":6,"points":8,"gap":"+6.835"},{"driver":"Sergey Nabokov","team":"Ferrari","position":7,"points":6,"gap":"+7.300"},{"driver":"Lewis Hamilton","team":"Visa Cash App RB","position":8,"points":4,"gap":"+13.062"},{"driver":"Gleb Becker","team":"Williams","position":9,"points":2,"gap":"+1 Lap"},{"driver":"Max Raze","team":"Mercedes","position":10,"points":1,"gap":"+1 Lap"},{"driver":"Yan Morel","team":"Alpine","position":11,"points":0,"gap":"+1 Lap"},{"driver":"Antonio Londyx","team":"Alpine","position":"DNF","points":0,"gap":"DNF"},{"driver":"Zayats Burmaldayats","team":"Haas","position":"DNF","points":0,"gap":"DNF"},{"driver":"Mark Freynem","team":"Aston Martin","position":"DNF","points":0,"gap":"DNF"},{"driver":"Oscar Piastri","team":"McLaren","position":"DNF","points":0,"gap":"DNF"},{"driver":"Esteban Ocon","team":"Kick Sauber","position":"DNF","points":0,"gap":"DNF"},{"driver":"Bruno Guimaraes","team":"Ferrari","position":"DNS","points":0,"gap":"DNS"}]},{"round":13,"grandPrix":"Великобритания","session":"race","results":[{"driver":"Gleb Becker","team":"Williams","position":1,"points":25,"gap":"GAP"},{"driver":"Sam Baker","team":"Williams","position":2,"points":18,"gap":"+2.344"},{"driver":"Jorginho Ferreira","team":"Haas","position":3,"points":15,"gap":"+9.257"},{"driver":"Sergey Nabokov","team":"Ferrari","position":4,"points":12,"gap":"+14.761"},{"driver":"Antonio Londyx","team":"Alpine","position":5,"points":10,"gap":"+15.459"},{"driver":"Dmitry Shelepa","team":"Aston Martin","position":6,"points":8,"gap":"+19.551"},{"driver":"Lewis Hamilton","team":"Visa Cash App RB","position":7,"points":6,"gap":"+46.468"},{"driver":"Oscar Piastri","team":"McLaren","position":8,"points":4,"gap":"+1 Lap"},{"driver":"Shishka Hamilton","team":"Haas","position":9,"points":2,"gap":"+1 Lap"},{"driver":"Toni Martinez","team":"Ferrari","position":10,"points":1,"gap":"+2 Laps"},{"driver":"Esteban Ocon","team":"Kick Sauber","position":11,"points":0,"gap":"+2 Laps"},{"driver":"Nikita Sprite","team":"Red Bull Racing","position":12,"points":0,"gap":"+2 Laps"},{"driver":"Mark Freynem","team":"Aston Martin","position":"DNF","points":0,"gap":"DNF"},{"driver":"Vova Scott","team":"Kick Sauber","position":"DNF","points":0,"gap":"DNF"}]},{"round":14,"grandPrix":"Бельгия","session":"sprint","results":[{"driver":"Sam Baker","team":"Williams","position":1,"points":8,"gap":"GAP"},{"driver":"Gleb Becker","team":"Williams","position":2,"points":7,"gap":"+0.472"},{"driver":"Jorginho Ferreira","team":"Haas","position":3,"points":6,"gap":"+1.384"},{"driver":"Sergey Nabokov","team":"Ferrari","position":4,"points":5,"gap":"+8.561"},{"driver":"Dmitry Shelepa","team":"Aston Martin","position":5,"points":4,"gap":"+16.565"},{"driver":"Timur Zaripov","team":"Visa Cash App RB","position":6,"points":3,"gap":"+22.475"},{"driver":"Ayrton Senna","team":"Mercedes","position":7,"points":2,"gap":"+23.400"},{"driver":"Nikita Sprite","team":"Red Bull Racing","position":8,"points":1,"gap":"+33.747"},{"driver":"Antonio Londyx","team":"Alpine","position":9,"points":0,"gap":"+39.884"},{"driver":"Toni Martinez","team":"Ferrari","position":10,"points":0,"gap":"+45.372"},{"driver":"Oscar Piastri","team":"McLaren","position":11,"points":0,"gap":"+58.348"},{"driver":"Mark Freynem","team":"Aston Martin","position":"DNF","points":0,"gap":"DNF"}]},{"round":15,"grandPrix":"Бельгия","session":"race","results":[{"driver":"Gleb Becker","team":"Williams","position":1,"points":25,"gap":"GAP"},{"driver":"Mark Freynem","team":"Aston Martin","position":2,"points":18,"gap":"+6.494"},{"driver":"Rock Johnson","team":"Alpine","position":3,"points":15,"gap":"+10.631"},{"driver":"Jorginho Ferreira","team":"Haas","position":4,"points":12,"gap":"+12.314"},{"driver":"Sergey Nabokov","team":"Ferrari","position":5,"points":10,"gap":"+12.527"},{"driver":"Sam Baker","team":"Williams","position":6,"points":8,"gap":"+13.723"},{"driver":"Antonio Londyx","team":"Alpine","position":7,"points":6,"gap":"+14.809"},{"driver":"Toni Martinez","team":"Red Bull Racing","position":8,"points":4,"gap":"+22.536"},{"driver":"Vova Scott","team":"Kick Sauber","position":9,"points":2,"gap":"+27.689"},{"driver":"Bogdan Strolov","team":"McLaren","position":10,"points":1,"gap":"+29.519"},{"driver":"Oscar Piastri","team":"McLaren","position":11,"points":0,"gap":"+29.943"},{"driver":"Max Raze","team":"Mercedes","position":12,"points":0,"gap":"+37.122"},{"driver":"Alexander Frame","team":"Kick Sauber","position":13,"points":0,"gap":"+45.531"},{"driver":"Timur Zaripov","team":"Visa Cash App RB","position":14,"points":0,"gap":"+1 Lap"},{"driver":"Dmitry Shelepa","team":"Aston Martin","position":15,"points":0,"gap":"+1 Lap"},{"driver":"Nikita Sprite","team":"Red Bull Racing","position":"DNF","points":0,"gap":"DNF"},{"driver":"Bruno Guimaraes","team":"Ferrari","position":"DNF","points":0,"gap":"DNF"}]}]};
+let raceData=null, stats=null;
+const teamMeta={
+ 'McLaren':['F1 TEAM • UNITED KINGDOM','McLaren Formula 1 Team','assets/mclaren.png'],
+ 'Ferrari':['F1 TEAM • ITALY','Scuderia Ferrari','assets/ferrari.png'],
+ 'Mercedes':['F1 TEAM • GERMANY','Mercedes-AMG Petronas Formula 1 Team','assets/mercedes.png'],
+ 'Red Bull Racing':['F1 TEAM • AUSTRIA','Oracle Red Bull Racing','assets/red-bull.png'],
+ 'Aston Martin':['F1 TEAM • UNITED KINGDOM','Aston Martin Aramco Formula 1 Team','assets/aston-martin.png'],
+ 'Williams':['F1 TEAM • UNITED KINGDOM','Williams Racing','assets/williams.png'],
+ 'Haas':['F1 TEAM • USA','MoneyGram Haas F1 Team','assets/haas.png'],
+ 'Alpine':['F1 TEAM • FRANCE','BWT Alpine F1 Team','assets/alpine.png'],
+ 'Visa Cash App RB':['F1 TEAM • ITALY','Visa Cash App Racing Bulls','assets/visa-rb.png'],
+ 'Kick Sauber':['F1 TEAM • SWITZERLAND','Stake F1 Team Kick Sauber','assets/sauber.png']
+};
+const buttons=document.querySelectorAll('nav button'),pages=document.querySelectorAll('.page');
+function showPage(id){const target=document.getElementById(id);if(!target)return;document.querySelectorAll('.page').forEach(p=>p.classList.toggle('active',p.id===id));document.querySelectorAll('nav button').forEach(b=>b.classList.toggle('active',b.dataset.page===id));window.scrollTo({top:0,behavior:'smooth'});if(id==='results'&&raceData)renderResults();if(id==='urgent-news'&&window.loadUrgentNews)window.loadUrgentNews();}
+buttons.forEach(b=>b.addEventListener('click',()=>showPage(b.dataset.page)));
+function esc(v){return String(v??'').replace(/[&<>"']/g,m=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[m]));}
+function sessionName(s){return s==='sprint'?'Спринт':'Гран-при'}
+function positionClass(p){return p==='DNF'?'status-dnf':p==='DNS'?'status-dns':p==='DSQ'?'status-dsq':''}
+function calc(){
+ const drivers={};const teams={};
+ raceData.races.forEach(r=>r.results.forEach(x=>{
+  if(!drivers[x.driver])drivers[x.driver]={name:x.driver,team:x.team,points:0,wins:0,podiums:0};
+  drivers[x.driver].points+=Number(x.points)||0;if(x.position===1)drivers[x.driver].wins++;if(typeof x.position==='number'&&x.position<=3)drivers[x.driver].podiums++;
+  if(!teams[x.team])teams[x.team]={name:x.team,points:0,drivers:new Set()};teams[x.team].points+=Number(x.points)||0;teams[x.team].drivers.add(x.driver);
+ }));
+ const ds=Object.values(drivers).sort((a,b)=>b.points-a.points||a.name.localeCompare(b.name));
+ const ts=Object.values(teams).sort((a,b)=>b.points-a.points||a.name.localeCompare(b.name));
+ return {drivers:ds,teams:ts};
+}
+function renderHome(){document.getElementById('stat-races').textContent=raceData.races.length;document.getElementById('stat-teams').textContent=stats.teams.length;document.getElementById('stat-drivers').textContent=stats.drivers.length;document.getElementById('stat-leader').textContent=stats.drivers[0]?`${stats.drivers[0].points} • ${stats.drivers[0].name}`:'—';}
+function renderTeams(){const c=document.getElementById('team-grid');c.innerHTML=stats.teams.map(t=>{const m=teamMeta[t.name]||['F1 TEAM','',null];return `<article class="team-card" onclick="openTeam('${esc(t.name).replace(/'/g,"\\'")}')">${m[2]?`<img src="${m[2]}" alt="${esc(t.name)}">`:''}<div class="score"><small>Очки</small><b>${t.points}</b></div></article>`}).join('');}
+function openTeam(name){const t=stats.teams.find(x=>x.name===name);if(!t)return;const m=teamMeta[name]||['F1 TEAM','Formula 1 Team',null];document.getElementById('team-country').textContent=m[0];document.getElementById('team-title').textContent=name;document.getElementById('team-description').textContent=m[1];document.getElementById('team-drivers').innerHTML=[...t.drivers].map(d=>`<div class="driver-card"><div class="driver-name">${esc(d)}</div><div class="driver-team">${esc(name)}</div></div>`).join('');let rows=[];raceData.races.forEach(r=>r.results.forEach(x=>{if(x.team===name)rows.push({...x,round:r.round,gp:r.grandPrix,session:r.session})}));document.getElementById('team-results').innerHTML=rows.map(x=>`<tr><td class="position">${String(x.round).padStart(2,'0')}</td><td>${esc(x.gp)}</td><td>${sessionName(x.session)}</td><td>${esc(x.driver)}</td><td class="${positionClass(x.position)}">${esc(x.position)}</td><td>${x.points}</td></tr>`).join('');showPage('team-page');}
+function driverRows(){return stats.drivers.map((d,i)=>`<tr><td class="position">${i+1}</td><td>${esc(d.name)}</td><td>${esc(d.team)}</td><td>${d.wins}</td><td>${d.podiums}</td><td><b>${d.points}</b></td></tr>`).join('');}
+function renderDrivers(){
+  document.getElementById('drivers-body').innerHTML=driverRows();
+  const leaderPoints=stats.drivers[0]?stats.drivers[0].points:0;
+  document.getElementById('championship-body').innerHTML=stats.drivers.map((d,i)=>{
+    const deficit=Math.max(0,leaderPoints-d.points);
+    return `<tr><td class="position">${i+1}</td><td>${esc(d.name)}</td><td>${esc(d.team)}</td><td>${d.wins}</td><td>${d.podiums}</td><td><b>${d.points}</b></td><td>${deficit===0?'—':`−${deficit}`}</td></tr>`;
+  }).join('');
+  const l=stats.drivers[0];
+  document.getElementById('championship-note').textContent=l?`Лидер: ${l.name} — ${l.points} очков`:'Нет данных';
+}
+function renderCalendar(){document.getElementById('calendar-body').innerHTML=raceData.races.map(r=>`<tr><td class="position">${String(r.round).padStart(2,'0')}</td><td>${esc(r.grandPrix)}</td><td>${sessionName(r.session)}</td><td>${r.results.length}</td></tr>`).join('');}
+function renderResults(filter='all'){const f=document.getElementById('race-filters');if(!f.dataset.ready){f.innerHTML='<button class="active" data-filter="all">Все</button><button data-filter="race">Гран-при</button><button data-filter="sprint">Спринты</button>';f.addEventListener('click',e=>{if(!e.target.dataset.filter)return;f.querySelectorAll('button').forEach(b=>b.classList.toggle('active',b===e.target));renderResults(e.target.dataset.filter)});f.dataset.ready='1'}const rs=filter==='all'?raceData.races:raceData.races.filter(r=>r.session===filter);document.getElementById('results-list').innerHTML=rs.map(r=>`<div style="margin-bottom:24px"><h2 class="race-title">${String(r.round).padStart(2,'0')}. ${esc(r.grandPrix)} <span class="badge">${sessionName(r.session)}</span></h2><div class="table-wrap"><table><thead><tr><th>Поз.</th><th>Пилот</th><th>Команда</th><th>Время / отставание</th><th>Очки</th></tr></thead><tbody>${r.results.map(x=>`<tr><td class="position ${positionClass(x.position)}">${esc(x.position)}</td><td>${esc(x.driver)}</td><td>${esc(x.team)}</td><td>${esc(x.gap)}</td><td>${x.points}</td></tr>`).join('')}</tbody></table></div></div>`).join('');}
+async function loadResults(){try{const response=await fetch('results.json',{cache:'no-store'});if(!response.ok)throw new Error('HTTP '+response.status);raceData=await response.json();}catch(e){console.warn('results.json недоступен, используются встроенные данные:',e);raceData=EMBEDDED_RESULTS;}stats=calc();renderHome();renderTeams();renderDrivers();renderCalendar();renderResults();}
+loadResults();
+</script>
+<section id="urgent-news" class="page urgent-news-section">
+  <div class="urgent-news-header">
+    <div>
+      <div class="urgent-news-kicker"><span class="urgent-live-dot"></span> СРОЧНЫЕ НОВОСТИ</div>
+      <h2>Последние новости F1 League</h2>
+    </div>
+    <div class="urgent-news-actions"><a class="urgent-admin-link" href="/admin">Админ-панель</a></div>
+  </div>
+  
+<div class="urgent-news-form" id="urgentNewsForm">
+  <div class="urgent-news-field">
+    <label for="urgentTitle">Заголовок</label>
+    <input id="urgentTitle" type="text" maxlength="160" placeholder="Например: Состав команды на следующий этап подтверждён">
+  </div>
+  <div class="urgent-news-field">
+    <label for="urgentText">Текст</label>
+    <textarea id="urgentText" maxlength="4000" placeholder="Напиши текст срочной новости..."></textarea>
+  </div>
+  <div class="urgent-news-field">
+    <label>Фото — можно выбрать несколько</label>
+    <label class="urgent-photo-picker" for="urgentPhotos">
+      📷 Нажми, чтобы прикрепить фотографии
+      <input id="urgentPhotos" type="file" accept="image/*" multiple hidden>
+    </label>
+    <div class="urgent-photo-previews" id="urgentPhotoPreviews"></div>
+  </div>
+  <div class="urgent-form-buttons">
+    <button class="urgent-save" id="urgentSaveBtn" type="button">Опубликовать</button>
+    <button class="urgent-cancel" id="urgentCancelBtn" type="button">Отмена</button>
+  </div>
+</div>
+
+  <div id="urgentNewsList" class="urgent-news-list"></div>
+</section>
+<style>
+.urgent-news-section{margin:32px 0;padding:24px;border:1px solid rgba(255,255,255,.09);border-radius:18px;background:linear-gradient(145deg,rgba(255,255,255,.055),rgba(255,255,255,.018));box-shadow:0 14px 40px rgba(0,0,0,.18)}
+.urgent-news-header{display:flex;align-items:center;justify-content:space-between;gap:16px;margin-bottom:18px}
+.urgent-news-kicker{font-size:12px;font-weight:800;letter-spacing:.12em;color:#ff4d4d;display:flex;align-items:center;gap:8px}
+.urgent-live-dot{width:8px;height:8px;border-radius:50%;background:#ff3b30;box-shadow:0 0 12px rgba(255,59,48,.8);animation:urgentPulse 1.4s infinite}
+@keyframes urgentPulse{50%{opacity:.35;transform:scale(.75)}}
+.urgent-news-header h2{margin:6px 0 0;font-size:24px}
+.urgent-news-list{display:grid;gap:12px}
+.urgent-news-card{padding:16px 18px;border-radius:14px;background:rgba(0,0,0,.20);border:1px solid rgba(255,255,255,.07)}
+.urgent-news-meta{display:flex;gap:10px;align-items:center;margin-bottom:7px;font-size:11px;color:#9da4ad}
+.urgent-news-tag{font-weight:800;color:#ff5a52}
+.urgent-news-title{font-size:17px;font-weight:800;margin-bottom:5px}
+.urgent-news-text{font-size:14px;line-height:1.55;color:#c6cad0}
+.urgent-news-add{border:0;border-radius:10px;padding:10px 14px;cursor:pointer;background:#fff;color:#111;font-weight:800}.urgent-admin-link{display:inline-block;border:1px solid rgba(255,255,255,.12);border-radius:10px;padding:10px 14px;color:#fff;text-decoration:none;font-weight:800;background:#15151a}.urgent-admin-link:hover{background:#e10600;border-color:#e10600}.urgent-news-form{display:none!important}
+.urgent-empty{color:#9298a1;padding:10px 0}
+
+.urgent-news-actions{display:flex;gap:8px;align-items:center}
+.urgent-news-form{
+  display:none;margin-bottom:16px;padding:16px;border-radius:14px;
+  background:rgba(0,0,0,.18);border:1px solid rgba(255,255,255,.07)
+}
+.urgent-news-form.open{display:block}
+.urgent-news-field{display:grid;gap:6px;margin-bottom:12px}
+.urgent-news-field label{font-size:12px;font-weight:700;color:#aeb4bd}
+.urgent-news-field input,.urgent-news-field textarea{
+  width:100%;box-sizing:border-box;border:1px solid rgba(255,255,255,.12);
+  background:rgba(255,255,255,.045);color:inherit;border-radius:10px;
+  padding:10px 12px;font:inherit;outline:none
+}
+.urgent-news-field textarea{min-height:90px;resize:vertical}
+.urgent-photo-picker{
+  border:1px dashed rgba(255,255,255,.22);padding:14px;border-radius:10px;
+  cursor:pointer;text-align:center;color:#aeb4bd
+}
+.urgent-photo-picker:hover{background:rgba(255,255,255,.04)}
+.urgent-photo-previews{display:flex;flex-wrap:wrap;gap:8px;margin-top:10px}
+.urgent-photo-thumb{width:86px;height:70px;object-fit:cover;border-radius:8px;border:1px solid rgba(255,255,255,.1)}
+.urgent-form-buttons{display:flex;gap:8px}
+.urgent-form-buttons button{border:0;border-radius:9px;padding:9px 13px;cursor:pointer;font-weight:800}
+.urgent-save{background:#fff;color:#111}.urgent-cancel{background:rgba(255,255,255,.08);color:#fff}
+.urgent-news-images{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:8px;margin-top:12px}
+.urgent-news-images img{width:100%;height:180px;object-fit:cover;border-radius:10px;cursor:zoom-in}
+
+@media(max-width:650px){.urgent-news-header{align-items:flex-start;flex-direction:column}}
+</style>
+<script>
+(function(){
+  const list=document.getElementById('urgentNewsList');
+  const add=document.getElementById('addUrgentNewsBtn');
+  const form=document.getElementById('urgentNewsForm');
+  const titleEl=document.getElementById('urgentTitle');
+  const textEl=document.getElementById('urgentText');
+  const photosEl=document.getElementById('urgentPhotos');
+  const previews=document.getElementById('urgentPhotoPreviews');
+  const saveBtn=document.getElementById('urgentSaveBtn');
+  const cancelBtn=document.getElementById('urgentCancelBtn');
+  if(!list)return;
+
+  let news=[];
+  let selectedImages=[];
+
+  const esc=s=>String(s??'').replace(/[&<>"']/g,c=>({
+    '&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#039;'
+  }[c]));
+
+  async function loadNews(){
+    try{
+      const response=await fetch('/api/news',{cache:'no-store'});
+      if(!response.ok)throw new Error('HTTP '+response.status);
+      const data=await response.json();
+      news=Array.isArray(data)?data:[];
+      render();
+    }catch(e){
+      console.error('Не удалось загрузить общие новости:',e);
+      news=[];
+      list.innerHTML='<div class="urgent-empty">Не удалось загрузить новости с сервера.</div>';
+    }
+  }
+
+  function render(){
+    if(!news.length){
+      list.innerHTML='<div class="urgent-empty">Срочных новостей пока нет.</div>';
+      return;
+    }
+    list.innerHTML=news.slice().sort((a,b)=>
+      (`${b.date} ${b.time||''}`).localeCompare(`${a.date} ${a.time||''}`)
+    ).map(n=>{
+      const imgs=(n.images||[]).map(src=>
+        `<img src="${esc(src)}" alt="Фото к новости" loading="lazy">`
+      ).join('');
+      return `<article class="urgent-news-card">
+        <div class="urgent-news-meta">
+          <span class="urgent-news-tag">${esc(n.tag||'СРОЧНО')}</span>
+          <span>${esc(n.date||'')}${n.time?' • '+esc(n.time):''}</span>
+        </div>
+        <div class="urgent-news-title">${esc(n.title)}</div>
+        <div class="urgent-news-text">${esc(n.text)}</div>
+        ${imgs?`<div class="urgent-news-images">${imgs}</div>`:''}
+      </article>`;
+    }).join('');
+  }
+
+  function resetForm(){
+    selectedImages=[];
+    titleEl.value='';
+    textEl.value='';
+    photosEl.value='';
+    previews.innerHTML='';
+    form.classList.remove('open');
+  }
+
+  function showPreviews(){
+    previews.innerHTML=selectedImages.map((src,i)=>
+      `<div style="position:relative"><img class="urgent-photo-thumb" src="${src}" alt="Предпросмотр ${i+1}"></div>`
+    ).join('');
+  }
+
+  function readAndCompress(file){
+    return new Promise((resolve,reject)=>{
+      const reader=new FileReader();
+      reader.onerror=reject;
+      reader.onload=()=>{
+        const img=new Image();
+        img.onload=()=>{
+          const max=1400;
+          const scale=Math.min(1,max/Math.max(img.width,img.height));
+          const c=document.createElement('canvas');
+          c.width=Math.max(1,Math.round(img.width*scale));
+          c.height=Math.max(1,Math.round(img.height*scale));
+          c.getContext('2d').drawImage(img,0,0,c.width,c.height);
+          resolve(c.toDataURL('image/jpeg',0.82));
+        };
+        img.onerror=reject;
+        img.src=reader.result;
+      };
+      reader.readAsDataURL(file);
+    });
+  }
+
+  if(add)add.onclick=()=>form.classList.add('open');
+  if(cancelBtn)cancelBtn.onclick=resetForm;
+
+  if(photosEl){
+    photosEl.addEventListener('change',async()=>{
+      selectedImages=[];
+      previews.innerHTML='<span style="font-size:12px;color:#9da4ad">Обрабатываем фото…</span>';
+      for(const file of Array.from(photosEl.files||[])){
+        if(!file.type.startsWith('image/'))continue;
+        try{selectedImages.push(await readAndCompress(file));}catch(e){}
+      }
+      showPreviews();
+    });
+  }
+
+  if(saveBtn)saveBtn.onclick=async()=>{
+    const title=titleEl.value.trim();
+    if(!title){alert('Укажи заголовок новости.');return}
+    const body=textEl.value.trim();
+    const now=new Date();
+    const item={
+      id:Date.now(),
+      date:now.toISOString().slice(0,10),
+      time:now.toTimeString().slice(0,5),
+      title,
+      text:body,
+      tag:'СРОЧНО',
+      images:selectedImages.slice()
+    };
+
+    saveBtn.disabled=true;
+    saveBtn.textContent='Публикуем…';
+    try{
+      const response=await fetch('/api/news',{
+        method:'POST',
+        headers:{'Content-Type':'application/json'},
+        body:JSON.stringify(item)
+      });
+      if(!response.ok){
+        const err=await response.json().catch(()=>({}));
+        throw new Error(err.error||('HTTP '+response.status));
+      }
+      resetForm();
+      await loadNews();
+    }catch(e){
+      alert('Не удалось опубликовать новость. Проверь, что сайт запущен через server.py. Если добавляешь фото, попробуй меньше фото.');
+    }finally{
+      saveBtn.disabled=false;
+      saveBtn.textContent='Опубликовать';
+    }
+  };
+
+  // All visitors load the same server-side news.
+  window.loadUrgentNews=loadNews;
+  loadNews();
+  // Pick up a newly published news item without requiring a manual refresh.
+  setInterval(loadNews,30000);
+})();
+</script>
+
+</main><footer>F1 LEAGUE © 2026 • Season 2</footer>
+<script>
+(async()=>{try{const r=await fetch('/api/auth/me',{cache:'no-store'});const d=await r.json();if(!d.authenticated){location.href='/auth';return}const n=document.getElementById('accountNick');if(n)n.textContent='@'+d.nick;const b=document.getElementById('accountLogout');if(b)b.onclick=async()=>{await fetch('/api/auth/logout',{method:'POST'});location.href='/auth'}}catch(e){location.href='/auth'}})();
+</script></body></html>

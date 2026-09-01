@@ -1,0 +1,4 @@
+# Замени f1league.ru на свой домен.
+f1league.ru, www.f1league.ru {
+    reverse_proxy 127.0.0.1:8080
+}
