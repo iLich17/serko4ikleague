@@ -101,238 +101,89 @@ async function loadResults(){try{const response=await fetch('results.json',{cach
 loadResults();
 </script>
 <section id="urgent-news" class="page urgent-news-section">
-  <div class="urgent-news-header">
+  <div class="news-page-head">
     <div>
-      <div class="urgent-news-kicker"><span class="urgent-live-dot"></span> СРОЧНЫЕ НОВОСТИ</div>
-      <h2>Последние новости F1 League</h2>
+      <div class="news-kicker"><span class="news-dot"></span> F1 LEAGUE · НОВОСТИ</div>
+      <h1>Новости</h1>
+      <p class="sub">Последние события и обновления чемпионата</p>
     </div>
-    <div class="urgent-news-actions"><a class="urgent-admin-link" href="/admin">Админ-панель</a></div>
   </div>
-  
-<div class="urgent-news-form" id="urgentNewsForm">
-  <div class="urgent-news-field">
-    <label for="urgentTitle">Заголовок</label>
-    <input id="urgentTitle" type="text" maxlength="160" placeholder="Например: Состав команды на следующий этап подтверждён">
-  </div>
-  <div class="urgent-news-field">
-    <label for="urgentText">Текст</label>
-    <textarea id="urgentText" maxlength="4000" placeholder="Напиши текст срочной новости..."></textarea>
-  </div>
-  <div class="urgent-news-field">
-    <label>Фото — можно выбрать несколько</label>
-    <label class="urgent-photo-picker" for="urgentPhotos">
-      📷 Нажми, чтобы прикрепить фотографии
-      <input id="urgentPhotos" type="file" accept="image/*" multiple hidden>
-    </label>
-    <div class="urgent-photo-previews" id="urgentPhotoPreviews"></div>
-  </div>
-  <div class="urgent-form-buttons">
-    <button class="urgent-save" id="urgentSaveBtn" type="button">Опубликовать</button>
-    <button class="urgent-cancel" id="urgentCancelBtn" type="button">Отмена</button>
-  </div>
-</div>
 
-  <div id="urgentNewsList" class="urgent-news-list"></div>
+  <div id="newsTitlesView">
+    <div id="urgentNewsList" class="news-title-list"></div>
+  </div>
+
+  <div id="newsArticleView" class="news-article-view" hidden>
+    <button type="button" class="news-back" id="newsBack">← Все новости</button>
+    <article id="newsArticle" class="news-article"></article>
+  </div>
 </section>
 <style>
-.urgent-news-section{margin:32px 0;padding:24px;border:1px solid rgba(255,255,255,.09);border-radius:18px;background:linear-gradient(145deg,rgba(255,255,255,.055),rgba(255,255,255,.018));box-shadow:0 14px 40px rgba(0,0,0,.18)}
-.urgent-news-header{display:flex;align-items:center;justify-content:space-between;gap:16px;margin-bottom:18px}
-.urgent-news-kicker{font-size:12px;font-weight:800;letter-spacing:.12em;color:#ff4d4d;display:flex;align-items:center;gap:8px}
-.urgent-live-dot{width:8px;height:8px;border-radius:50%;background:#ff3b30;box-shadow:0 0 12px rgba(255,59,48,.8);animation:urgentPulse 1.4s infinite}
-@keyframes urgentPulse{50%{opacity:.35;transform:scale(.75)}}
-.urgent-news-header h2{margin:6px 0 0;font-size:24px}
-.urgent-news-list{display:grid;gap:12px}
-.urgent-news-card{padding:16px 18px;border-radius:14px;background:rgba(0,0,0,.20);border:1px solid rgba(255,255,255,.07)}
-.urgent-news-meta{display:flex;gap:10px;align-items:center;margin-bottom:7px;font-size:11px;color:#9da4ad}
-.urgent-news-tag{font-weight:800;color:#ff5a52}
-.urgent-news-title{font-size:17px;font-weight:800;margin-bottom:5px}
-.urgent-news-text{font-size:14px;line-height:1.55;color:#c6cad0}
-.urgent-news-add{border:0;border-radius:10px;padding:10px 14px;cursor:pointer;background:#fff;color:#111;font-weight:800}.urgent-admin-link{display:inline-block;border:1px solid rgba(255,255,255,.12);border-radius:10px;padding:10px 14px;color:#fff;text-decoration:none;font-weight:800;background:#15151a}.urgent-admin-link:hover{background:#e10600;border-color:#e10600}.urgent-news-form{display:none!important}
-.urgent-empty{color:#9298a1;padding:10px 0}
-
-.urgent-news-actions{display:flex;gap:8px;align-items:center}
-.urgent-news-form{
-  display:none;margin-bottom:16px;padding:16px;border-radius:14px;
-  background:rgba(0,0,0,.18);border:1px solid rgba(255,255,255,.07)
-}
-.urgent-news-form.open{display:block}
-.urgent-news-field{display:grid;gap:6px;margin-bottom:12px}
-.urgent-news-field label{font-size:12px;font-weight:700;color:#aeb4bd}
-.urgent-news-field input,.urgent-news-field textarea{
-  width:100%;box-sizing:border-box;border:1px solid rgba(255,255,255,.12);
-  background:rgba(255,255,255,.045);color:inherit;border-radius:10px;
-  padding:10px 12px;font:inherit;outline:none
-}
-.urgent-news-field textarea{min-height:90px;resize:vertical}
-.urgent-photo-picker{
-  border:1px dashed rgba(255,255,255,.22);padding:14px;border-radius:10px;
-  cursor:pointer;text-align:center;color:#aeb4bd
-}
-.urgent-photo-picker:hover{background:rgba(255,255,255,.04)}
-.urgent-photo-previews{display:flex;flex-wrap:wrap;gap:8px;margin-top:10px}
-.urgent-photo-thumb{width:86px;height:70px;object-fit:cover;border-radius:8px;border:1px solid rgba(255,255,255,.1)}
-.urgent-form-buttons{display:flex;gap:8px}
-.urgent-form-buttons button{border:0;border-radius:9px;padding:9px 13px;cursor:pointer;font-weight:800}
-.urgent-save{background:#fff;color:#111}.urgent-cancel{background:rgba(255,255,255,.08);color:#fff}
-.urgent-news-images{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:8px;margin-top:12px}
-.urgent-news-images img{width:100%;height:180px;object-fit:cover;border-radius:10px;cursor:zoom-in}
-
-@media(max-width:650px){.urgent-news-header{align-items:flex-start;flex-direction:column}}
+.urgent-news-section{margin:32px 0;padding:0 0 30px}
+.news-page-head{padding:8px 0 24px;border-bottom:1px solid #292930;margin-bottom:18px}
+.news-kicker{font-size:11px;font-weight:900;letter-spacing:.14em;color:#e10600;display:flex;align-items:center;gap:8px}
+.news-dot{width:7px;height:7px;border-radius:50%;background:#e10600;box-shadow:0 0 10px rgba(225,6,0,.7)}
+.news-page-head h1{margin:8px 0 6px;font-size:42px}
+.news-page-head .sub{margin:0}
+.news-title-list{display:grid;gap:10px}
+.news-title-item{width:100%;display:flex;align-items:center;justify-content:space-between;gap:18px;text-align:left;padding:20px 22px;border:1px solid #292930;border-radius:14px;background:#111116;color:#fff;cursor:pointer;transition:.18s;box-shadow:0 8px 24px #0002}
+.news-title-item:hover{transform:translateY(-2px);border-color:#555;color:#fff;background:#15151a}
+.news-title-main{min-width:0}
+.news-title-meta{font-size:11px;color:#85858d;margin-bottom:7px;display:flex;gap:9px;align-items:center;flex-wrap:wrap}
+.news-title-tag{color:#e10600;font-weight:900;text-transform:uppercase}
+.news-title-text{font-size:20px;font-weight:900;line-height:1.25;word-break:break-word}
+.news-title-arrow{font-size:24px;color:#777;flex:0 0 auto;transition:.18s}
+.news-title-item:hover .news-title-arrow{color:#e10600;transform:translateX(3px)}
+.news-empty{padding:30px 0;color:#777}
+.news-article-view[hidden]{display:none}
+.news-back{border:0;background:#25252b;color:#fff;padding:10px 15px;border-radius:8px;cursor:pointer;font-weight:800;margin-bottom:16px}
+.news-back:hover{background:#e10600}
+.news-article{padding:28px;border:1px solid #292930;border-radius:18px;background:#111116;box-shadow:0 14px 40px #0003}
+.news-article-meta{display:flex;gap:10px;align-items:center;flex-wrap:wrap;color:#85858d;font-size:12px;margin-bottom:12px}
+.news-article-tag{color:#e10600;font-weight:900;text-transform:uppercase}
+.news-article h2{font-size:38px;line-height:1.1;margin:0 0 18px}
+.news-article-body{font-size:16px;line-height:1.75;color:#d0d3d8;white-space:pre-wrap;word-break:break-word}
+.news-article-images{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:10px;margin-top:24px}
+.news-article-images img{width:100%;height:260px;object-fit:cover;border-radius:12px;cursor:zoom-in;border:1px solid #292930}
+@media(max-width:650px){.news-page-head h1{font-size:36px}.news-title-item{padding:17px}.news-title-text{font-size:17px}.news-article{padding:20px}.news-article h2{font-size:30px}.news-article-images{grid-template-columns:1fr}.news-article-images img{height:auto;max-height:360px}}
 </style>
 <script>
 (function(){
   const list=document.getElementById('urgentNewsList');
-  const add=document.getElementById('addUrgentNewsBtn');
-  const form=document.getElementById('urgentNewsForm');
-  const titleEl=document.getElementById('urgentTitle');
-  const textEl=document.getElementById('urgentText');
-  const photosEl=document.getElementById('urgentPhotos');
-  const previews=document.getElementById('urgentPhotoPreviews');
-  const saveBtn=document.getElementById('urgentSaveBtn');
-  const cancelBtn=document.getElementById('urgentCancelBtn');
+  const titlesView=document.getElementById('newsTitlesView');
+  const articleView=document.getElementById('newsArticleView');
+  const article=document.getElementById('newsArticle');
+  const back=document.getElementById('newsBack');
   if(!list)return;
-
   let news=[];
-  let selectedImages=[];
-
-  const esc=s=>String(s??'').replace(/[&<>"']/g,c=>({
-    '&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#039;'
-  }[c]));
-
-  async function loadNews(){
-    try{
-      const response=await fetch('/api/news',{cache:'no-store'});
-      if(!response.ok)throw new Error('HTTP '+response.status);
-      const data=await response.json();
-      news=Array.isArray(data)?data:[];
-      render();
-    }catch(e){
-      console.error('Не удалось загрузить общие новости:',e);
-      news=[];
-      list.innerHTML='<div class="urgent-empty">Не удалось загрузить новости с сервера.</div>';
-    }
-  }
-
+  const esc=s=>String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#039;'}[c]));
+  const sorted=()=>news.slice().sort((a,b)=>(`${b.date||''} ${b.time||''}`).localeCompare(`${a.date||''} ${a.time||''}`));
   function render(){
-    if(!news.length){
-      list.innerHTML='<div class="urgent-empty">Срочных новостей пока нет.</div>';
-      return;
-    }
-    list.innerHTML=news.slice().sort((a,b)=>
-      (`${b.date} ${b.time||''}`).localeCompare(`${a.date} ${a.time||''}`)
-    ).map(n=>{
-      const imgs=(n.images||[]).map(src=>
-        `<img src="${esc(src)}" alt="Фото к новости" loading="lazy">`
-      ).join('');
-      return `<article class="urgent-news-card">
-        <div class="urgent-news-meta">
-          <span class="urgent-news-tag">${esc(n.tag||'СРОЧНО')}</span>
-          <span>${esc(n.date||'')}${n.time?' • '+esc(n.time):''}</span>
-        </div>
-        <div class="urgent-news-title">${esc(n.title)}</div>
-        <div class="urgent-news-text">${esc(n.text)}</div>
-        ${imgs?`<div class="urgent-news-images">${imgs}</div>`:''}
-      </article>`;
-    }).join('');
+    const items=sorted();
+    if(!items.length){list.innerHTML='<div class="news-empty">Новостей пока нет.</div>';return;}
+    list.innerHTML=items.map(n=>`<button type="button" class="news-title-item" data-news-id="${esc(n.id)}">
+      <span class="news-title-main"><span class="news-title-meta"><span class="news-title-tag">${esc(n.tag||'F1 LEAGUE')}</span><span>${esc(n.date||'')}${n.time?' · '+esc(n.time):''}</span></span><span class="news-title-text">${esc(n.title)}</span></span>
+      <span class="news-title-arrow">›</span>
+    </button>`).join('');
   }
-
-  function resetForm(){
-    selectedImages=[];
-    titleEl.value='';
-    textEl.value='';
-    photosEl.value='';
-    previews.innerHTML='';
-    form.classList.remove('open');
+  function openArticle(id){
+    const n=news.find(x=>String(x.id)===String(id));
+    if(!n)return;
+    const imgs=(n.images||[]).map(src=>`<img src="${esc(src)}" alt="" loading="lazy" onclick="window.open(this.src,'_blank')">`).join('');
+    article.innerHTML=`<div class="news-article-meta"><span class="news-article-tag">${esc(n.tag||'F1 LEAGUE')}</span><span>${esc(n.date||'')}${n.time?' · '+esc(n.time):''}</span></div><h2>${esc(n.title)}</h2><div class="news-article-body">${esc(n.text||'')}</div>${imgs?`<div class="news-article-images">${imgs}</div>`:''}`;
+    titlesView.hidden=true;articleView.hidden=false;window.scrollTo({top:0,behavior:'smooth'});
   }
-
-  function showPreviews(){
-    previews.innerHTML=selectedImages.map((src,i)=>
-      `<div style="position:relative"><img class="urgent-photo-thumb" src="${src}" alt="Предпросмотр ${i+1}"></div>`
-    ).join('');
+  list.addEventListener('click',e=>{const b=e.target.closest('.news-title-item');if(b)openArticle(b.dataset.newsId)});
+  back.addEventListener('click',()=>{articleView.hidden=true;titlesView.hidden=false;window.scrollTo({top:0,behavior:'smooth'})});
+  async function loadNews(){
+    try{const r=await fetch('/api/news',{cache:'no-store'});if(!r.ok)throw new Error('HTTP '+r.status);const d=await r.json();news=Array.isArray(d)?d:[];render();}
+    catch(e){console.error(e);list.innerHTML='<div class="news-empty">Не удалось загрузить новости с сервера.</div>'}
   }
-
-  function readAndCompress(file){
-    return new Promise((resolve,reject)=>{
-      const reader=new FileReader();
-      reader.onerror=reject;
-      reader.onload=()=>{
-        const img=new Image();
-        img.onload=()=>{
-          const max=1400;
-          const scale=Math.min(1,max/Math.max(img.width,img.height));
-          const c=document.createElement('canvas');
-          c.width=Math.max(1,Math.round(img.width*scale));
-          c.height=Math.max(1,Math.round(img.height*scale));
-          c.getContext('2d').drawImage(img,0,0,c.width,c.height);
-          resolve(c.toDataURL('image/jpeg',0.82));
-        };
-        img.onerror=reject;
-        img.src=reader.result;
-      };
-      reader.readAsDataURL(file);
-    });
-  }
-
-  if(add)add.onclick=()=>form.classList.add('open');
-  if(cancelBtn)cancelBtn.onclick=resetForm;
-
-  if(photosEl){
-    photosEl.addEventListener('change',async()=>{
-      selectedImages=[];
-      previews.innerHTML='<span style="font-size:12px;color:#9da4ad">Обрабатываем фото…</span>';
-      for(const file of Array.from(photosEl.files||[])){
-        if(!file.type.startsWith('image/'))continue;
-        try{selectedImages.push(await readAndCompress(file));}catch(e){}
-      }
-      showPreviews();
-    });
-  }
-
-  if(saveBtn)saveBtn.onclick=async()=>{
-    const title=titleEl.value.trim();
-    if(!title){alert('Укажи заголовок новости.');return}
-    const body=textEl.value.trim();
-    const now=new Date();
-    const item={
-      id:Date.now(),
-      date:now.toISOString().slice(0,10),
-      time:now.toTimeString().slice(0,5),
-      title,
-      text:body,
-      tag:'СРОЧНО',
-      images:selectedImages.slice()
-    };
-
-    saveBtn.disabled=true;
-    saveBtn.textContent='Публикуем…';
-    try{
-      const response=await fetch('/api/news',{
-        method:'POST',
-        headers:{'Content-Type':'application/json'},
-        body:JSON.stringify(item)
-      });
-      if(!response.ok){
-        const err=await response.json().catch(()=>({}));
-        throw new Error(err.error||('HTTP '+response.status));
-      }
-      resetForm();
-      await loadNews();
-    }catch(e){
-      alert('Не удалось опубликовать новость. Проверь, что сайт запущен через server.py. Если добавляешь фото, попробуй меньше фото.');
-    }finally{
-      saveBtn.disabled=false;
-      saveBtn.textContent='Опубликовать';
-    }
-  };
-
-  // All visitors load the same server-side news.
   window.loadUrgentNews=loadNews;
   loadNews();
-  // Pick up a newly published news item without requiring a manual refresh.
   setInterval(loadNews,30000);
 })();
 </script>
-
 
 <script>
 (() => {
