@@ -337,6 +337,28 @@ class F1Handler(SimpleHTTPRequestHandler):
             if not is_admin(self):
                 self._json_response(403, {"error": "Доказательства доступны только администраторам"})
                 return
+            # Serve evidence files only after the admin check.
+            requested = path[len("/protest-files/"):]
+            requested = requested.split("?", 1)[0]
+            if not requested or "/" in requested or "\\" in requested or ".." in requested:
+                self._json_response(404, {"error": "Файл не найден"})
+                return
+            file_path = (PROTESTS_DIR / requested).resolve()
+            try:
+                if file_path.parent != PROTESTS_DIR.resolve() or not file_path.is_file():
+                    self._json_response(404, {"error": "Файл не найден"})
+                    return
+                mime = mimetypes.guess_type(file_path.name)[0] or "application/octet-stream"
+                data = file_path.read_bytes()
+                self.send_response(200)
+                self.send_header("Content-Type", mime)
+                self.send_header("Content-Length", str(len(data)))
+                self.send_header("Cache-Control", "private, max-age=300")
+                self.end_headers()
+                self.wfile.write(data)
+            except OSError:
+                self._json_response(404, {"error": "Файл не найден"})
+            return
         if path == "/admin":
             self.path = "/admin.html"
             return super().do_GET()
