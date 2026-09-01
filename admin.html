@@ -83,9 +83,6 @@ $('newsForm').onsubmit=async e=>{e.preventDefault();const now=new Date();const p
 async function loadNews(){try{const ns=await api('/api/news');$('newsList').innerHTML=ns.length?ns.map(n=>`<article class="item"><div class="meta">${esc(n.tag||'F1 LEAGUE')} · ${esc(n.date||'')}${n.time?' · '+esc(n.time):''}</div><div class="title">${esc(n.title)}</div><div class="text">${esc(n.text)}</div>${(n.images||[]).length?`<div class="thumbs">${n.images.map(x=>`<img src="${esc(x)}" alt="">`).join('')}</div>`:''}<div class="buttons" style="margin-top:12px"><button class="btn secondary" onclick="editNews(${Number(n.id)})">Редактировать</button><button class="btn danger" onclick="deleteNews(${Number(n.id)})">Удалить</button></div></article>`).join(''):'<div class="status">Новостей пока нет.</div>'}catch(e){$('newsList').innerHTML='<div class="status error">'+esc(e.message)+'</div>'}}
 async function editNews(id){const ns=await api('/api/news');const n=ns.find(x=>Number(x.id)===Number(id));if(!n)return;editingId=id;$('title').value=n.title||'';$('text').value=n.text||'';$('tag').value=n.tag||'F1 LEAGUE';selectedImages=[...(n.images||[])];previews();$('formTitle').textContent='Редактирование новости';$('saveBtn').textContent='Сохранить изменения';$('cancelEdit').classList.remove('hidden');scrollTo({top:0,behavior:'smooth'})}
 async function deleteNews(id){if(!confirm('Удалить эту новость?'))return;try{await api('/api/news/'+id,{method:'DELETE'});if(Number(editingId)===Number(id))reset();loadNews()}catch(e){alert(e.message)}}
-check();
-}
-
 document.addEventListener('click', async (e) => {
   const btn = e.target.closest('.delete-protest');
   if (!btn) return;
@@ -101,6 +98,7 @@ document.addEventListener('click', async (e) => {
     btn.disabled = false;
     btn.textContent = 'Удалить протест';
   }
+});
 
-
+check();
 </script></body></html>

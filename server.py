@@ -529,8 +529,7 @@ class F1Handler(SimpleHTTPRequestHandler):
                                 file_path.unlink()
                             except OSError:
                                 pass
-                    protests = [p for p in protests if str(p.get("id")) != protest_id]
-                    save_protests(protests)
+                    save_protests([p for p in protests if str(p.get("id")) != protest_id])
                 self._json_response(200, {"ok": True})
                 return
 
