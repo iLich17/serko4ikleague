@@ -24,6 +24,11 @@
     <div id="adminsList" class="news"></div>
     <div id="adminMsg" class="status"></div>
   </div>
+  <div class="panel">
+    <h2>⚖️ Протесты</h2>
+    <p class="sub">Протесты доступны только администраторам.</p>
+    <div id="protestsList" class="news"></div>
+  </div>
   <form class="panel" id="newsForm"><h2 id="formTitle">Новая новость</h2><div class="field"><label>Заголовок</label><input id="title" maxlength="160" required></div><div class="field"><label>Текст</label><textarea id="text" maxlength="4000"></textarea></div><div class="field"><label>Тег</label><input id="tag" maxlength="50" value="F1 LEAGUE"></div><div class="field"><label>Фотографии</label><input id="photos" type="file" accept="image/*" multiple></div><div id="previews" class="thumbs"></div><div class="buttons"><button class="btn primary" type="submit" id="saveBtn">Опубликовать</button><button class="btn secondary hidden" type="button" id="cancelEdit">Отмена</button></div><div id="formMsg" class="status"></div></form>
   <div class="panel"><h2>Опубликованные</h2><div id="newsList" class="news"></div></div>
 </section>
@@ -37,7 +42,32 @@ function previews(){ $('previews').innerHTML=selectedImages.map(x=>`<img src="${
 $('photos').onchange=async()=>{selectedImages=[];for(const f of [...$('photos').files]){if(f.type.startsWith('image/'))try{selectedImages.push(await compress(f))}catch{}}previews()};
 async function check(){try{const d=await api('/api/admin/me');if(d.authenticated)showApp()}catch{} }
 function showApp(){$('login').classList.add('hidden');$('app').classList.remove('hidden');loadNews();loadManagement();api('/api/admin/me').then(d=>{$('adminWho').textContent='Вы вошли как: '+(d.nick||'администратор')})}
-async function loadManagement(){await loadUsers();await loadAdmins()}
+async function loadManagement(){await loadUsers();await loadAdmins();await loadProtests()}
+
+async function loadProtests(){
+  try{
+    const d=await api('/api/admin/protests');
+    const el=$('protestsList');
+    if(!d.protests.length){el.innerHTML='<div class="status">Протестов пока нет.</div>';return}
+    el.innerHTML=d.protests.map(p=>{
+      const isVideo=(p.evidence_mime||'').startsWith('video/');
+      const media=isVideo
+        ? `<video src="${esc(p.evidence)}" controls style="max-width:100%;max-height:420px;border-radius:10px"></video>`
+        : `<img src="${esc(p.evidence)}" alt="Доказательство" style="max-width:100%;max-height:420px;object-fit:contain;border-radius:10px">`;
+      return `<article class="item">
+        <div class="meta">${esc(p.status||'Новый')} · ${esc(p.submitted_at||'')} · аккаунт @${esc(p.user_nick||'')}</div>
+        <div class="title">Ваше имя: ${esc(p.pilot_name||'—')}</div>
+        <div style="margin:8px 0"><b>Нарушитель:</b> ${esc(p.violator_name||'не указан — протест на отмену штрафа')}</div>
+        <div class="text"><b>Жалоба:</b>\n${esc(p.complaint||'')}</div>
+        <div class="thumbs" style="margin-top:14px">${media}</div>
+        <div class="meta" style="margin-top:10px">Файл: ${esc(p.evidence_name||'доказательство')}</div>
+      </article>`;
+    }).join('');
+  }catch(e){
+    $('protestsList').innerHTML='<div class="status error">'+esc(e.message)+'</div>';
+  }
+}
+
 async function loadUsers(){try{const d=await api('/api/admin/users');const el=$('usersList');el.innerHTML=d.users.length?d.users.map(u=>`<article class="item"><div class="title">${esc(u.nick)} ${u.admin?'<span style="font-size:12px;color:#72d28b">· администратор</span>':''}</div><div class="meta">Регистрация: ${esc(u.created_at||'неизвестно')}</div><div class="buttons">${u.admin?'<button class="btn secondary" disabled>Администратор</button>':''}<button class="btn danger" onclick="deleteUser('${encodeURIComponent(u.nick)}')">Удалить</button></div></article>`).join(''):'<div class="status">Пользователей пока нет.</div>'}catch(e){$('usersList').innerHTML='<div class="status error">'+esc(e.message)+'</div>'}}
 async function loadAdmins(){try{const d=await api('/api/admins');const el=$('adminsList');el.innerHTML=d.admins.length?d.admins.map(a=>`<article class="item"><div class="title">${esc(a)}</div><button class="btn danger" onclick="removeAdmin('${encodeURIComponent(a)}')">Убрать из админов</button></article>`).join(''):'<div class="status">Администраторов нет.</div>'}catch(e){$('adminsList').innerHTML='<div class="status error">'+esc(e.message)+'</div>'}}
 $('addAdmin').onclick=async()=>{const nick=$('adminNick').value.trim();if(!nick)return;try{await api('/api/admins',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({nick})});$('adminNick').value='';$('adminMsg').textContent='Администратор добавлен';$('adminMsg').className='status success';loadManagement()}catch(e){$('adminMsg').textContent=e.message;$('adminMsg').className='status error'}};

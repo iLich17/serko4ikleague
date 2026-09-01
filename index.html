@@ -4,11 +4,11 @@
 <meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1.0">
 <title>F1 League — Season 2</title>
 <style>
-*{box-sizing:border-box;margin:0;padding:0}body{font-family:Arial,Helvetica,sans-serif;background:#07070a;color:#fff}header{position:sticky;top:0;z-index:100;background:#101014;border-bottom:1px solid #292930;padding:15px 4vw;display:flex;align-items:center;gap:42px}.logo{font-size:25px;font-weight:950;white-space:nowrap;cursor:pointer}.logo span,.red{color:#e10600}nav{display:flex;gap:6px;overflow-x:auto}nav button{border:0;background:transparent;color:#9999a2;padding:11px 15px;border-radius:7px;font-weight:800;cursor:pointer;white-space:nowrap}nav button:hover{background:#1c1c22;color:#fff}nav button.active{background:#e10600;color:#fff}main{max-width:1500px;margin:auto;padding:42px 4vw}.page{display:none}.page.active{display:block;animation:fade .22s ease}@keyframes fade{from{opacity:0;transform:translateY(7px)}to{opacity:1;transform:none}}h1{font-size:44px;line-height:1;margin-bottom:9px}.sub{color:#85858d;margin-bottom:30px}.hero{padding:50px;border-radius:18px;background:linear-gradient(110deg,#1d1d23,#0c0c10);border:1px solid #292930;margin-bottom:25px}.hero h2{font-size:48px;margin:10px 0}.hero p{color:#aaa;max-width:700px;line-height:1.6}.stats{display:grid;grid-template-columns:repeat(4,1fr);gap:15px}.stat{background:#15151a;border:1px solid #292930;border-radius:14px;padding:22px}.stat small{color:#777;text-transform:uppercase}.stat b{display:block;font-size:30px;margin-top:8px}.team-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:20px}.team-card{position:relative;overflow:hidden;border-radius:17px;border:1px solid #292930;background:#15151a;transition:.22s;box-shadow:0 10px 30px #0004;cursor:pointer;min-height:130px}.team-card:hover{transform:translateY(-5px);border-color:#777}.team-card img{width:100%;height:auto;display:block;opacity:.8}.score{position:absolute;right:14px;bottom:13px;background:#09090ccc;border:1px solid #ffffff22;border-radius:8px;padding:7px 11px;text-align:right;backdrop-filter:blur(5px)}.score small{display:block;font-size:9px;color:#aaa;text-transform:uppercase}.score b{font-size:19px}.team-header{position:relative;overflow:hidden;min-height:190px;display:flex;align-items:flex-end;padding:35px;border-radius:18px;background:linear-gradient(90deg,#15151a 0%,#101014cc 55%,#10101400 100%),#15151a;border:1px solid #292930;margin-bottom:30px}.team-header h2{font-size:48px;margin-bottom:8px}.team-header p{color:#999}.back-button{border:0;background:#25252b;color:#fff;padding:9px 14px;border-radius:7px;cursor:pointer;font-weight:700;margin-bottom:20px}.back-button:hover{background:#e10600}.section-title{font-size:28px;margin:35px 0 18px}.driver-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:18px}.driver-card{background:#15151a;border:1px solid #292930;border-radius:15px;padding:20px;min-height:120px}.driver-name{font-size:22px;font-weight:900}.driver-team{color:#999;margin-top:6px}.table-wrap{overflow:auto;background:#15151a;border:1px solid #292930;border-radius:14px}table{width:100%;border-collapse:collapse}th,td{padding:15px 18px;border-bottom:1px solid #292930;text-align:left}th{font-size:11px;color:#777;text-transform:uppercase}tr:last-child td{border:0}.position{font-weight:900}.status-dns{color:#777;font-weight:900}.status-dnf,.status-dsq{color:#e10600;font-weight:900}.filterbar{display:flex;gap:10px;flex-wrap:wrap;margin-bottom:18px}.filterbar button{border:1px solid #292930;background:#15151a;color:#aaa;padding:9px 12px;border-radius:8px;cursor:pointer}.filterbar button.active{background:#e10600;color:#fff;border-color:#e10600}.muted{color:#777}.race-title{font-weight:900}.badge{display:inline-block;margin-left:8px;padding:3px 7px;border-radius:6px;background:#25252b;color:#aaa;font-size:10px;text-transform:uppercase}.leader{font-size:14px;color:#aaa;margin-bottom:22px}footer{text-align:center;color:#606069;border-top:1px solid #292930;padding:28px;margin-top:30px}@media(max-width:850px){header{flex-direction:column;align-items:flex-start;gap:12px}.team-grid{grid-template-columns:1fr}.stats{grid-template-columns:repeat(2,1fr)}.driver-grid{grid-template-columns:repeat(2,1fr)}h1{font-size:36px}.hero h2,.team-header h2{font-size:36px}}@media(max-width:520px){main{padding:28px 16px}.stats,.team-grid,.driver-grid{grid-template-columns:1fr}.team-header{padding:22px}.team-header h2{font-size:32px}}
+*{box-sizing:border-box;margin:0;padding:0}body{font-family:Arial,Helvetica,sans-serif;background:#07070a;color:#fff}header{position:sticky;top:0;z-index:100;background:#101014;border-bottom:1px solid #292930;padding:15px 4vw;display:flex;align-items:center;gap:42px}.logo{font-size:25px;font-weight:950;white-space:nowrap;cursor:pointer}.logo span,.red{color:#e10600}nav{display:flex;gap:6px;overflow-x:auto}nav button{border:0;background:transparent;color:#9999a2;padding:11px 15px;border-radius:7px;font-weight:800;cursor:pointer;white-space:nowrap}nav button:hover{background:#1c1c22;color:#fff}nav button.active{background:#e10600;color:#fff}main{max-width:1500px;margin:auto;padding:42px 4vw}.page{display:none}.page.active{display:block;animation:fade .22s ease}@keyframes fade{from{opacity:0;transform:translateY(7px)}to{opacity:1;transform:none}}h1{font-size:44px;line-height:1;margin-bottom:9px}.sub{color:#85858d;margin-bottom:30px}.hero{padding:50px;border-radius:18px;background:linear-gradient(110deg,#1d1d23,#0c0c10);border:1px solid #292930;margin-bottom:25px}.hero h2{font-size:48px;margin:10px 0}.hero p{color:#aaa;max-width:700px;line-height:1.6}.stats{display:grid;grid-template-columns:repeat(4,1fr);gap:15px}.stat{background:#15151a;border:1px solid #292930;border-radius:14px;padding:22px}.stat small{color:#777;text-transform:uppercase}.stat b{display:block;font-size:30px;margin-top:8px}.team-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:20px}.team-card{position:relative;overflow:hidden;border-radius:17px;border:1px solid #292930;background:#15151a;transition:.22s;box-shadow:0 10px 30px #0004;cursor:pointer;min-height:130px}.team-card:hover{transform:translateY(-5px);border-color:#777}.team-card img{width:100%;height:auto;display:block;opacity:.8}.score{position:absolute;right:14px;bottom:13px;background:#09090ccc;border:1px solid #ffffff22;border-radius:8px;padding:7px 11px;text-align:right;backdrop-filter:blur(5px)}.score small{display:block;font-size:9px;color:#aaa;text-transform:uppercase}.score b{font-size:19px}.team-header{position:relative;overflow:hidden;min-height:190px;display:flex;align-items:flex-end;padding:35px;border-radius:18px;background:linear-gradient(90deg,#15151a 0%,#101014cc 55%,#10101400 100%),#15151a;border:1px solid #292930;margin-bottom:30px}.team-header h2{font-size:48px;margin-bottom:8px}.team-header p{color:#999}.back-button{border:0;background:#25252b;color:#fff;padding:9px 14px;border-radius:7px;cursor:pointer;font-weight:700;margin-bottom:20px}.back-button:hover{background:#e10600}.section-title{font-size:28px;margin:35px 0 18px}.driver-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:18px}.driver-card{background:#15151a;border:1px solid #292930;border-radius:15px;padding:20px;min-height:120px}.driver-name{font-size:22px;font-weight:900}.driver-team{color:#999;margin-top:6px}.table-wrap{overflow:auto;background:#15151a;border:1px solid #292930;border-radius:14px}table{width:100%;border-collapse:collapse}th,td{padding:15px 18px;border-bottom:1px solid #292930;text-align:left}th{font-size:11px;color:#777;text-transform:uppercase}tr:last-child td{border:0}.position{font-weight:900}.status-dns{color:#777;font-weight:900}.status-dnf,.status-dsq{color:#e10600;font-weight:900}.filterbar{display:flex;gap:10px;flex-wrap:wrap;margin-bottom:18px}.filterbar button{border:1px solid #292930;background:#15151a;color:#aaa;padding:9px 12px;border-radius:8px;cursor:pointer}.filterbar button.active{background:#e10600;color:#fff;border-color:#e10600}.muted{color:#777}.race-title{font-weight:900}.badge{display:inline-block;margin-left:8px;padding:3px 7px;border-radius:6px;background:#25252b;color:#aaa;font-size:10px;text-transform:uppercase}.leader{font-size:14px;color:#aaa;margin-bottom:22px}.field{display:grid;gap:7px}.field label{font-size:12px;font-weight:800;color:#aeb4bd}.field input,.field textarea{width:100%;border:1px solid #303038;background:#0d0d11;color:#fff;border-radius:10px;padding:12px;font:inherit;outline:none}.field textarea{min-height:150px;resize:vertical}.status{color:#9da4ad}.success{color:#72d28b}.error{color:#ff6a63}footer{text-align:center;color:#606069;border-top:1px solid #292930;padding:28px;margin-top:30px}@media(max-width:850px){header{flex-direction:column;align-items:flex-start;gap:12px}.team-grid{grid-template-columns:1fr}.stats{grid-template-columns:repeat(2,1fr)}.driver-grid{grid-template-columns:repeat(2,1fr)}h1{font-size:36px}.hero h2,.team-header h2{font-size:36px}}@media(max-width:520px){main{padding:28px 16px}.stats,.team-grid,.driver-grid{grid-template-columns:1fr}.team-header{padding:22px}.team-header h2{font-size:32px}}
 </style></head>
 <body>
 <header><div class="logo" onclick="showPage('home')">F1<span>LEAGUE</span></div><nav>
-<button class="active" data-page="home">Главная</button><button data-page="teams">Команды</button><button data-page="drivers">Пилоты</button><button data-page="results">Результаты гонок</button><button data-page="calendar">Календарь</button><button data-page="championship">Чемпионат</button><button data-page="urgent-news">Новости</button>
+<button class="active" data-page="home">Главная</button><button data-page="teams">Команды</button><button data-page="drivers">Пилоты</button><button data-page="results">Результаты гонок</button><button data-page="calendar">Календарь</button><button data-page="championship">Чемпионат</button><button data-page="urgent-news">Новости</button><button data-page="protests">Протесты</button>
 </nav><div id="accountBox" style="margin-left:auto;display:flex;align-items:center;gap:8px;font-size:12px;color:#aaa"><span id="accountNick"></span><button id="accountLogout" style="border:1px solid #292930;background:#15151a;color:#fff;border-radius:8px;padding:8px 10px;cursor:pointer;font-weight:800">Выйти</button></div></header>
 <main>
 <section id="home" class="page active"><div class="hero"><div class="red">F1 LEAGUE • SEASON 2</div><h2>Реальные данные твоего чемпионата</h2><p>Все страницы сайта строятся из одного results.json: результаты, пилоты, команды, очки и чемпионат больше не расходятся между собой.</p></div><div class="stats"><div class="stat"><small>Сессий</small><b id="stat-races">—</b></div><div class="stat"><small>Команд</small><b id="stat-teams">—</b></div><div class="stat"><small>Пилотов</small><b id="stat-drivers">—</b></div><div class="stat"><small>Лидер</small><b id="stat-leader">—</b></div></div></section>
@@ -17,6 +17,29 @@
 <section id="drivers" class="page"><h1>Пилоты</h1><p class="sub">Личный зачёт, рассчитанный непосредственно из results.json.</p><div class="table-wrap"><table><thead><tr><th>Поз.</th><th>Пилот</th><th>Команда</th><th>Победы</th><th>Подиумы</th><th>Очки</th></tr></thead><tbody id="drivers-body"></tbody></table></div></section>
 <section id="results" class="page"><h1>Результаты гонок</h1><p class="sub">Все доступные этапы и спринты.</p><div id="race-filters" class="filterbar"></div><div id="results-list"></div></section>
 <section id="calendar" class="page"><h1>Календарь</h1><p class="sub">Этапы, для которых предоставлены результаты.</p><div class="table-wrap"><table><thead><tr><th>Этап</th><th>Гран-при</th><th>Формат</th><th>Участников</th></tr></thead><tbody id="calendar-body"></tbody></table></div></section>
+<section id="protests" class="page">
+<h1>Протесты</h1>
+<p class="sub">Подайте протест с доказательством. Все протесты видят только администраторы.</p>
+<div class="hero" style="padding:28px">
+  <form id="protestForm">
+    <div class="field" style="margin-bottom:16px"><label>1. Фото/видео/кружок доказательства</label>
+      <input id="protestEvidence" type="file" accept="image/*,video/*" required>
+      <div class="muted" style="font-size:12px;margin-top:6px">Максимальный размер файла — 50 МБ.</div>
+    </div>
+    <div class="field" style="margin-bottom:16px"><label>2. Ваше имя (имя пилота, не ник в игре)</label>
+      <input id="protestPilot" maxlength="120" placeholder="Например: Иван Иванов" required>
+    </div>
+    <div class="field" style="margin-bottom:16px"><label>3. Имя нарушителя (имя пилота, не ник в игре)</label>
+      <input id="protestViolator" maxlength="120" placeholder="Оставьте пустым, если протест на отмену штрафа">
+    </div>
+    <div class="field" style="margin-bottom:16px"><label>4. Сама жалоба</label>
+      <textarea id="protestComplaint" maxlength="5000" placeholder="Опишите ситуацию как можно подробнее…" required></textarea>
+    </div>
+    <button class="back-button" type="submit" id="protestSubmit" style="margin-bottom:0">Подать протест</button>
+    <div id="protestMsg" class="status" style="margin-top:12px"></div>
+  </form>
+</div>
+</section>
 <section id="championship" class="page"><h1>Чемпионат</h1><p class="sub">Текущее положение в личном зачёте.</p><div class="leader" id="championship-note"></div><div class="table-wrap"><table><thead><tr><th>Поз.</th><th>Пилот</th><th>Команда</th><th>Победы</th><th>Подиумы</th><th>Очки</th><th>Отставание</th></tr></thead><tbody id="championship-body"></tbody></table></div></section>
 
 
@@ -307,6 +330,41 @@ loadResults();
   loadNews();
   // Pick up a newly published news item without requiring a manual refresh.
   setInterval(loadNews,30000);
+})();
+</script>
+
+
+<script>
+(() => {
+  const form = document.getElementById('protestForm');
+  if (!form) return;
+  form.addEventListener('submit', async (e) => {
+    e.preventDefault();
+    const msg = document.getElementById('protestMsg');
+    const btn = document.getElementById('protestSubmit');
+    const file = document.getElementById('protestEvidence').files[0];
+    if (!file) { msg.textContent='Прикрепите доказательство.'; msg.className='status error'; return; }
+    if (file.size > 50 * 1024 * 1024) { msg.textContent='Файл слишком большой. Максимум 50 МБ.'; msg.className='status error'; return; }
+    const data = new FormData();
+    data.append('evidence', file);
+    data.append('pilot_name', document.getElementById('protestPilot').value.trim());
+    data.append('violator_name', document.getElementById('protestViolator').value.trim());
+    data.append('complaint', document.getElementById('protestComplaint').value.trim());
+    btn.disabled = true; btn.textContent='Отправляем…'; msg.textContent='';
+    try {
+      const r = await fetch('/api/protests', {method:'POST', body:data});
+      const d = await r.json().catch(()=>({}));
+      if (!r.ok) throw new Error(d.error || ('HTTP '+r.status));
+      form.reset();
+      msg.textContent='Протест успешно подан. Его увидят только администраторы.';
+      msg.className='status success';
+    } catch (err) {
+      msg.textContent=err.message;
+      msg.className='status error';
+    } finally {
+      btn.disabled=false; btn.textContent='Подать протест';
+    }
+  });
 })();
 </script>
 

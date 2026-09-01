@@ -23,9 +23,13 @@ def data_file(name):
 NEWS_FILE = data_file("news.json")
 USERS_FILE = data_file("users.json")
 ADMINS_FILE = data_file("admins.json")
+PROTESTS_FILE = data_file("protests.json")
+PROTESTS_DIR = DATA_DIR / "protest_files"
+PROTESTS_DIR.mkdir(parents=True, exist_ok=True)
 NEWS_LOCK = threading.Lock()
 USERS_LOCK = threading.Lock()
 ADMINS_LOCK = threading.Lock()
+PROTESTS_LOCK = threading.Lock()
 
 SESSION_TTL = 12 * 60 * 60
 SESSIONS = {}  # token -> {expires, nick}
@@ -79,6 +83,15 @@ def load_admins():
 
 def save_admins(data):
     save_json(ADMINS_FILE, data)
+
+
+def load_protests():
+    data = load_json(PROTESTS_FILE, [])
+    return data if isinstance(data, list) else []
+
+
+def save_protests(data):
+    save_json(PROTESTS_FILE, data)
 
 
 def parse_cookies(header):
@@ -223,6 +236,49 @@ class F1Handler(SimpleHTTPRequestHandler):
             raise ValueError("request too large")
         return json.loads(self.rfile.read(length).decode("utf-8"))
 
+    def _read_multipart(self, max_bytes=55 * 1024 * 1024):
+        content_type = self.headers.get("Content-Type", "")
+        match = re.search(r'boundary=(?:"([^"]+)"|([^;]+))', content_type)
+        if not match:
+            raise ValueError("Ожидается multipart/form-data")
+        boundary = (match.group(1) or match.group(2)).encode("utf-8")
+        length_header = self.headers.get("Content-Length")
+        if not length_header:
+            raise ValueError("Не указан размер запроса")
+        try:
+            length = int(length_header)
+        except ValueError:
+            raise ValueError("Некорректный размер запроса")
+        if length <= 0 or length > max_bytes:
+            raise ValueError("Файл слишком большой. Максимум 50 МБ")
+        body = self.rfile.read(length)
+        delimiter = b"--" + boundary
+        parts = body.split(delimiter)
+        fields = {}
+        file_part = None
+        for part in parts[1:]:
+            if part.startswith(b"--"):
+                break
+            if part.startswith(b"\r\n"):
+                part = part[2:]
+            if part.endswith(b"\r\n"):
+                part = part[:-2]
+            if b"\r\n\r\n" not in part:
+                continue
+            raw_headers, content = part.split(b"\r\n\r\n", 1)
+            headers = raw_headers.decode("utf-8", "replace")
+            disposition = re.search(r'Content-Disposition:\s*form-data;\s*name="([^"]+)"(?:;\s*filename="([^"]*)")?', headers, re.I)
+            if not disposition:
+                continue
+            name, filename = disposition.group(1), disposition.group(2)
+            ctype = re.search(r'Content-Type:\s*([^\r\n;]+)', headers, re.I)
+            mime = ctype.group(1).strip().lower() if ctype else ""
+            if filename is not None:
+                file_part = {"name": name, "filename": filename, "mime": mime, "data": content}
+            else:
+                fields[name] = content.decode("utf-8", "replace")
+        return fields, file_part
+
     def _redirect(self, location):
         self.send_response(302)
         self.send_header("Location", location)
@@ -270,6 +326,17 @@ class F1Handler(SimpleHTTPRequestHandler):
             with NEWS_LOCK:
                 self._json_response(200, load_news())
             return
+        if path == "/api/admin/protests":
+            if not is_admin(self):
+                self._json_response(401, {"error": "Требуется вход в админ-панель"})
+                return
+            with PROTESTS_LOCK:
+                self._json_response(200, {"protests": load_protests()})
+            return
+        if path.startswith("/protest-files/"):
+            if not is_admin(self):
+                self._json_response(403, {"error": "Доказательства доступны только администраторам"})
+                return
         if path == "/admin":
             self.path = "/admin.html"
             return super().do_GET()
@@ -327,6 +394,59 @@ class F1Handler(SimpleHTTPRequestHandler):
             if path == "/api/auth/logout":
                 delete_user_session(self)
                 self._json_response(200, {"ok": True}, [("Set-Cookie", cookie("f1_user", "", 0))])
+                return
+
+            if path == "/api/protests":
+                nick = current_user(self)
+                if not nick:
+                    self._json_response(401, {"error": "Сначала зарегистрируйтесь или войдите"})
+                    return
+                fields, file_part = self._read_multipart()
+                pilot_name = fields.get("pilot_name", "").strip()
+                violator_name = fields.get("violator_name", "").strip()
+                complaint = fields.get("complaint", "").strip()
+                if not pilot_name:
+                    self._json_response(400, {"error": "Укажите ваше имя пилота"})
+                    return
+                if not complaint:
+                    self._json_response(400, {"error": "Опишите жалобу"})
+                    return
+                if not file_part or not file_part.get("data"):
+                    self._json_response(400, {"error": "Прикрепите фото или видео доказательства"})
+                    return
+                mime = file_part.get("mime", "")
+                if not (mime.startswith("image/") or mime.startswith("video/")):
+                    self._json_response(400, {"error": "Можно прикрепить только изображение или видео"})
+                    return
+                data = file_part["data"]
+                if len(data) > 50 * 1024 * 1024:
+                    self._json_response(400, {"error": "Доказательство не должно превышать 50 МБ"})
+                    return
+                ext = Path(file_part.get("filename") or "").suffix.lower()
+                allowed_ext = {".jpg",".jpeg",".png",".gif",".webp",".mp4",".webm",".mov",".m4v",".avi"}
+                if ext not in allowed_ext:
+                    ext = ".mp4" if mime.startswith("video/") else ".jpg"
+                protest_id = str(int(time.time() * 1000)) + secrets.token_hex(3)
+                filename = protest_id + ext
+                target = PROTESTS_DIR / filename
+                target.write_bytes(data)
+                item = {
+                    "id": protest_id,
+                    "submitted_at": time.strftime("%Y-%m-%dT%H:%M:%SZ", time.gmtime()),
+                    "user_nick": nick,
+                    "pilot_name": pilot_name[:120],
+                    "violator_name": violator_name[:120],
+                    "complaint": complaint[:5000],
+                    "evidence": "/protest-files/" + filename,
+                    "evidence_name": str(file_part.get("filename") or filename)[:200],
+                    "evidence_mime": mime,
+                    "status": "Новый"
+                }
+                with PROTESTS_LOCK:
+                    protests = load_protests()
+                    protests.insert(0, item)
+                    save_protests(protests[:500])
+                self._json_response(201, {"ok": True, "id": protest_id})
                 return
 
             if path == "/api/admin/login":
@@ -481,6 +601,7 @@ def main():
     if not USERS_FILE.exists(): save_users([])
     if not ADMINS_FILE.exists(): save_admins(["admin"])
     if not NEWS_FILE.exists(): save_news([])
+    if not PROTESTS_FILE.exists(): save_protests([])
     server = ThreadingHTTPServer((HOST, PORT), F1Handler)
     print(f"F1 League server: http://{HOST}:{PORT}")
     print(f"Registration/login: http://127.0.0.1:{PORT}/auth")
