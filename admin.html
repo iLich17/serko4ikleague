@@ -61,6 +61,7 @@ async function loadProtests(){
         <div class="text"><b>Жалоба:</b>\n${esc(p.complaint||'')}</div>
         <div class="thumbs" style="margin-top:14px">${media}</div>
         <div class="meta" style="margin-top:10px">Файл: ${esc(p.evidence_name||'доказательство')}</div>
+        <button type="button" class="delete-protest" data-id="${esc(p.id)}" style="margin-top:14px;background:#d62828;color:#fff;border:0;border-radius:8px;padding:10px 16px;font-weight:700;cursor:pointer">Удалить протест</button>
       </article>`;
     }).join('');
   }catch(e){
@@ -83,4 +84,23 @@ async function loadNews(){try{const ns=await api('/api/news');$('newsList').inne
 async function editNews(id){const ns=await api('/api/news');const n=ns.find(x=>Number(x.id)===Number(id));if(!n)return;editingId=id;$('title').value=n.title||'';$('text').value=n.text||'';$('tag').value=n.tag||'F1 LEAGUE';selectedImages=[...(n.images||[])];previews();$('formTitle').textContent='Редактирование новости';$('saveBtn').textContent='Сохранить изменения';$('cancelEdit').classList.remove('hidden');scrollTo({top:0,behavior:'smooth'})}
 async function deleteNews(id){if(!confirm('Удалить эту новость?'))return;try{await api('/api/news/'+id,{method:'DELETE'});if(Number(editingId)===Number(id))reset();loadNews()}catch(e){alert(e.message)}}
 check();
+}
+
+document.addEventListener('click', async (e) => {
+  const btn = e.target.closest('.delete-protest');
+  if (!btn) return;
+  const id = btn.dataset.id;
+  if (!confirm('Удалить этот протест и прикреплённое доказательство? Это действие нельзя отменить.')) return;
+  btn.disabled = true;
+  btn.textContent = 'Удаляем…';
+  try {
+    await api('/api/admin/protests/' + encodeURIComponent(id) + '/delete', {method:'POST'});
+    await loadProtests();
+  } catch (err) {
+    alert(err.message || 'Не удалось удалить протест');
+    btn.disabled = false;
+    btn.textContent = 'Удалить протест';
+  }
+
+
 </script></body></html>

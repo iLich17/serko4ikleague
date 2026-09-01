@@ -506,6 +506,34 @@ class F1Handler(SimpleHTTPRequestHandler):
                 self._json_response(201, {"ok": True, "id": protest_id})
                 return
 
+            if path.startswith("/api/admin/protests/") and path.endswith("/delete"):
+                if not is_admin(self):
+                    self._json_response(401, {"error": "Требуется вход в админ-панель"})
+                    return
+                protest_id = path[len("/api/admin/protests/"):-len("/delete")].strip("/")
+                if not protest_id:
+                    self._json_response(400, {"error": "Не указан протест"})
+                    return
+                with PROTESTS_LOCK:
+                    protests = load_protests()
+                    target = next((p for p in protests if str(p.get("id")) == protest_id), None)
+                    if not target:
+                        self._json_response(404, {"error": "Протест не найден"})
+                        return
+                    evidence = str(target.get("evidence", ""))
+                    filename = Path(evidence[len("/protest-files/"):]).name if evidence.startswith("/protest-files/") else ""
+                    if filename:
+                        file_path = (PROTESTS_DIR / filename).resolve()
+                        if file_path.parent == PROTESTS_DIR.resolve() and file_path.is_file():
+                            try:
+                                file_path.unlink()
+                            except OSError:
+                                pass
+                    protests = [p for p in protests if str(p.get("id")) != protest_id]
+                    save_protests(protests)
+                self._json_response(200, {"ok": True})
+                return
+
             if path == "/api/admin/login":
                 data = self._read_json(64 * 1024)
                 nick = str(data.get("nick", "")).strip() if isinstance(data, dict) else ""
