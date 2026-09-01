@@ -12,6 +12,18 @@
 <section id="login" class="panel login"><h1>Вход</h1><p class="sub">Только для пользователей из списка администраторов.</p><div class="field"><label>Ник</label><input id="nick" autocomplete="username"></div><div class="field"><label>Пароль</label><input id="password" type="password" autocomplete="current-password"></div><button class="btn primary" id="loginBtn">Войти</button><div id="loginMsg" class="status"></div></section>
 <section id="app" class="hidden">
   <div class="panel"><div style="display:flex;justify-content:space-between;gap:15px;align-items:center;flex-wrap:wrap"><div><h1>Новости</h1><p class="sub">Создание, редактирование и удаление публикаций.</p><div id="adminWho" class="status"></div></div><button class="btn secondary" id="logoutBtn">Выйти</button></div></div>
+  <div class="panel">
+    <h2>👥 Пользователи</h2>
+    <p class="sub">Зарегистрированные пользователи сайта.</p>
+    <div id="usersList" class="news"></div>
+  </div>
+  <div class="panel">
+    <h2>🛡️ Администраторы</h2>
+    <p class="sub">Только пользователи из этого списка могут публиковать и управлять новостями.</p>
+    <div class="field"><label>Добавить зарегистрированного пользователя</label><div style="display:flex;gap:9px"><input id="adminNick" placeholder="Введите ник"><button class="btn primary" type="button" id="addAdmin">Добавить</button></div></div>
+    <div id="adminsList" class="news"></div>
+    <div id="adminMsg" class="status"></div>
+  </div>
   <form class="panel" id="newsForm"><h2 id="formTitle">Новая новость</h2><div class="field"><label>Заголовок</label><input id="title" maxlength="160" required></div><div class="field"><label>Текст</label><textarea id="text" maxlength="4000"></textarea></div><div class="field"><label>Тег</label><input id="tag" maxlength="50" value="F1 LEAGUE"></div><div class="field"><label>Фотографии</label><input id="photos" type="file" accept="image/*" multiple></div><div id="previews" class="thumbs"></div><div class="buttons"><button class="btn primary" type="submit" id="saveBtn">Опубликовать</button><button class="btn secondary hidden" type="button" id="cancelEdit">Отмена</button></div><div id="formMsg" class="status"></div></form>
   <div class="panel"><h2>Опубликованные</h2><div id="newsList" class="news"></div></div>
 </section>
@@ -24,7 +36,13 @@ async function compress(file){return new Promise((resolve,reject)=>{const fr=new
 function previews(){ $('previews').innerHTML=selectedImages.map(x=>`<img src="${x}" alt="">`).join('') }
 $('photos').onchange=async()=>{selectedImages=[];for(const f of [...$('photos').files]){if(f.type.startsWith('image/'))try{selectedImages.push(await compress(f))}catch{}}previews()};
 async function check(){try{const d=await api('/api/admin/me');if(d.authenticated)showApp()}catch{} }
-function showApp(){$('login').classList.add('hidden');$('app').classList.remove('hidden');loadNews();api('/api/admin/me').then(d=>{$('adminWho').textContent='Вы вошли как: '+(d.nick||'администратор')})}
+function showApp(){$('login').classList.add('hidden');$('app').classList.remove('hidden');loadNews();loadManagement();api('/api/admin/me').then(d=>{$('adminWho').textContent='Вы вошли как: '+(d.nick||'администратор')})}
+async function loadManagement(){await loadUsers();await loadAdmins()}
+async function loadUsers(){try{const d=await api('/api/admin/users');const el=$('usersList');el.innerHTML=d.users.length?d.users.map(u=>`<article class="item"><div class="title">${esc(u.nick)} ${u.admin?'<span style="font-size:12px;color:#72d28b">· администратор</span>':''}</div><div class="meta">Регистрация: ${esc(u.created_at||'неизвестно')}</div><div class="buttons">${u.admin?'<button class="btn secondary" disabled>Администратор</button>':''}<button class="btn danger" onclick="deleteUser('${encodeURIComponent(u.nick)}')">Удалить</button></div></article>`).join(''):'<div class="status">Пользователей пока нет.</div>'}catch(e){$('usersList').innerHTML='<div class="status error">'+esc(e.message)+'</div>'}}
+async function loadAdmins(){try{const d=await api('/api/admins');const el=$('adminsList');el.innerHTML=d.admins.length?d.admins.map(a=>`<article class="item"><div class="title">${esc(a)}</div><button class="btn danger" onclick="removeAdmin('${encodeURIComponent(a)}')">Убрать из админов</button></article>`).join(''):'<div class="status">Администраторов нет.</div>'}catch(e){$('adminsList').innerHTML='<div class="status error">'+esc(e.message)+'</div>'}}
+$('addAdmin').onclick=async()=>{const nick=$('adminNick').value.trim();if(!nick)return;try{await api('/api/admins',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({nick})});$('adminNick').value='';$('adminMsg').textContent='Администратор добавлен';$('adminMsg').className='status success';loadManagement()}catch(e){$('adminMsg').textContent=e.message;$('adminMsg').className='status error'}};
+async function removeAdmin(nick){if(!confirm('Убрать '+decodeURIComponent(nick)+' из администраторов?'))return;try{await api('/api/admins/'+nick,{method:'DELETE'});loadManagement()}catch(e){alert(e.message)}}
+async function deleteUser(nick){nick=encodeURIComponent(decodeURIComponent(nick));if(!confirm('Удалить пользователя '+decodeURIComponent(nick)+'? Это также уберёт его из администраторов.'))return;try{await api('/api/admin/users/'+nick,{method:'DELETE'});loadManagement()}catch(e){alert(e.message)}}
 $('loginBtn').onclick=async()=>{try{await api('/api/admin/login',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({nick:$('nick').value.trim(),password:$('password').value})});$('loginMsg').textContent='Вход выполнен';showApp()}catch(e){$('loginMsg').textContent=e.message;$('loginMsg').className='status error'}};
 $('password').onkeydown=e=>{if(e.key==='Enter')$('loginBtn').click()};$('nick').onkeydown=e=>{if(e.key==='Enter')$('loginBtn').click()};
 $('logoutBtn').onclick=async()=>{await api('/api/admin/logout',{method:'POST'});location.reload()};

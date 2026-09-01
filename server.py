@@ -25,6 +25,7 @@ USERS_FILE = data_file("users.json")
 ADMINS_FILE = data_file("admins.json")
 NEWS_LOCK = threading.Lock()
 USERS_LOCK = threading.Lock()
+ADMINS_LOCK = threading.Lock()
 
 SESSION_TTL = 12 * 60 * 60
 SESSIONS = {}  # token -> {expires, nick}
@@ -249,6 +250,19 @@ class F1Handler(SimpleHTTPRequestHandler):
                 return
             self._json_response(200, {"admins": load_admins()})
             return
+        if path == "/api/admin/users":
+            if not is_admin(self):
+                self._json_response(401, {"error": "Требуется вход в админ-панель"})
+                return
+            admins = {a.casefold() for a in load_admins()}
+            with USERS_LOCK:
+                users = load_users()
+            public = []
+            for u in users:
+                nick = str(u.get("nick", ""))
+                public.append({"nick": nick, "created_at": u.get("created_at", ""), "admin": nick.casefold() in admins})
+            self._json_response(200, {"users": public})
+            return
         if path == "/api/news":
             if not current_user(self) and not is_admin(self):
                 self._json_response(401, {"error": "Сначала зарегистрируйтесь или войдите"})
@@ -337,6 +351,26 @@ class F1Handler(SimpleHTTPRequestHandler):
                 self._json_response(200, {"ok": True}, [("Set-Cookie", cookie("f1_admin", "", 0))])
                 return
 
+            if path == "/api/admins":
+                if not is_admin(self):
+                    self._json_response(401, {"error": "Требуется вход в админ-панель"})
+                    return
+                data = self._read_json(64 * 1024)
+                nick = str(data.get("nick", "")).strip() if isinstance(data, dict) else ""
+                if not NICK_RE.fullmatch(nick):
+                    self._json_response(400, {"error": "Некорректный ник"}); return
+                with USERS_LOCK:
+                    users = load_users()
+                    user = next((u for u in users if u.get("nick", "").casefold() == nick.casefold()), None)
+                if not user:
+                    self._json_response(404, {"error": "Сначала зарегистрируйте этого пользователя"}); return
+                with ADMINS_LOCK:
+                    admins = load_admins()
+                    if not any(a.casefold() == nick.casefold() for a in admins):
+                        admins.append(user["nick"])
+                        save_admins(admins)
+                self._json_response(201, {"ok": True, "admins": load_admins()}); return
+
             if path == "/api/news":
                 if not is_admin(self):
                     self._json_response(401, {"error": "Требуется вход в админ-панель"})
@@ -393,6 +427,37 @@ class F1Handler(SimpleHTTPRequestHandler):
 
     def do_DELETE(self):
         path = self.path.split("?", 1)[0]
+        if path.startswith("/api/admins/"):
+            if not is_admin(self):
+                self._json_response(401, {"error": "Требуется вход в админ-панель"}); return
+            nick = unquote(path.rsplit("/", 1)[1]).strip()
+            with ADMINS_LOCK:
+                admins = load_admins()
+                target = next((a for a in admins if a.casefold() == nick.casefold()), None)
+                if not target:
+                    self._json_response(404, {"error": "Администратор не найден"}); return
+                if len(admins) <= 1:
+                    self._json_response(400, {"error": "Нельзя удалить последнего администратора"}); return
+                admins = [a for a in admins if a.casefold() != nick.casefold()]
+                save_admins(admins)
+            self._json_response(200, {"ok": True, "admins": load_admins()}); return
+        if path.startswith("/api/admin/users/"):
+            if not is_admin(self):
+                self._json_response(401, {"error": "Требуется вход в админ-панель"}); return
+            nick = unquote(path.rsplit("/", 1)[1]).strip()
+            current = current_admin(self)
+            if current and current.casefold() == nick.casefold():
+                self._json_response(400, {"error": "Нельзя удалить самого себя"}); return
+            with USERS_LOCK:
+                users = load_users()
+                if not any(u.get("nick", "").casefold() == nick.casefold() for u in users):
+                    self._json_response(404, {"error": "Пользователь не найден"}); return
+                users = [u for u in users if u.get("nick", "").casefold() != nick.casefold()]
+                save_users(users)
+            with ADMINS_LOCK:
+                admins = [a for a in load_admins() if a.casefold() != nick.casefold()]
+                save_admins(admins)
+            self._json_response(200, {"ok": True}); return
         if not path.startswith("/api/news/"):
             self._json_response(404, {"error": "not found"}); return
         if not is_admin(self):
