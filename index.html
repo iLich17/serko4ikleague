@@ -21,7 +21,7 @@
 </style></head>
 <body>
 <header><div class="logo" onclick="showPage('home')">F1<span>LEAGUE</span></div><nav>
-<button class="active" data-page="home">Главная</button><button data-page="teams">Команды</button><button data-page="drivers">Пилоты</button><button data-page="results">Результаты гонок</button><button data-page="calendar">Календарь</button><button data-page="championship">Чемпионат</button><button data-page="urgent-news">Новости</button><button data-page="protests">Протесты</button>
+<button class="active" data-page="home">Главная</button><button data-page="teams">Команды</button><button data-page="drivers">Пилоты</button><button data-page="results">Результаты гонок</button><button data-page="calendar">Календарь</button><button data-page="championship">Чемпионат</button><button data-page="urgent-news">Новости</button><button data-page="protests">Протесты</button><a id="adminNav" href="/admin" style="display:none;text-decoration:none;color:#fff;background:#27272d;padding:11px 15px;border-radius:7px;font-weight:800;white-space:nowrap">Админ-панель</a>
 </nav><div id="accountBox" style="margin-left:auto;display:flex;align-items:center;gap:8px;font-size:12px;color:#aaa"><span id="accountNick"></span><button id="accountLogout" style="border:1px solid #292930;background:#15151a;color:#fff;border-radius:8px;padding:8px 10px;cursor:pointer;font-weight:800">Выйти</button></div></header>
 <main>
 <section id="home" class="page active"><div class="hero"><div class="red">F1 LEAGUE • SEASON 2</div><h2>Реальные данные твоего чемпионата</h2><p>Все страницы сайта строятся из одного results.json: результаты, пилоты, команды, очки и чемпионат больше не расходятся между собой.</p></div><div class="stats"><div class="stat"><small>Сессий</small><b id="stat-races">—</b></div><div class="stat"><small>Команд</small><b id="stat-teams">—</b></div><div class="stat"><small>Пилотов</small><b id="stat-drivers">—</b></div><div class="stat"><small>Лидер</small><b id="stat-leader">—</b></div></div></section>
@@ -117,7 +117,7 @@ loadResults();
       <div class="urgent-news-kicker"><span class="urgent-live-dot"></span> СРОЧНЫЕ НОВОСТИ</div>
       <h2>Последние новости F1 League</h2>
     </div>
-    <div class="urgent-news-actions"><a class="urgent-admin-link" href="/admin">Админ-панель</a></div>
+    
   </div>
   
 <div class="urgent-news-form" id="urgentNewsForm">
@@ -435,4 +435,18 @@ loadResults();
 </main><footer>F1 LEAGUE © 2026 • Season 2</footer>
 <script>
 (async()=>{try{const r=await fetch('/api/auth/me',{cache:'no-store'});const d=await r.json();if(!d.authenticated){location.href='/auth';return}const n=document.getElementById('accountNick');if(n)n.textContent='@'+d.nick;const b=document.getElementById('accountLogout');if(b)b.onclick=async()=>{await fetch('/api/auth/logout',{method:'POST'});location.href='/auth'}}catch(e){location.href='/auth'}})();
-</script></body></html>
+</script>
+<script>
+(async function(){
+  const adminNav=document.getElementById('adminNav');
+  if(!adminNav) return;
+  try {
+    const r=await fetch('/api/admin/me',{credentials:'same-origin'});
+    const d=await r.json();
+    adminNav.style.display=d.authenticated?'inline-flex':'none';
+  } catch(e) {
+    adminNav.style.display='none';
+  }
+})();
+</script>
+</body></html>
