@@ -155,9 +155,10 @@ def driver_public_list(include_inactive=False):
         active = bool(item.get("active", True))
         if not include_inactive and not active:
             continue
+        current_team = season_driver_team("2", name) or item.get("team", "")
         rows.append({
             "name": name,
-            "team": item.get("team", ""),
+            "team": current_team,
             "photo": item.get("photo", ""),
             "active": active,
         })
@@ -223,7 +224,52 @@ def season_roster_base(season_id):
 
 def season_roster_public(season_id):
     base = season_roster_base(season_id)
-    return [{"name": str(k), "team": str(v.get("team", ""))} for k,v in base.items() if isinstance(v, dict)]
+    rows = []
+    for k, v in base.items():
+        if not isinstance(v, dict) or str(k) == "transfers":
+            continue
+        transfers = v.get("transfers", []) if isinstance(v.get("transfers", []), list) else []
+        clean = []
+        for tr in transfers:
+            if not isinstance(tr, dict):
+                continue
+            try:
+                effective_round = int(tr.get("effective_round", 1))
+            except (TypeError, ValueError):
+                continue
+            clean.append({
+                "from_team": str(tr.get("from_team", "")),
+                "to_team": str(tr.get("to_team", "")),
+                "effective_round": max(1, effective_round),
+            })
+        clean.sort(key=lambda x: x["effective_round"])
+        current = str(v.get("team", ""))
+        for tr in clean:
+            current = tr["to_team"] or current
+        rows.append({"name": str(k), "team": current, "transfers": clean})
+    return rows
+
+def season_driver_team(season_id, name, round_no=None):
+    base = season_roster_base(season_id)
+    item = next((v for k, v in base.items() if str(k).casefold() == str(name).casefold() and isinstance(v, dict)), None)
+    if not item:
+        return ""
+    team = str(item.get("team", ""))
+    transfers = item.get("transfers", []) if isinstance(item.get("transfers", []), list) else []
+    parsed = []
+    for tr in transfers:
+        if not isinstance(tr, dict):
+            continue
+        try:
+            effective = int(tr.get("effective_round", 1))
+        except (TypeError, ValueError):
+            continue
+        parsed.append((max(1, effective), str(tr.get("to_team", "")).strip()))
+    for effective, to_team in sorted(parsed):
+        if round_no is None or int(round_no) >= effective:
+            if to_team:
+                team = to_team
+    return team
 
 def safe_team_photo_filename(name):
     base = re.sub(r"[^A-Za-z0-9._-]+", "_", str(name)).strip("._-") or "team"
@@ -686,10 +732,16 @@ class F1Handler(SimpleHTTPRequestHandler):
                 season_id = str(data.get("season_id", "")).strip() if isinstance(data, dict) else ""
                 driver = str(data.get("driver", "")).strip() if isinstance(data, dict) else ""
                 team = str(data.get("team", "")).strip() if isinstance(data, dict) else ""
+                try:
+                    effective_round = int(data.get("effective_round", 1)) if isinstance(data, dict) else 1
+                except (TypeError, ValueError):
+                    effective_round = 0
                 if season_id not in {"1", "2"}:
                     self._json_response(400, {"error": "Выберите сезон"}); return
                 if not driver or not team:
                     self._json_response(400, {"error": "Укажите пилота и новую команду"}); return
+                if effective_round < 1:
+                    self._json_response(400, {"error": "Укажите корректный номер этапа"}); return
                 roster = season_roster_base(season_id)
                 canonical = next((n for n in roster if n.casefold() == driver.casefold()), None)
                 if not canonical:
@@ -700,12 +752,18 @@ class F1Handler(SimpleHTTPRequestHandler):
                     if not isinstance(current, dict):
                         current = dict(roster)
                     item = dict(current.get(canonical, {}))
-                    old_team = item.get("team", "")
-                    item.update({"name": canonical, "team": team})
+                    old_team = season_driver_team(season_id, canonical, effective_round - 1) or item.get("team", "")
+                    if old_team == team:
+                        self._json_response(400, {"error": "Новая команда совпадает с текущей"}); return
+                    transfers = item.get("transfers", []) if isinstance(item.get("transfers", []), list) else []
+                    transfers = [t for t in transfers if not (isinstance(t, dict) and int(t.get("effective_round", 0) or 0) == effective_round)]
+                    transfers.append({"from_team": old_team, "to_team": team, "effective_round": effective_round})
+                    transfers.sort(key=lambda t: int(t.get("effective_round", 0) or 0))
+                    item.update({"name": canonical, "team": item.get("team", old_team), "transfers": transfers})
                     current[canonical] = item
                     all_rosters[season_id] = current
                     save_season_rosters(all_rosters)
-                self._json_response(200, {"ok": True, "season_id": int(season_id), "driver": canonical, "old_team": old_team, "new_team": team})
+                self._json_response(200, {"ok": True, "season_id": int(season_id), "driver": canonical, "old_team": old_team, "new_team": team, "effective_round": effective_round})
                 return
 
             if path == "/api/admin/drivers":
