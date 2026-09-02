@@ -181,7 +181,7 @@ function calc(){
   const team=seasonDriverTeam(data,x.driver,r.round)||x.team;
   if(!teams[team])teams[team]={name:team,points:0,drivers:new Set()};
   teams[team].points+=Number(x.points)||0;
-  if(!drivers[x.driver])drivers[x.driver]={name:x.driver,team:seasonDriverTeam(data,x.driver)||team,points:0,wins:0,podiums:0,photo:cfg.photo||''};
+  if(!drivers[x.driver])drivers[x.driver]={name:x.driver,team:(cfg.team||seasonDriverTeam(seasonData(2),x.driver)||team),points:0,wins:0,podiums:0,photo:cfg.photo||''};
   drivers[x.driver].points+=Number(x.points)||0;if(x.position===1)drivers[x.driver].wins++;if(typeof x.position==='number'&&x.position<=3)drivers[x.driver].podiums++;
   teams[team].drivers.add(x.driver);
  }));
@@ -197,8 +197,25 @@ function openTeam(name){const t=stats.teams.find(x=>x.name===name);if(!t)return;
 function driverRows(){return stats.drivers.map((d,i)=>`<article class="driver-card">${driverPhoto(d.name)}<div class="driver-card-body"><div class="driver-name">${esc(d.name)}</div><div class="driver-team">${esc(d.team)}</div><div class="driver-stats"><span>Место <b>${i+1}</b></span><span>Победы <b>${d.wins}</b></span><span>Подиумы <b>${d.podiums}</b></span><span>Очки <b>${d.points}</b></span></div></div></article>`).join('');}
 function renderDrivers(){document.getElementById('drivers-body').innerHTML=driverRows();renderChampionship();}
 function seasonData(id){return seasonDatas[String(id)]||null;}
-function seasonDriverTeam(data,name){const sid=String((data&&data.season)||'');const roster=(seasonRosters[sid]||[]).find(x=>x.name===name);if(roster&&roster.team)return roster.team;const cfg=data&&data.drivers&&data.drivers[name];return cfg&&cfg.team?cfg.team:'';}
-function calcSeason(data){const drivers={};const teams={};if(!data)return {drivers:[],teams:[]};data.races.forEach(r=>r.results.forEach(x=>{if(x.position==='DNS')return;const name=x.driver,team=seasonDriverTeam(data,name,r.round)||x.team,currentTeam=seasonDriverTeam(data,name)||team;if(!teams[team])teams[team]={name:team,points:0,drivers:new Set()};teams[team].points+=Number(x.points)||0;if(!drivers[name])drivers[name]={name,team:currentTeam,points:0,wins:0,podiums:0};drivers[name].points+=Number(x.points)||0;if(x.position===1)drivers[name].wins++;if(typeof x.position==='number'&&x.position<=3)drivers[name].podiums++;drivers[name].team=currentTeam;teams[team].drivers.add(name)}));return {drivers:Object.values(drivers).sort((a,b)=>b.points-a.points||a.name.localeCompare(b.name)),teams:Object.values(teams).sort((a,b)=>b.points-a.points||a.name.localeCompare(b.name))};}
+function seasonDriverTeam(data,name,roundNo=null){
+ const sid=String((data&&data.season)||'');
+ const list=seasonRosters[sid]||[];
+ const roster=Array.isArray(list)
+   ? list.find(x=>String(x?.name||'').casefold?.()===String(name).casefold?.())
+   : (list[name] || Object.values(list).find(x=>String(x?.name||'').toLowerCase()===String(name).toLowerCase()));
+ if(roster){
+   let team=roster.team||'';
+   const transfers=Array.isArray(roster.transfers)?roster.transfers:[];
+   for(const tr of transfers){
+     const effective=Number(tr.effective_round);
+     if(Number.isFinite(effective) && (roundNo==null || Number(roundNo)>=effective) && tr.to_team) team=tr.to_team;
+   }
+   if(team)return team;
+ }
+ const cfg=data&&data.drivers&&data.drivers[name];
+ return cfg&&cfg.team?cfg.team:'';
+}
+function calcSeason(data){const drivers={};const teams={};if(!data)return {drivers:[],teams:[]};data.races.forEach(r=>r.results.forEach(x=>{if(x.position==='DNS')return;const name=x.driver,team=seasonDriverTeam(data,name,r.round)||x.team,currentSeasonTeam=driverMeta(name).team||seasonDriverTeam(seasonData(2),name)||team;if(!teams[team])teams[team]={name:team,points:0,drivers:new Set()};teams[team].points+=Number(x.points)||0;if(!drivers[name])drivers[name]={name,team:currentSeasonTeam,points:0,wins:0,podiums:0};drivers[name].points+=Number(x.points)||0;if(x.position===1)drivers[name].wins++;if(typeof x.position==='number'&&x.position<=3)drivers[name].podiums++;drivers[name].team=currentSeasonTeam;teams[team].drivers.add(name)}));return {drivers:Object.values(drivers).sort((a,b)=>b.points-a.points||a.name.localeCompare(b.name)),teams:Object.values(teams).sort((a,b)=>b.points-a.points||a.name.localeCompare(b.name))};}
 function renderSeasonSwitch(kind,selected){const el=document.getElementById(`season-${kind}-switch`);if(!el)return;el.innerHTML=seasonList.map(s=>`<button class="${s.id===selected?'active':''}" onclick="selectSeason('${kind}',${s.id})">${esc(s.name)}</button>`).join('');}
 function selectSeason(kind,id){if(!seasonData(id))return;if(kind==='calendar'){selectedCalendarSeason=id;renderCalendar();}else{selectedChampionshipSeason=id;renderChampionship();}}
 function renderChampionship(){const data=seasonData(selectedChampionshipSeason);const c=calcSeason(data);const leaderPoints=c.drivers[0]?c.drivers[0].points:0;renderSeasonSwitch('championship',selectedChampionshipSeason);document.getElementById('championship-body').innerHTML=c.drivers.map((d,i)=>{const deficit=Math.max(0,leaderPoints-d.points);return `<tr><td class="position">${i+1}</td><td>${esc(d.name)}</td><td>${esc(d.team)}</td><td>${d.wins}</td><td>${d.podiums}</td><td><b>${d.points}</b></td><td>${deficit===0?'—':`−${deficit}`}</td></tr>`}).join('');const l=c.drivers[0];document.getElementById('championship-note').textContent=l?`${seasonData(selectedChampionshipSeason).name}: лидер ${l.name} — ${l.points} очков`:'Нет данных';}
