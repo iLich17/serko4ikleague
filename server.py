@@ -38,6 +38,8 @@ ADMINS_LOCK = threading.Lock()
 PROTESTS_LOCK = threading.Lock()
 DRIVERS_LOCK = threading.Lock()
 TEAMS_LOCK = threading.Lock()
+SEASON_ROSTERS_FILE = data_file("season_rosters.json")
+SEASON_ROSTERS_LOCK = threading.Lock()
 
 SESSION_TTL = 12 * 60 * 60
 SESSIONS = {}  # token -> {expires, nick}
@@ -192,6 +194,36 @@ def team_public_list():
     settings = load_team_settings()
     return [{"name": n, "photo": settings.get(n, {}).get("photo", "")} for n in team_names_from_results()]
 
+
+def load_season_rosters():
+    data = load_json(SEASON_ROSTERS_FILE, {})
+    return data if isinstance(data, dict) else {}
+
+def save_season_rosters(data):
+    save_json(SEASON_ROSTERS_FILE, data)
+
+def season_roster_base(season_id):
+    sid = str(season_id)
+    rosters = load_season_rosters()
+    if sid in rosters and isinstance(rosters[sid], dict):
+        return rosters[sid]
+    if sid == "1":
+        data = load_json(ROOT / "season1.json", {})
+        return data.get("drivers", {}) if isinstance(data, dict) else {}
+    data = load_json(ROOT / "results.json", {})
+    result = {}
+    if isinstance(data, dict):
+        for race in data.get("races", []):
+            for row in race.get("results", []):
+                name = str(row.get("driver", "")).strip()
+                team = str(row.get("team", "")).strip()
+                if name and team:
+                    result[name] = {"name": name, "team": team}
+    return result
+
+def season_roster_public(season_id):
+    base = season_roster_base(season_id)
+    return [{"name": str(k), "team": str(v.get("team", ""))} for k,v in base.items() if isinstance(v, dict)]
 
 def safe_team_photo_filename(name):
     base = re.sub(r"[^A-Za-z0-9._-]+", "_", str(name)).strip("._-") or "team"
@@ -434,6 +466,24 @@ class F1Handler(SimpleHTTPRequestHandler):
                 return
             self._json_response(200, {"teams": team_public_list()})
             return
+        if path == "/api/season-rosters":
+            if not current_user(self) and not is_admin(self):
+                self._json_response(401, {"error": "Сначала зарегистрируйтесь или войдите"})
+                return
+            rosters = load_season_rosters()
+            result = {}
+            for sid in ("1", "2"):
+                result[sid] = season_roster_public(sid)
+            self._json_response(200, {"rosters": result})
+            return
+        if path == "/api/admin/season-rosters":
+            if not is_admin(self):
+                self._json_response(401, {"error": "Требуется вход в админ-панель"})
+                return
+            result = {sid: season_roster_public(sid) for sid in ("1", "2")}
+            self._json_response(200, {"rosters": result})
+            return
+
         if path == "/api/admin/teams":
             if not is_admin(self):
                 self._json_response(401, {"error": "Требуется вход в админ-панель"})
@@ -626,6 +676,36 @@ class F1Handler(SimpleHTTPRequestHandler):
             if path == "/api/auth/logout":
                 delete_user_session(self)
                 self._json_response(200, {"ok": True}, [("Set-Cookie", cookie("f1_user", "", 0))])
+                return
+
+            if path == "/api/admin/transfers":
+                if not is_admin(self):
+                    self._json_response(401, {"error": "Требуется вход в админ-панель"})
+                    return
+                data = self._read_json(64 * 1024)
+                season_id = str(data.get("season_id", "")).strip() if isinstance(data, dict) else ""
+                driver = str(data.get("driver", "")).strip() if isinstance(data, dict) else ""
+                team = str(data.get("team", "")).strip() if isinstance(data, dict) else ""
+                if season_id not in {"1", "2"}:
+                    self._json_response(400, {"error": "Выберите сезон"}); return
+                if not driver or not team:
+                    self._json_response(400, {"error": "Укажите пилота и новую команду"}); return
+                roster = season_roster_base(season_id)
+                canonical = next((n for n in roster if n.casefold() == driver.casefold()), None)
+                if not canonical:
+                    self._json_response(404, {"error": "Пилот не найден в выбранном сезоне"}); return
+                with SEASON_ROSTERS_LOCK:
+                    all_rosters = load_season_rosters()
+                    current = all_rosters.get(season_id)
+                    if not isinstance(current, dict):
+                        current = dict(roster)
+                    item = dict(current.get(canonical, {}))
+                    old_team = item.get("team", "")
+                    item.update({"name": canonical, "team": team})
+                    current[canonical] = item
+                    all_rosters[season_id] = current
+                    save_season_rosters(all_rosters)
+                self._json_response(200, {"ok": True, "season_id": int(season_id), "driver": canonical, "old_team": old_team, "new_team": team})
                 return
 
             if path == "/api/admin/drivers":

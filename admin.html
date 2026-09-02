@@ -54,6 +54,17 @@
     <div id="driversAdminList" class="news"></div>
   </div>
   <div class="panel">
+    <h2>🔄 Трансфер пилота</h2>
+    <p class="sub">Переводи пилота между командами отдельно для каждого сезона. Результаты уже проведённых гонок не изменяются.</p>
+    <div class="field"><label>Сезон</label><select id="transferSeason" style="width:100%;border:1px solid #303038;background:#0d0d11;color:#fff;border-radius:10px;padding:12px;font:inherit"><option value="1">Сезон 1</option><option value="2" selected>Сезон 2</option></select></div>
+    <div class="field"><label>Пилот</label><select id="transferDriver" style="width:100%;border:1px solid #303038;background:#0d0d11;color:#fff;border-radius:10px;padding:12px;font:inherit"></select></div>
+    <div class="field"><label>Новая команда</label><select id="transferTeam" style="width:100%;border:1px solid #303038;background:#0d0d11;color:#fff;border-radius:10px;padding:12px;font:inherit"></select></div>
+    <div id="transferCurrent" class="status"></div>
+    <div class="buttons"><button class="btn primary" type="button" id="saveTransfer">Оформить трансфер</button></div>
+    <div id="transferMsg" class="status"></div>
+    <div id="transfersList" class="news"></div>
+  </div>
+  <div class="panel">
     <h2>⚖️ Протесты</h2>
     <p class="sub">Протесты доступны только администраторам.</p>
     <div id="protestsList" class="news"></div>
@@ -86,7 +97,25 @@ $('deleteDriver').onclick=()=>{if($('driverSelect').value)deleteDriver(encodeURI
 async function loadTeamsAdmin(){try{const d=await api('/api/admin/teams');$('teamSelect').innerHTML=d.teams.map(x=>`<option value="${esc(x.name)}">${esc(x.name)}</option>`).join('');$('teamsAdminList').innerHTML=d.teams.map(x=>`<article class="item"><div class="title">${esc(x.name)}</div><div class="meta">${x.photo?'Своя фотография':'Стандартная фотография'}</div>${x.photo?`<div class="thumbs"><img src="${esc(x.photo)}" alt=""></div>`:''}</article>`).join('')}catch(e){$('teamsAdminList').innerHTML='<div class="status error">'+esc(e.message)+'</div>'}}
 $('saveTeamPhoto').onclick=async()=>{const name=$('teamSelect').value;const f=$('teamPhoto').files[0];if(!f){$('teamMsg').textContent='Выберите фотографию';$('teamMsg').className='status error';return}const fd=new FormData();fd.append('name',name);fd.append('photo',f);try{await api('/api/admin/teams',{method:'POST',body:fd});$('teamMsg').textContent='Фото команды сохранено';$('teamMsg').className='status success';$('teamPhoto').value='';loadTeamsAdmin()}catch(e){$('teamMsg').textContent=e.message;$('teamMsg').className='status error'}}
 
-async function loadManagement(){await loadUsers();await loadAdmins();await loadProtests();await loadTeamsAdmin();await loadDriversAdmin()}
+let transferRosters={};
+const transferTeams=['McLaren','Ferrari','Mercedes','Red Bull Racing','Aston Martin','Williams','Haas','Alpine','Visa Cash App RB','Kick Sauber'];
+async function loadTransfersAdmin(){
+  try{
+    const d=await api('/api/admin/season-rosters'); transferRosters=d.rosters||{}; renderTransferForm();
+  }catch(e){ $('transferMsg').textContent=e.message; $('transferMsg').className='status error'; }
+}
+function renderTransferForm(){
+  const sid=$('transferSeason').value; const list=transferRosters[sid]||[];
+  $('transferDriver').innerHTML=list.map(x=>`<option value="${esc(x.name)}">${esc(x.name)}</option>`).join('');
+  $('transferTeam').innerHTML=transferTeams.map(x=>`<option value="${esc(x)}">${esc(x)}</option>`).join('');
+  updateTransferCurrent();
+  $('transfersList').innerHTML=list.map(x=>`<article class="item"><div class="title">${esc(x.name)}</div><div class="meta">${esc(x.team||'Команда не указана')}</div></article>`).join('');
+}
+function updateTransferCurrent(){const sid=$('transferSeason').value;const name=$('transferDriver').value;const x=(transferRosters[sid]||[]).find(v=>v.name===name);if(x){$('transferCurrent').textContent='Текущая команда: '+(x.team||'—');$('transferTeam').value=x.team||$('transferTeam').value;}}
+$('transferSeason').onchange=renderTransferForm; $('transferDriver').onchange=updateTransferCurrent;
+$('saveTransfer').onclick=async()=>{const season_id=$('transferSeason').value,driver=$('transferDriver').value,team=$('transferTeam').value;if(!driver||!team)return;try{const d=await api('/api/admin/transfers',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({season_id,driver,team})});$('transferMsg').textContent=`Трансфер оформлен: ${d.driver} — ${d.old_team||'без команды'} → ${d.new_team}`;$('transferMsg').className='status success';await loadTransfersAdmin();}catch(e){$('transferMsg').textContent=e.message;$('transferMsg').className='status error'}};
+
+async function loadManagement(){await loadUsers();await loadAdmins();await loadProtests();await loadTeamsAdmin();await loadDriversAdmin();await loadTransfersAdmin()}
 
 async function loadProtests(){
   try{
