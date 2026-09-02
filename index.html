@@ -17,7 +17,19 @@
   cursor:zoom-in;
 }
 
-.driver-card{position:relative;overflow:hidden;background:#15151a;border:1px solid #292930;border-radius:15px;min-height:300px;padding:0;box-shadow:0 10px 30px #0003;transition:.2s}.driver-card:hover{transform:translateY(-4px);border-color:#555}.driver-photo{width:100%;height:235px;object-fit:contain;object-position:center;background:#0b0b0f;display:block}.driver-photo-placeholder{width:100%;height:235px;display:flex;align-items:center;justify-content:center;background:linear-gradient(145deg,#1d1d23,#0b0b0f);color:#777;font-size:52px;font-weight:900}.driver-card-body{padding:16px}.driver-name{font-size:21px;font-weight:900}.driver-team{color:#999;margin-top:5px}.driver-stats{display:flex;gap:14px;flex-wrap:wrap;margin-top:12px;font-size:12px;color:#b7bbc2}.driver-stats b{color:#fff}.team-driver-card{background:#15151a;border:1px solid #292930;border-radius:15px;overflow:hidden}.team-driver-card .driver-photo,.team-driver-card .driver-photo-placeholder{height:190px}
+.driver-card{position:relative;overflow:hidden;background:#15151a;border:1px solid #292930;border-radius:16px;min-height:300px;padding:0;box-shadow:0 10px 30px #0003;transition:.2s}.driver-card:hover{transform:translateY(-4px);border-color:#555}
+
+/* Карточка фотографии пилота оформлена в стиле F1 Drivers:
+   фото занимает всю ширину, сохраняет пропорции и не получает чёрных
+   полос по бокам. Если загружено готовое фото-карточка (как Jorginho),
+   его графика остаётся полностью читаемой. */
+.driver-photo{width:100%;height:auto;max-height:none;aspect-ratio:auto;object-fit:contain;object-position:center;background:#0b0b0f;display:block}
+
+/* Для обычного портрета без готового фона используем тот же визуальный
+   блок, но не растягиваем изображение. */
+.driver-photo-placeholder{width:100%;min-height:235px;display:flex;align-items:center;justify-content:center;background:linear-gradient(145deg,#1d1d23,#0b0b0f);color:#777;font-size:52px;font-weight:900}
+
+.driver-card-body{padding:16px;background:#15151a}.driver-name{font-size:21px;font-weight:900}.driver-team{color:#999;margin-top:5px}.driver-stats{display:flex;gap:14px;flex-wrap:wrap;margin-top:12px;font-size:12px;color:#b7bbc2}.driver-stats b{color:#fff}.team-driver-card{background:#15151a;border:1px solid #292930;border-radius:15px;overflow:hidden}.team-driver-card .driver-photo,.team-driver-card .driver-photo-placeholder{height:190px;min-height:190px;object-fit:cover}
 .team-card img{width:100%;height:auto !important;max-height:none !important;object-fit:contain !important;display:block}.team-header{background-size:cover;background-position:center}\n</style></head>
 <body>
 <header><div class="logo" onclick="showPage('home')">F1<span>LEAGUE</span></div><nav>
