@@ -766,6 +766,55 @@ class F1Handler(SimpleHTTPRequestHandler):
                 self._json_response(200, {"ok": True, "season_id": int(season_id), "driver": canonical, "old_team": old_team, "new_team": team, "effective_round": effective_round})
                 return
 
+            if path == "/api/admin/teams":
+                if not is_admin(self):
+                    self._json_response(401, {"error": "Требуется вход в админ-панель"})
+                    return
+                fields, file_part = self._read_multipart(max_bytes=15 * 1024 * 1024)
+                name = fields.get("name", "").strip()
+                if not name:
+                    self._json_response(400, {"error": "Не указана команда"})
+                    return
+                canonical = next((n for n in team_names_from_results() if n.casefold() == name.casefold()), None)
+                if not canonical:
+                    self._json_response(404, {"error": "Команда не найдена"})
+                    return
+                if not file_part or not file_part.get("data"):
+                    self._json_response(400, {"error": "Выберите фотографию команды"})
+                    return
+                mime = file_part.get("mime", "")
+                if not mime.startswith("image/"):
+                    self._json_response(400, {"error": "Фото команды должно быть изображением"})
+                    return
+                data = file_part["data"]
+                if len(data) > 10 * 1024 * 1024:
+                    self._json_response(400, {"error": "Фото не должно превышать 10 МБ"})
+                    return
+                ext = Path(file_part.get("filename") or "").suffix.lower()
+                if ext not in {".jpg", ".jpeg", ".png", ".webp", ".gif"}:
+                    ext = ".jpg"
+                filename = safe_team_photo_filename(canonical) + ext
+                with TEAMS_LOCK:
+                    settings = load_team_settings()
+                    item = settings.get(canonical)
+                    if not isinstance(item, dict):
+                        item = {}
+                    old = str(item.get("photo", ""))
+                    if old.startswith("/team-photos/"):
+                        old_file = (TEAM_PHOTOS_DIR / Path(old).name).resolve()
+                        if old_file.parent == TEAM_PHOTOS_DIR.resolve() and old_file.is_file() and old_file.name != filename:
+                            try:
+                                old_file.unlink()
+                            except OSError:
+                                pass
+                    target = TEAM_PHOTOS_DIR / filename
+                    target.write_bytes(data)
+                    item["photo"] = "/team-photos/" + filename
+                    settings[canonical] = item
+                    save_team_settings(settings)
+                self._json_response(200, {"ok": True, "team": {"name": canonical, "photo": settings[canonical]["photo"]}})
+                return
+
             if path == "/api/admin/drivers":
                 if not is_admin(self):
                     self._json_response(401, {"error": "Требуется вход в админ-панель"})
