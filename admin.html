@@ -5,6 +5,17 @@
 <title>F1 League — Админ-панель</title>
 <style>
 *{box-sizing:border-box}body{margin:0;font-family:Arial,Helvetica,sans-serif;background:#07070a;color:#fff}header{background:#101014;border-bottom:1px solid #292930;padding:16px 4vw;display:flex;justify-content:space-between;align-items:center;gap:20px}.logo{font-size:25px;font-weight:950}.logo span{color:#e10600}a{color:#fff;text-decoration:none}.back{color:#aaa}.wrap{max-width:1100px;margin:0 auto;padding:38px 4vw}.panel{background:#15151a;border:1px solid #292930;border-radius:16px;padding:22px;margin-bottom:18px}h1{font-size:38px;margin:0 0 8px}.sub{color:#8d8d96;margin:0 0 26px}.field{display:grid;gap:7px;margin-bottom:14px}.field label{font-size:12px;font-weight:800;color:#aeb4bd}.field input,.field textarea{width:100%;border:1px solid #303038;background:#0d0d11;color:#fff;border-radius:10px;padding:12px;font:inherit;outline:none}.field textarea{min-height:150px;resize:vertical}.buttons{display:flex;gap:9px;flex-wrap:wrap}.btn{border:0;border-radius:9px;padding:11px 15px;font-weight:800;cursor:pointer}.primary{background:#e10600;color:#fff}.secondary{background:#292930;color:#fff}.danger{background:#3a1616;color:#ff7770}.hidden{display:none!important}.news{display:grid;gap:12px}.item{padding:16px;border:1px solid #292930;border-radius:13px;background:#0f0f13}.meta{font-size:11px;color:#8f959e;margin-bottom:7px}.title{font-size:19px;font-weight:900;margin-bottom:6px}.text{color:#c6cad0;line-height:1.55;white-space:pre-wrap}.thumbs{display:flex;gap:8px;flex-wrap:wrap;margin-top:12px}.thumbs img{width:120px;height:80px;object-fit:cover;border-radius:8px}.login{max-width:430px;margin:80px auto}.status{color:#9da4ad;margin:10px 0}.error{color:#ff6a63}.success{color:#72d28b}@media(max-width:600px){h1{font-size:30px}header{align-items:flex-start;flex-direction:column}}
+
+@media(max-width:600px){
+  header{padding:12px 14px;gap:10px}
+  .wrap{padding:22px 12px}
+  .panel{padding:15px;border-radius:13px}
+  h1{font-size:27px}
+  .buttons{display:grid;grid-template-columns:1fr;gap:8px}
+  .btn{width:100%;padding:12px}
+  .thumbs img{width:calc(50% - 4px);height:auto;aspect-ratio:3/2}
+  .item{padding:13px}
+}
 </style>
 </head><body>
 <header><div class="logo">F1<span>LEAGUE</span> · ADMIN</div><div><a class="back" href="/">← На сайт</a></div></header>
