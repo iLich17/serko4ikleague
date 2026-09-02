@@ -1,0 +1,4 @@
+
+window.URGENT_NEWS = [
+  {id:1,date:"2026-09-01",time:"18:30",title:"Срочные новости",text:"Следите за последними обновлениями F1 League.",tag:"F1 LEAGUE",images:[]}
+];
