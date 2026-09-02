@@ -1,0 +1,2584 @@
+{
+  "season": 1,
+  "name": "Сезон 1",
+  "drivers": {
+    "Alexander Frame": {
+      "name": "Alexander Frame",
+      "team": "Ferrari"
+    },
+    "Antonio Londyx": {
+      "name": "Antonio Londyx",
+      "team": "Mercedes"
+    },
+    "Ayrton Senna": {
+      "name": "Ayrton Senna",
+      "team": "Red Bull Racing"
+    },
+    "Banana Leclerc": {
+      "name": "Banana Leclerc",
+      "team": "McLaren"
+    },
+    "Bogdan Strolov": {
+      "name": "Bogdan Strolov",
+      "team": "Alpine"
+    },
+    "Bruno Guimaraes": {
+      "name": "Bruno Guimaraes",
+      "team": "Mercedes"
+    },
+    "Cristiano Ronaldo": {
+      "name": "Cristiano Ronaldo",
+      "team": "Williams"
+    },
+    "Dmitry Shelepa": {
+      "name": "Dmitry Shelepa",
+      "team": "Haas"
+    },
+    "Esteban Ocon": {
+      "name": "Esteban Ocon",
+      "team": "Alpine"
+    },
+    "Gleb Becker": {
+      "name": "Gleb Becker",
+      "team": "Kick Sauber"
+    },
+    "Hasan Tigiev": {
+      "name": "Hasan Tigiev",
+      "team": "Aston Martin"
+    },
+    "Jorginho Ferreira": {
+      "name": "Jorginho Ferreira",
+      "team": "Ferrari"
+    },
+    "Lewis Hamilton": {
+      "name": "Lewis Hamilton",
+      "team": "Mercedes"
+    },
+    "Mark Freynem": {
+      "name": "Mark Freynem",
+      "team": "Haas"
+    },
+    "Max Raze": {
+      "name": "Max Raze",
+      "team": "Red Bull Racing"
+    },
+    "Nikita Sprite": {
+      "name": "Nikita Sprite",
+      "team": "Visa Cash App RB"
+    },
+    "Oscar Piastri": {
+      "name": "Oscar Piastri",
+      "team": "Ferrari"
+    },
+    "Rock Johnson": {
+      "name": "Rock Johnson",
+      "team": "Williams"
+    },
+    "Sam Baker": {
+      "name": "Sam Baker",
+      "team": "McLaren"
+    },
+    "Sergey Nabokov": {
+      "name": "Sergey Nabokov",
+      "team": "Aston Martin"
+    },
+    "Shishka Hamilton": {
+      "name": "Shishka Hamilton",
+      "team": "Williams"
+    },
+    "Steven Lindbald": {
+      "name": "Steven Lindbald",
+      "team": "Red Bull Racing"
+    },
+    "Timur Zaripov": {
+      "name": "Timur Zaripov",
+      "team": "Visa Cash App RB"
+    },
+    "Toni Martinez": {
+      "name": "Toni Martinez",
+      "team": "Alpine"
+    },
+    "Vova Scott": {
+      "name": "Vova Scott",
+      "team": "Kick Sauber"
+    },
+    "Wang Kim": {
+      "name": "Wang Kim",
+      "team": "McLaren"
+    },
+    "Yan Morel": {
+      "name": "Yan Morel",
+      "team": "Haas"
+    },
+    "Zayats Burmaldayats": {
+      "name": "Zayats Burmaldayats",
+      "team": "Aston Martin"
+    }
+  },
+  "races": [
+    {
+      "round": 1,
+      "grandPrix": "Австралия",
+      "session": "race",
+      "results": [
+        {
+          "driver": "Rock Johnson",
+          "team": "Williams",
+          "position": 1,
+          "points": 25,
+          "gap": "GAP"
+        },
+        {
+          "driver": "Yan Morel",
+          "team": "Haas",
+          "position": 2,
+          "points": 18,
+          "gap": "+39.385"
+        },
+        {
+          "driver": "Shishka Hamilton",
+          "team": "Williams",
+          "position": 3,
+          "points": 15,
+          "gap": "+47.484"
+        },
+        {
+          "driver": "Hasan Tigiev",
+          "team": "Aston Martin",
+          "position": 4,
+          "points": 12,
+          "gap": "+6.247"
+        },
+        {
+          "driver": "Cristiano Ronaldo",
+          "team": "Williams",
+          "position": 5,
+          "points": 10,
+          "gap": "+33.380"
+        },
+        {
+          "driver": "Jorginho Ferreira",
+          "team": "Ferrari",
+          "position": 6,
+          "points": 8,
+          "gap": "+26.933"
+        },
+        {
+          "driver": "Ayrton Senna",
+          "team": "Red Bull Racing",
+          "position": 7,
+          "points": 6,
+          "gap": "+4.424"
+        },
+        {
+          "driver": "Timur Zaripov",
+          "team": "Visa Cash App RB",
+          "position": 8,
+          "points": 4,
+          "gap": "+29.752"
+        },
+        {
+          "driver": "Alexander Frame",
+          "team": "Ferrari",
+          "position": 9,
+          "points": 2,
+          "gap": "+7.802"
+        },
+        {
+          "driver": "Antonio Londyx",
+          "team": "Mercedes",
+          "position": 10,
+          "points": 1,
+          "gap": "+8.493"
+        },
+        {
+          "driver": "Steven Lindbald",
+          "team": "Red Bull Racing",
+          "position": "DSQ",
+          "points": 0,
+          "gap": "DSQ"
+        },
+        {
+          "driver": "Esteban Ocon",
+          "team": "Alpine",
+          "position": "DSQ",
+          "points": 0,
+          "gap": "DSQ"
+        },
+        {
+          "driver": "Sam Baker",
+          "team": "McLaren",
+          "position": "DNF",
+          "points": 0,
+          "gap": "DNF"
+        },
+        {
+          "driver": "Bogdan Strolov",
+          "team": "Alpine",
+          "position": "DNF",
+          "points": 0,
+          "gap": "DNF"
+        },
+        {
+          "driver": "Max Raze",
+          "team": "Red Bull Racing",
+          "position": "DNF",
+          "points": 0,
+          "gap": "DNF"
+        },
+        {
+          "driver": "Oscar Piastri",
+          "team": "Ferrari",
+          "position": "DNF",
+          "points": 0,
+          "gap": "DNF"
+        },
+        {
+          "driver": "Nikita Sprite",
+          "team": "Visa Cash App RB",
+          "position": "DNF",
+          "points": 0,
+          "gap": "DNF"
+        },
+        {
+          "driver": "Sergey Nabokov",
+          "team": "Aston Martin",
+          "position": "DSQ",
+          "points": 0,
+          "gap": "DSQ"
+        },
+        {
+          "driver": "Toni Martinez",
+          "team": "Alpine",
+          "position": "DNF",
+          "points": 0,
+          "gap": "DNF"
+        }
+      ]
+    },
+    {
+      "round": 2,
+      "grandPrix": "Китай",
+      "session": "sprint",
+      "results": [
+        {
+          "driver": "Gleb Becker",
+          "team": "Kick Sauber",
+          "position": 1,
+          "points": 8,
+          "gap": "GAP"
+        },
+        {
+          "driver": "Vova Scott",
+          "team": "Kick Sauber",
+          "position": 2,
+          "points": 7,
+          "gap": "+33.303"
+        },
+        {
+          "driver": "Wang Kim",
+          "team": "McLaren",
+          "position": 3,
+          "points": 6,
+          "gap": "+51.430"
+        },
+        {
+          "driver": "Jorginho Ferreira",
+          "team": "Ferrari",
+          "position": 4,
+          "points": 5,
+          "gap": "+14.479"
+        },
+        {
+          "driver": "Esteban Ocon",
+          "team": "Alpine",
+          "position": 5,
+          "points": 4,
+          "gap": "+51.360"
+        },
+        {
+          "driver": "Cristiano Ronaldo",
+          "team": "Williams",
+          "position": 6,
+          "points": 3,
+          "gap": "+38.530"
+        },
+        {
+          "driver": "Max Raze",
+          "team": "Red Bull Racing",
+          "position": 7,
+          "points": 2,
+          "gap": "+43.738"
+        },
+        {
+          "driver": "Yan Morel",
+          "team": "Haas",
+          "position": 8,
+          "points": 1,
+          "gap": "+9.807"
+        },
+        {
+          "driver": "Shishka Hamilton",
+          "team": "Williams",
+          "position": "DNF",
+          "points": 0,
+          "gap": "DNF"
+        },
+        {
+          "driver": "Lewis Hamilton",
+          "team": "Mercedes",
+          "position": "DNF",
+          "points": 0,
+          "gap": "DNF"
+        },
+        {
+          "driver": "Steven Lindbald",
+          "team": "Red Bull Racing",
+          "position": "DNF",
+          "points": 0,
+          "gap": "DNF"
+        },
+        {
+          "driver": "Ayrton Senna",
+          "team": "Red Bull Racing",
+          "position": "DNF",
+          "points": 0,
+          "gap": "DNF"
+        },
+        {
+          "driver": "Dmitry Shelepa",
+          "team": "Haas",
+          "position": "DNF",
+          "points": 0,
+          "gap": "DNF"
+        },
+        {
+          "driver": "Alexander Frame",
+          "team": "Ferrari",
+          "position": "DNF",
+          "points": 0,
+          "gap": "DNF"
+        },
+        {
+          "driver": "Antonio Londyx",
+          "team": "Mercedes",
+          "position": "DSQ",
+          "points": 0,
+          "gap": "DSQ"
+        },
+        {
+          "driver": "Nikita Sprite",
+          "team": "Visa Cash App RB",
+          "position": "DNF",
+          "points": 0,
+          "gap": "DNF"
+        },
+        {
+          "driver": "Oscar Piastri",
+          "team": "Ferrari",
+          "position": "DNF",
+          "points": 0,
+          "gap": "DNF"
+        },
+        {
+          "driver": "Toni Martinez",
+          "team": "Alpine",
+          "position": "DNF",
+          "points": 0,
+          "gap": "DNF"
+        },
+        {
+          "driver": "Sergey Nabokov",
+          "team": "Aston Martin",
+          "position": "DNF",
+          "points": 0,
+          "gap": "DNF"
+        },
+        {
+          "driver": "Rock Johnson",
+          "team": "Williams",
+          "position": "DNF",
+          "points": 0,
+          "gap": "DNF"
+        },
+        {
+          "driver": "Sam Baker",
+          "team": "McLaren",
+          "position": "DNF",
+          "points": 0,
+          "gap": "DNF"
+        },
+        {
+          "driver": "Bruno Guimaraes",
+          "team": "Mercedes",
+          "position": "DNF",
+          "points": 0,
+          "gap": "DNF"
+        },
+        {
+          "driver": "Mark Freynem",
+          "team": "Haas",
+          "position": "DNS",
+          "points": 0,
+          "gap": "DNS"
+        },
+        {
+          "driver": "Timur Zaripov",
+          "team": "Visa Cash App RB",
+          "position": "DNS",
+          "points": 0,
+          "gap": "DNS"
+        }
+      ]
+    },
+    {
+      "round": 3,
+      "grandPrix": "Япония",
+      "session": "race",
+      "results": [
+        {
+          "driver": "Steven Lindbald",
+          "team": "Red Bull Racing",
+          "position": 1,
+          "points": 25,
+          "gap": "GAP"
+        },
+        {
+          "driver": "Lewis Hamilton",
+          "team": "Mercedes",
+          "position": 2,
+          "points": 18,
+          "gap": "+31.623"
+        },
+        {
+          "driver": "Vova Scott",
+          "team": "Kick Sauber",
+          "position": 3,
+          "points": 15,
+          "gap": "+1.989"
+        },
+        {
+          "driver": "Mark Freynem",
+          "team": "Haas",
+          "position": 4,
+          "points": 12,
+          "gap": "+7.760"
+        },
+        {
+          "driver": "Ayrton Senna",
+          "team": "Red Bull Racing",
+          "position": 5,
+          "points": 10,
+          "gap": "+30.675"
+        },
+        {
+          "driver": "Sam Baker",
+          "team": "McLaren",
+          "position": 6,
+          "points": 8,
+          "gap": "+46.633"
+        },
+        {
+          "driver": "Nikita Sprite",
+          "team": "Visa Cash App RB",
+          "position": 7,
+          "points": 6,
+          "gap": "+10.919"
+        },
+        {
+          "driver": "Bogdan Strolov",
+          "team": "Alpine",
+          "position": 8,
+          "points": 4,
+          "gap": "+53.188"
+        },
+        {
+          "driver": "Esteban Ocon",
+          "team": "Alpine",
+          "position": 9,
+          "points": 2,
+          "gap": "+40.942"
+        },
+        {
+          "driver": "Gleb Becker",
+          "team": "Kick Sauber",
+          "position": 10,
+          "points": 1,
+          "gap": "+30.522"
+        },
+        {
+          "driver": "Yan Morel",
+          "team": "Haas",
+          "position": "DNF",
+          "points": 0,
+          "gap": "DNF"
+        },
+        {
+          "driver": "Wang Kim",
+          "team": "McLaren",
+          "position": "DNF",
+          "points": 0,
+          "gap": "DNF"
+        },
+        {
+          "driver": "Alexander Frame",
+          "team": "Ferrari",
+          "position": "DNF",
+          "points": 0,
+          "gap": "DNF"
+        },
+        {
+          "driver": "Sergey Nabokov",
+          "team": "Aston Martin",
+          "position": "DNF",
+          "points": 0,
+          "gap": "DNF"
+        },
+        {
+          "driver": "Toni Martinez",
+          "team": "Alpine",
+          "position": "DNF",
+          "points": 0,
+          "gap": "DNF"
+        },
+        {
+          "driver": "Antonio Londyx",
+          "team": "Mercedes",
+          "position": "DNF",
+          "points": 0,
+          "gap": "DNF"
+        },
+        {
+          "driver": "Rock Johnson",
+          "team": "Williams",
+          "position": "DNF",
+          "points": 0,
+          "gap": "DNF"
+        },
+        {
+          "driver": "Oscar Piastri",
+          "team": "Ferrari",
+          "position": "DNF",
+          "points": 0,
+          "gap": "DNF"
+        },
+        {
+          "driver": "Bruno Guimaraes",
+          "team": "Mercedes",
+          "position": "DNF",
+          "points": 0,
+          "gap": "DNF"
+        },
+        {
+          "driver": "Jorginho Ferreira",
+          "team": "Ferrari",
+          "position": "DNF",
+          "points": 0,
+          "gap": "DNF"
+        },
+        {
+          "driver": "Shishka Hamilton",
+          "team": "Williams",
+          "position": "DNF",
+          "points": 0,
+          "gap": "DNF"
+        },
+        {
+          "driver": "Timur Zaripov",
+          "team": "Visa Cash App RB",
+          "position": "DNF",
+          "points": 0,
+          "gap": "DNF"
+        },
+        {
+          "driver": "Dmitry Shelepa",
+          "team": "Haas",
+          "position": "DNS",
+          "points": 0,
+          "gap": "DNS"
+        }
+      ]
+    },
+    {
+      "round": 4,
+      "grandPrix": "Бахрейн",
+      "session": "race",
+      "results": [
+        {
+          "driver": "Lewis Hamilton",
+          "team": "Mercedes",
+          "position": 1,
+          "points": 25,
+          "gap": "GAP"
+        },
+        {
+          "driver": "Yan Morel",
+          "team": "Haas",
+          "position": 2,
+          "points": 18,
+          "gap": "+36.837"
+        },
+        {
+          "driver": "Dmitry Shelepa",
+          "team": "Haas",
+          "position": 3,
+          "points": 15,
+          "gap": "+39.667"
+        },
+        {
+          "driver": "Banana Leclerc",
+          "team": "McLaren",
+          "position": 4,
+          "points": 12,
+          "gap": "+41.378"
+        },
+        {
+          "driver": "Oscar Piastri",
+          "team": "Ferrari",
+          "position": 5,
+          "points": 10,
+          "gap": "+14.951"
+        },
+        {
+          "driver": "Alexander Frame",
+          "team": "Ferrari",
+          "position": 6,
+          "points": 8,
+          "gap": "+17.674"
+        },
+        {
+          "driver": "Nikita Sprite",
+          "team": "Visa Cash App RB",
+          "position": 7,
+          "points": 6,
+          "gap": "+5.775"
+        },
+        {
+          "driver": "Steven Lindbald",
+          "team": "Red Bull Racing",
+          "position": 8,
+          "points": 4,
+          "gap": "+47.205"
+        },
+        {
+          "driver": "Ayrton Senna",
+          "team": "Red Bull Racing",
+          "position": 9,
+          "points": 2,
+          "gap": "+5.704"
+        },
+        {
+          "driver": "Shishka Hamilton",
+          "team": "Williams",
+          "position": 10,
+          "points": 1,
+          "gap": "+45.547"
+        },
+        {
+          "driver": "Zayats Burmaldayats",
+          "team": "Aston Martin",
+          "position": "DNF",
+          "points": 0,
+          "gap": "DNF"
+        },
+        {
+          "driver": "Sergey Nabokov",
+          "team": "Aston Martin",
+          "position": "DSQ",
+          "points": 0,
+          "gap": "DSQ"
+        },
+        {
+          "driver": "Wang Kim",
+          "team": "McLaren",
+          "position": "DNF",
+          "points": 0,
+          "gap": "DNF"
+        },
+        {
+          "driver": "Jorginho Ferreira",
+          "team": "Ferrari",
+          "position": "DNF",
+          "points": 0,
+          "gap": "DNF"
+        },
+        {
+          "driver": "Hasan Tigiev",
+          "team": "Aston Martin",
+          "position": "DNF",
+          "points": 0,
+          "gap": "DNF"
+        },
+        {
+          "driver": "Cristiano Ronaldo",
+          "team": "Williams",
+          "position": "DNF",
+          "points": 0,
+          "gap": "DNF"
+        },
+        {
+          "driver": "Esteban Ocon",
+          "team": "Alpine",
+          "position": "DNF",
+          "points": 0,
+          "gap": "DNF"
+        },
+        {
+          "driver": "Gleb Becker",
+          "team": "Kick Sauber",
+          "position": "DNF",
+          "points": 0,
+          "gap": "DNF"
+        },
+        {
+          "driver": "Antonio Londyx",
+          "team": "Mercedes",
+          "position": "DNF",
+          "points": 0,
+          "gap": "DNF"
+        },
+        {
+          "driver": "Sam Baker",
+          "team": "McLaren",
+          "position": "DNF",
+          "points": 0,
+          "gap": "DNF"
+        },
+        {
+          "driver": "Rock Johnson",
+          "team": "Williams",
+          "position": "DNF",
+          "points": 0,
+          "gap": "DNF"
+        },
+        {
+          "driver": "Vova Scott",
+          "team": "Kick Sauber",
+          "position": "DNF",
+          "points": 0,
+          "gap": "DNF"
+        },
+        {
+          "driver": "Timur Zaripov",
+          "team": "Visa Cash App RB",
+          "position": "DNS",
+          "points": 0,
+          "gap": "DNS"
+        }
+      ]
+    },
+    {
+      "round": 5,
+      "grandPrix": "Майами",
+      "session": "race",
+      "results": [
+        {
+          "driver": "Hasan Tigiev",
+          "team": "Aston Martin",
+          "position": 1,
+          "points": 25,
+          "gap": "GAP"
+        },
+        {
+          "driver": "Zayats Burmaldayats",
+          "team": "Aston Martin",
+          "position": 2,
+          "points": 18,
+          "gap": "+15.592"
+        },
+        {
+          "driver": "Gleb Becker",
+          "team": "Kick Sauber",
+          "position": 3,
+          "points": 15,
+          "gap": "+51.098"
+        },
+        {
+          "driver": "Sam Baker",
+          "team": "McLaren",
+          "position": 4,
+          "points": 12,
+          "gap": "+39.363"
+        },
+        {
+          "driver": "Mark Freynem",
+          "team": "Haas",
+          "position": 5,
+          "points": 10,
+          "gap": "+26.610"
+        },
+        {
+          "driver": "Cristiano Ronaldo",
+          "team": "Williams",
+          "position": 6,
+          "points": 8,
+          "gap": "+7.467"
+        },
+        {
+          "driver": "Dmitry Shelepa",
+          "team": "Haas",
+          "position": 7,
+          "points": 6,
+          "gap": "+24.123"
+        },
+        {
+          "driver": "Jorginho Ferreira",
+          "team": "Ferrari",
+          "position": 8,
+          "points": 4,
+          "gap": "+23.367"
+        },
+        {
+          "driver": "Max Raze",
+          "team": "Red Bull Racing",
+          "position": 9,
+          "points": 2,
+          "gap": "+19.439"
+        },
+        {
+          "driver": "Alexander Frame",
+          "team": "Ferrari",
+          "position": 10,
+          "points": 1,
+          "gap": "+41.220"
+        },
+        {
+          "driver": "Bogdan Strolov",
+          "team": "Alpine",
+          "position": "DNF",
+          "points": 0,
+          "gap": "DNF"
+        },
+        {
+          "driver": "Bruno Guimaraes",
+          "team": "Mercedes",
+          "position": "DSQ",
+          "points": 0,
+          "gap": "DSQ"
+        },
+        {
+          "driver": "Steven Lindbald",
+          "team": "Red Bull Racing",
+          "position": "DNF",
+          "points": 0,
+          "gap": "DNF"
+        },
+        {
+          "driver": "Shishka Hamilton",
+          "team": "Williams",
+          "position": "DNF",
+          "points": 0,
+          "gap": "DNF"
+        },
+        {
+          "driver": "Lewis Hamilton",
+          "team": "Mercedes",
+          "position": "DNF",
+          "points": 0,
+          "gap": "DNF"
+        },
+        {
+          "driver": "Vova Scott",
+          "team": "Kick Sauber",
+          "position": "DSQ",
+          "points": 0,
+          "gap": "DSQ"
+        },
+        {
+          "driver": "Antonio Londyx",
+          "team": "Mercedes",
+          "position": "DNF",
+          "points": 0,
+          "gap": "DNF"
+        },
+        {
+          "driver": "Nikita Sprite",
+          "team": "Visa Cash App RB",
+          "position": "DNF",
+          "points": 0,
+          "gap": "DNF"
+        },
+        {
+          "driver": "Rock Johnson",
+          "team": "Williams",
+          "position": "DNF",
+          "points": 0,
+          "gap": "DNF"
+        },
+        {
+          "driver": "Wang Kim",
+          "team": "McLaren",
+          "position": "DNF",
+          "points": 0,
+          "gap": "DNF"
+        },
+        {
+          "driver": "Esteban Ocon",
+          "team": "Alpine",
+          "position": "DNF",
+          "points": 0,
+          "gap": "DNF"
+        },
+        {
+          "driver": "Timur Zaripov",
+          "team": "Visa Cash App RB",
+          "position": "DNF",
+          "points": 0,
+          "gap": "DNF"
+        },
+        {
+          "driver": "Banana Leclerc",
+          "team": "McLaren",
+          "position": "DSQ",
+          "points": 0,
+          "gap": "DSQ"
+        },
+        {
+          "driver": "Toni Martinez",
+          "team": "Alpine",
+          "position": "DNF",
+          "points": 0,
+          "gap": "DNF"
+        }
+      ]
+    },
+    {
+      "round": 6,
+      "grandPrix": "Канада",
+      "session": "sprint",
+      "results": [
+        {
+          "driver": "Jorginho Ferreira",
+          "team": "Ferrari",
+          "position": 1,
+          "points": 8,
+          "gap": "GAP"
+        },
+        {
+          "driver": "Banana Leclerc",
+          "team": "McLaren",
+          "position": 2,
+          "points": 7,
+          "gap": "+42.431"
+        },
+        {
+          "driver": "Antonio Londyx",
+          "team": "Mercedes",
+          "position": 3,
+          "points": 6,
+          "gap": "+37.255"
+        },
+        {
+          "driver": "Dmitry Shelepa",
+          "team": "Haas",
+          "position": 4,
+          "points": 5,
+          "gap": "+56.216"
+        },
+        {
+          "driver": "Cristiano Ronaldo",
+          "team": "Williams",
+          "position": 5,
+          "points": 4,
+          "gap": "+37.391"
+        },
+        {
+          "driver": "Bogdan Strolov",
+          "team": "Alpine",
+          "position": 6,
+          "points": 3,
+          "gap": "+12.857"
+        },
+        {
+          "driver": "Vova Scott",
+          "team": "Kick Sauber",
+          "position": 7,
+          "points": 2,
+          "gap": "+46.038"
+        },
+        {
+          "driver": "Oscar Piastri",
+          "team": "Ferrari",
+          "position": 8,
+          "points": 1,
+          "gap": "+20.475"
+        },
+        {
+          "driver": "Shishka Hamilton",
+          "team": "Williams",
+          "position": "DNF",
+          "points": 0,
+          "gap": "DNF"
+        },
+        {
+          "driver": "Mark Freynem",
+          "team": "Haas",
+          "position": "DNF",
+          "points": 0,
+          "gap": "DNF"
+        },
+        {
+          "driver": "Gleb Becker",
+          "team": "Kick Sauber",
+          "position": "DNF",
+          "points": 0,
+          "gap": "DNF"
+        },
+        {
+          "driver": "Timur Zaripov",
+          "team": "Visa Cash App RB",
+          "position": "DNF",
+          "points": 0,
+          "gap": "DNF"
+        },
+        {
+          "driver": "Toni Martinez",
+          "team": "Alpine",
+          "position": "DNF",
+          "points": 0,
+          "gap": "DNF"
+        },
+        {
+          "driver": "Sam Baker",
+          "team": "McLaren",
+          "position": "DNF",
+          "points": 0,
+          "gap": "DNF"
+        },
+        {
+          "driver": "Sergey Nabokov",
+          "team": "Aston Martin",
+          "position": "DNF",
+          "points": 0,
+          "gap": "DNF"
+        },
+        {
+          "driver": "Max Raze",
+          "team": "Red Bull Racing",
+          "position": "DNF",
+          "points": 0,
+          "gap": "DNF"
+        },
+        {
+          "driver": "Bruno Guimaraes",
+          "team": "Mercedes",
+          "position": "DSQ",
+          "points": 0,
+          "gap": "DSQ"
+        },
+        {
+          "driver": "Zayats Burmaldayats",
+          "team": "Aston Martin",
+          "position": "DSQ",
+          "points": 0,
+          "gap": "DSQ"
+        },
+        {
+          "driver": "Ayrton Senna",
+          "team": "Red Bull Racing",
+          "position": "DNF",
+          "points": 0,
+          "gap": "DNF"
+        },
+        {
+          "driver": "Esteban Ocon",
+          "team": "Alpine",
+          "position": "DNF",
+          "points": 0,
+          "gap": "DNF"
+        },
+        {
+          "driver": "Nikita Sprite",
+          "team": "Visa Cash App RB",
+          "position": "DNF",
+          "points": 0,
+          "gap": "DNF"
+        },
+        {
+          "driver": "Steven Lindbald",
+          "team": "Red Bull Racing",
+          "position": "DNF",
+          "points": 0,
+          "gap": "DNF"
+        },
+        {
+          "driver": "Lewis Hamilton",
+          "team": "Mercedes",
+          "position": "DSQ",
+          "points": 0,
+          "gap": "DSQ"
+        }
+      ]
+    },
+    {
+      "round": 7,
+      "grandPrix": "Испания",
+      "session": "race",
+      "results": [
+        {
+          "driver": "Yan Morel",
+          "team": "Haas",
+          "position": 1,
+          "points": 25,
+          "gap": "GAP"
+        },
+        {
+          "driver": "Esteban Ocon",
+          "team": "Alpine",
+          "position": 2,
+          "points": 18,
+          "gap": "+24.125"
+        },
+        {
+          "driver": "Cristiano Ronaldo",
+          "team": "Williams",
+          "position": 3,
+          "points": 15,
+          "gap": "+34.679"
+        },
+        {
+          "driver": "Banana Leclerc",
+          "team": "McLaren",
+          "position": 4,
+          "points": 12,
+          "gap": "+3.233"
+        },
+        {
+          "driver": "Zayats Burmaldayats",
+          "team": "Aston Martin",
+          "position": 5,
+          "points": 10,
+          "gap": "+5.946"
+        },
+        {
+          "driver": "Timur Zaripov",
+          "team": "Visa Cash App RB",
+          "position": 6,
+          "points": 8,
+          "gap": "+6.602"
+        },
+        {
+          "driver": "Oscar Piastri",
+          "team": "Ferrari",
+          "position": 7,
+          "points": 6,
+          "gap": "+51.582"
+        },
+        {
+          "driver": "Jorginho Ferreira",
+          "team": "Ferrari",
+          "position": 8,
+          "points": 4,
+          "gap": "+56.033"
+        },
+        {
+          "driver": "Hasan Tigiev",
+          "team": "Aston Martin",
+          "position": 9,
+          "points": 2,
+          "gap": "+2.189"
+        },
+        {
+          "driver": "Mark Freynem",
+          "team": "Haas",
+          "position": 10,
+          "points": 1,
+          "gap": "+47.193"
+        },
+        {
+          "driver": "Antonio Londyx",
+          "team": "Mercedes",
+          "position": "DNF",
+          "points": 0,
+          "gap": "DNF"
+        },
+        {
+          "driver": "Sam Baker",
+          "team": "McLaren",
+          "position": "DNF",
+          "points": 0,
+          "gap": "DNF"
+        },
+        {
+          "driver": "Bogdan Strolov",
+          "team": "Alpine",
+          "position": "DSQ",
+          "points": 0,
+          "gap": "DSQ"
+        },
+        {
+          "driver": "Ayrton Senna",
+          "team": "Red Bull Racing",
+          "position": "DSQ",
+          "points": 0,
+          "gap": "DSQ"
+        },
+        {
+          "driver": "Lewis Hamilton",
+          "team": "Mercedes",
+          "position": "DNF",
+          "points": 0,
+          "gap": "DNF"
+        },
+        {
+          "driver": "Rock Johnson",
+          "team": "Williams",
+          "position": "DSQ",
+          "points": 0,
+          "gap": "DSQ"
+        },
+        {
+          "driver": "Shishka Hamilton",
+          "team": "Williams",
+          "position": "DNF",
+          "points": 0,
+          "gap": "DNF"
+        },
+        {
+          "driver": "Dmitry Shelepa",
+          "team": "Haas",
+          "position": "DSQ",
+          "points": 0,
+          "gap": "DSQ"
+        },
+        {
+          "driver": "Vova Scott",
+          "team": "Kick Sauber",
+          "position": "DNS",
+          "points": 0,
+          "gap": "DNS"
+        }
+      ]
+    },
+    {
+      "round": 8,
+      "grandPrix": "Монако",
+      "session": "race",
+      "results": [
+        {
+          "driver": "Toni Martinez",
+          "team": "Alpine",
+          "position": 1,
+          "points": 25,
+          "gap": "GAP"
+        },
+        {
+          "driver": "Mark Freynem",
+          "team": "Haas",
+          "position": 2,
+          "points": 18,
+          "gap": "+34.168"
+        },
+        {
+          "driver": "Sam Baker",
+          "team": "McLaren",
+          "position": 3,
+          "points": 15,
+          "gap": "+19.501"
+        },
+        {
+          "driver": "Steven Lindbald",
+          "team": "Red Bull Racing",
+          "position": 4,
+          "points": 12,
+          "gap": "+16.487"
+        },
+        {
+          "driver": "Zayats Burmaldayats",
+          "team": "Aston Martin",
+          "position": 5,
+          "points": 10,
+          "gap": "+55.723"
+        },
+        {
+          "driver": "Jorginho Ferreira",
+          "team": "Ferrari",
+          "position": 6,
+          "points": 8,
+          "gap": "+1.560"
+        },
+        {
+          "driver": "Max Raze",
+          "team": "Red Bull Racing",
+          "position": 7,
+          "points": 6,
+          "gap": "+4.707"
+        },
+        {
+          "driver": "Oscar Piastri",
+          "team": "Ferrari",
+          "position": 8,
+          "points": 4,
+          "gap": "+51.539"
+        },
+        {
+          "driver": "Rock Johnson",
+          "team": "Williams",
+          "position": 9,
+          "points": 2,
+          "gap": "+21.640"
+        },
+        {
+          "driver": "Bogdan Strolov",
+          "team": "Alpine",
+          "position": 10,
+          "points": 1,
+          "gap": "+14.658"
+        },
+        {
+          "driver": "Gleb Becker",
+          "team": "Kick Sauber",
+          "position": "DNF",
+          "points": 0,
+          "gap": "DNF"
+        },
+        {
+          "driver": "Shishka Hamilton",
+          "team": "Williams",
+          "position": "DSQ",
+          "points": 0,
+          "gap": "DSQ"
+        },
+        {
+          "driver": "Vova Scott",
+          "team": "Kick Sauber",
+          "position": "DNF",
+          "points": 0,
+          "gap": "DNF"
+        },
+        {
+          "driver": "Esteban Ocon",
+          "team": "Alpine",
+          "position": "DNF",
+          "points": 0,
+          "gap": "DNF"
+        },
+        {
+          "driver": "Yan Morel",
+          "team": "Haas",
+          "position": "DNF",
+          "points": 0,
+          "gap": "DNF"
+        },
+        {
+          "driver": "Banana Leclerc",
+          "team": "McLaren",
+          "position": "DNF",
+          "points": 0,
+          "gap": "DNF"
+        },
+        {
+          "driver": "Ayrton Senna",
+          "team": "Red Bull Racing",
+          "position": "DSQ",
+          "points": 0,
+          "gap": "DSQ"
+        },
+        {
+          "driver": "Nikita Sprite",
+          "team": "Visa Cash App RB",
+          "position": "DNF",
+          "points": 0,
+          "gap": "DNF"
+        },
+        {
+          "driver": "Sergey Nabokov",
+          "team": "Aston Martin",
+          "position": "DNF",
+          "points": 0,
+          "gap": "DNF"
+        },
+        {
+          "driver": "Bruno Guimaraes",
+          "team": "Mercedes",
+          "position": "DSQ",
+          "points": 0,
+          "gap": "DSQ"
+        },
+        {
+          "driver": "Cristiano Ronaldo",
+          "team": "Williams",
+          "position": "DNF",
+          "points": 0,
+          "gap": "DNF"
+        },
+        {
+          "driver": "Timur Zaripov",
+          "team": "Visa Cash App RB",
+          "position": "DNF",
+          "points": 0,
+          "gap": "DNF"
+        },
+        {
+          "driver": "Hasan Tigiev",
+          "team": "Aston Martin",
+          "position": "DNF",
+          "points": 0,
+          "gap": "DNF"
+        },
+        {
+          "driver": "Wang Kim",
+          "team": "McLaren",
+          "position": "DNF",
+          "points": 0,
+          "gap": "DNF"
+        },
+        {
+          "driver": "Lewis Hamilton",
+          "team": "Mercedes",
+          "position": "DNS",
+          "points": 0,
+          "gap": "DNS"
+        },
+        {
+          "driver": "Alexander Frame",
+          "team": "Ferrari",
+          "position": "DNS",
+          "points": 0,
+          "gap": "DNS"
+        }
+      ]
+    },
+    {
+      "round": 9,
+      "grandPrix": "Великобритания",
+      "session": "race",
+      "results": [
+        {
+          "driver": "Lewis Hamilton",
+          "team": "Mercedes",
+          "position": 1,
+          "points": 25,
+          "gap": "GAP"
+        },
+        {
+          "driver": "Bruno Guimaraes",
+          "team": "Mercedes",
+          "position": 2,
+          "points": 18,
+          "gap": "+50.196"
+        },
+        {
+          "driver": "Yan Morel",
+          "team": "Haas",
+          "position": 3,
+          "points": 15,
+          "gap": "+6.527"
+        },
+        {
+          "driver": "Zayats Burmaldayats",
+          "team": "Aston Martin",
+          "position": 4,
+          "points": 12,
+          "gap": "+39.697"
+        },
+        {
+          "driver": "Oscar Piastri",
+          "team": "Ferrari",
+          "position": 5,
+          "points": 10,
+          "gap": "+56.654"
+        },
+        {
+          "driver": "Gleb Becker",
+          "team": "Kick Sauber",
+          "position": 6,
+          "points": 8,
+          "gap": "+52.706"
+        },
+        {
+          "driver": "Toni Martinez",
+          "team": "Alpine",
+          "position": 7,
+          "points": 6,
+          "gap": "+22.072"
+        },
+        {
+          "driver": "Jorginho Ferreira",
+          "team": "Ferrari",
+          "position": 8,
+          "points": 4,
+          "gap": "+21.265"
+        },
+        {
+          "driver": "Sam Baker",
+          "team": "McLaren",
+          "position": 9,
+          "points": 2,
+          "gap": "+24.279"
+        },
+        {
+          "driver": "Esteban Ocon",
+          "team": "Alpine",
+          "position": 10,
+          "points": 1,
+          "gap": "+53.462"
+        },
+        {
+          "driver": "Ayrton Senna",
+          "team": "Red Bull Racing",
+          "position": "DSQ",
+          "points": 0,
+          "gap": "DSQ"
+        },
+        {
+          "driver": "Sergey Nabokov",
+          "team": "Aston Martin",
+          "position": "DNF",
+          "points": 0,
+          "gap": "DNF"
+        },
+        {
+          "driver": "Bogdan Strolov",
+          "team": "Alpine",
+          "position": "DNF",
+          "points": 0,
+          "gap": "DNF"
+        },
+        {
+          "driver": "Vova Scott",
+          "team": "Kick Sauber",
+          "position": "DNF",
+          "points": 0,
+          "gap": "DNF"
+        },
+        {
+          "driver": "Rock Johnson",
+          "team": "Williams",
+          "position": "DNF",
+          "points": 0,
+          "gap": "DNF"
+        },
+        {
+          "driver": "Antonio Londyx",
+          "team": "Mercedes",
+          "position": "DNF",
+          "points": 0,
+          "gap": "DNF"
+        },
+        {
+          "driver": "Alexander Frame",
+          "team": "Ferrari",
+          "position": "DNF",
+          "points": 0,
+          "gap": "DNF"
+        },
+        {
+          "driver": "Dmitry Shelepa",
+          "team": "Haas",
+          "position": "DNF",
+          "points": 0,
+          "gap": "DNF"
+        },
+        {
+          "driver": "Banana Leclerc",
+          "team": "McLaren",
+          "position": "DSQ",
+          "points": 0,
+          "gap": "DSQ"
+        },
+        {
+          "driver": "Shishka Hamilton",
+          "team": "Williams",
+          "position": "DNF",
+          "points": 0,
+          "gap": "DNF"
+        },
+        {
+          "driver": "Steven Lindbald",
+          "team": "Red Bull Racing",
+          "position": "DNF",
+          "points": 0,
+          "gap": "DNF"
+        },
+        {
+          "driver": "Wang Kim",
+          "team": "McLaren",
+          "position": "DNF",
+          "points": 0,
+          "gap": "DNF"
+        },
+        {
+          "driver": "Hasan Tigiev",
+          "team": "Aston Martin",
+          "position": "DNS",
+          "points": 0,
+          "gap": "DNS"
+        },
+        {
+          "driver": "Nikita Sprite",
+          "team": "Visa Cash App RB",
+          "position": "DNS",
+          "points": 0,
+          "gap": "DNS"
+        }
+      ]
+    },
+    {
+      "round": 10,
+      "grandPrix": "Австрия",
+      "session": "race",
+      "results": [
+        {
+          "driver": "Cristiano Ronaldo",
+          "team": "Williams",
+          "position": 1,
+          "points": 25,
+          "gap": "GAP"
+        },
+        {
+          "driver": "Lewis Hamilton",
+          "team": "Mercedes",
+          "position": 2,
+          "points": 18,
+          "gap": "+10.999"
+        },
+        {
+          "driver": "Nikita Sprite",
+          "team": "Visa Cash App RB",
+          "position": 3,
+          "points": 15,
+          "gap": "+10.378"
+        },
+        {
+          "driver": "Max Raze",
+          "team": "Red Bull Racing",
+          "position": 4,
+          "points": 12,
+          "gap": "+8.690"
+        },
+        {
+          "driver": "Alexander Frame",
+          "team": "Ferrari",
+          "position": 5,
+          "points": 10,
+          "gap": "+55.512"
+        },
+        {
+          "driver": "Antonio Londyx",
+          "team": "Mercedes",
+          "position": 6,
+          "points": 8,
+          "gap": "+30.005"
+        },
+        {
+          "driver": "Dmitry Shelepa",
+          "team": "Haas",
+          "position": 7,
+          "points": 6,
+          "gap": "+31.790"
+        },
+        {
+          "driver": "Jorginho Ferreira",
+          "team": "Ferrari",
+          "position": 8,
+          "points": 4,
+          "gap": "+45.769"
+        },
+        {
+          "driver": "Oscar Piastri",
+          "team": "Ferrari",
+          "position": 9,
+          "points": 2,
+          "gap": "+23.478"
+        },
+        {
+          "driver": "Wang Kim",
+          "team": "McLaren",
+          "position": 10,
+          "points": 1,
+          "gap": "+22.016"
+        },
+        {
+          "driver": "Banana Leclerc",
+          "team": "McLaren",
+          "position": "DNF",
+          "points": 0,
+          "gap": "DNF"
+        },
+        {
+          "driver": "Yan Morel",
+          "team": "Haas",
+          "position": "DNF",
+          "points": 0,
+          "gap": "DNF"
+        },
+        {
+          "driver": "Steven Lindbald",
+          "team": "Red Bull Racing",
+          "position": "DNF",
+          "points": 0,
+          "gap": "DNF"
+        },
+        {
+          "driver": "Zayats Burmaldayats",
+          "team": "Aston Martin",
+          "position": "DNF",
+          "points": 0,
+          "gap": "DNF"
+        },
+        {
+          "driver": "Hasan Tigiev",
+          "team": "Aston Martin",
+          "position": "DNF",
+          "points": 0,
+          "gap": "DNF"
+        },
+        {
+          "driver": "Timur Zaripov",
+          "team": "Visa Cash App RB",
+          "position": "DNF",
+          "points": 0,
+          "gap": "DNF"
+        },
+        {
+          "driver": "Toni Martinez",
+          "team": "Alpine",
+          "position": "DNF",
+          "points": 0,
+          "gap": "DNF"
+        },
+        {
+          "driver": "Rock Johnson",
+          "team": "Williams",
+          "position": "DNF",
+          "points": 0,
+          "gap": "DNF"
+        },
+        {
+          "driver": "Gleb Becker",
+          "team": "Kick Sauber",
+          "position": "DNF",
+          "points": 0,
+          "gap": "DNF"
+        },
+        {
+          "driver": "Sam Baker",
+          "team": "McLaren",
+          "position": "DNF",
+          "points": 0,
+          "gap": "DNF"
+        },
+        {
+          "driver": "Bruno Guimaraes",
+          "team": "Mercedes",
+          "position": "DNF",
+          "points": 0,
+          "gap": "DNF"
+        },
+        {
+          "driver": "Sergey Nabokov",
+          "team": "Aston Martin",
+          "position": "DSQ",
+          "points": 0,
+          "gap": "DSQ"
+        },
+        {
+          "driver": "Mark Freynem",
+          "team": "Haas",
+          "position": "DNF",
+          "points": 0,
+          "gap": "DNF"
+        }
+      ]
+    },
+    {
+      "round": 11,
+      "grandPrix": "Бельгия",
+      "session": "race",
+      "results": [
+        {
+          "driver": "Toni Martinez",
+          "team": "Alpine",
+          "position": 1,
+          "points": 25,
+          "gap": "GAP"
+        },
+        {
+          "driver": "Cristiano Ronaldo",
+          "team": "Williams",
+          "position": 2,
+          "points": 18,
+          "gap": "+56.939"
+        },
+        {
+          "driver": "Shishka Hamilton",
+          "team": "Williams",
+          "position": 3,
+          "points": 15,
+          "gap": "+25.094"
+        },
+        {
+          "driver": "Jorginho Ferreira",
+          "team": "Ferrari",
+          "position": 4,
+          "points": 12,
+          "gap": "+36.037"
+        },
+        {
+          "driver": "Steven Lindbald",
+          "team": "Red Bull Racing",
+          "position": 5,
+          "points": 10,
+          "gap": "+11.482"
+        },
+        {
+          "driver": "Dmitry Shelepa",
+          "team": "Haas",
+          "position": 6,
+          "points": 8,
+          "gap": "+6.251"
+        },
+        {
+          "driver": "Bogdan Strolov",
+          "team": "Alpine",
+          "position": 7,
+          "points": 6,
+          "gap": "+55.767"
+        },
+        {
+          "driver": "Nikita Sprite",
+          "team": "Visa Cash App RB",
+          "position": 8,
+          "points": 4,
+          "gap": "+14.818"
+        },
+        {
+          "driver": "Bruno Guimaraes",
+          "team": "Mercedes",
+          "position": 9,
+          "points": 2,
+          "gap": "+32.686"
+        },
+        {
+          "driver": "Oscar Piastri",
+          "team": "Ferrari",
+          "position": 10,
+          "points": 1,
+          "gap": "+26.093"
+        },
+        {
+          "driver": "Rock Johnson",
+          "team": "Williams",
+          "position": "DNF",
+          "points": 0,
+          "gap": "DNF"
+        },
+        {
+          "driver": "Yan Morel",
+          "team": "Haas",
+          "position": "DNF",
+          "points": 0,
+          "gap": "DNF"
+        },
+        {
+          "driver": "Banana Leclerc",
+          "team": "McLaren",
+          "position": "DNF",
+          "points": 0,
+          "gap": "DNF"
+        },
+        {
+          "driver": "Gleb Becker",
+          "team": "Kick Sauber",
+          "position": "DNF",
+          "points": 0,
+          "gap": "DNF"
+        },
+        {
+          "driver": "Timur Zaripov",
+          "team": "Visa Cash App RB",
+          "position": "DNF",
+          "points": 0,
+          "gap": "DNF"
+        },
+        {
+          "driver": "Hasan Tigiev",
+          "team": "Aston Martin",
+          "position": "DSQ",
+          "points": 0,
+          "gap": "DSQ"
+        },
+        {
+          "driver": "Ayrton Senna",
+          "team": "Red Bull Racing",
+          "position": "DNF",
+          "points": 0,
+          "gap": "DNF"
+        },
+        {
+          "driver": "Alexander Frame",
+          "team": "Ferrari",
+          "position": "DNF",
+          "points": 0,
+          "gap": "DNF"
+        },
+        {
+          "driver": "Lewis Hamilton",
+          "team": "Mercedes",
+          "position": "DNF",
+          "points": 0,
+          "gap": "DNF"
+        },
+        {
+          "driver": "Sergey Nabokov",
+          "team": "Aston Martin",
+          "position": "DSQ",
+          "points": 0,
+          "gap": "DSQ"
+        },
+        {
+          "driver": "Antonio Londyx",
+          "team": "Mercedes",
+          "position": "DNF",
+          "points": 0,
+          "gap": "DNF"
+        },
+        {
+          "driver": "Sam Baker",
+          "team": "McLaren",
+          "position": "DNF",
+          "points": 0,
+          "gap": "DNF"
+        },
+        {
+          "driver": "Vova Scott",
+          "team": "Kick Sauber",
+          "position": "DNS",
+          "points": 0,
+          "gap": "DNS"
+        },
+        {
+          "driver": "Mark Freynem",
+          "team": "Haas",
+          "position": "DNS",
+          "points": 0,
+          "gap": "DNS"
+        }
+      ]
+    },
+    {
+      "round": 12,
+      "grandPrix": "Венгрия",
+      "session": "race",
+      "results": [
+        {
+          "driver": "Yan Morel",
+          "team": "Haas",
+          "position": 1,
+          "points": 25,
+          "gap": "GAP"
+        },
+        {
+          "driver": "Rock Johnson",
+          "team": "Williams",
+          "position": 2,
+          "points": 18,
+          "gap": "+46.336"
+        },
+        {
+          "driver": "Timur Zaripov",
+          "team": "Visa Cash App RB",
+          "position": 3,
+          "points": 15,
+          "gap": "+14.464"
+        },
+        {
+          "driver": "Mark Freynem",
+          "team": "Haas",
+          "position": 4,
+          "points": 12,
+          "gap": "+22.981"
+        },
+        {
+          "driver": "Jorginho Ferreira",
+          "team": "Ferrari",
+          "position": 5,
+          "points": 10,
+          "gap": "+29.065"
+        },
+        {
+          "driver": "Cristiano Ronaldo",
+          "team": "Williams",
+          "position": 6,
+          "points": 8,
+          "gap": "+11.374"
+        },
+        {
+          "driver": "Alexander Frame",
+          "team": "Ferrari",
+          "position": 7,
+          "points": 6,
+          "gap": "+46.929"
+        },
+        {
+          "driver": "Hasan Tigiev",
+          "team": "Aston Martin",
+          "position": 8,
+          "points": 4,
+          "gap": "+7.287"
+        },
+        {
+          "driver": "Antonio Londyx",
+          "team": "Mercedes",
+          "position": 9,
+          "points": 2,
+          "gap": "+21.061"
+        },
+        {
+          "driver": "Banana Leclerc",
+          "team": "McLaren",
+          "position": 10,
+          "points": 1,
+          "gap": "+57.603"
+        },
+        {
+          "driver": "Vova Scott",
+          "team": "Kick Sauber",
+          "position": "DNF",
+          "points": 0,
+          "gap": "DNF"
+        },
+        {
+          "driver": "Oscar Piastri",
+          "team": "Ferrari",
+          "position": "DNF",
+          "points": 0,
+          "gap": "DNF"
+        },
+        {
+          "driver": "Shishka Hamilton",
+          "team": "Williams",
+          "position": "DSQ",
+          "points": 0,
+          "gap": "DSQ"
+        },
+        {
+          "driver": "Sam Baker",
+          "team": "McLaren",
+          "position": "DNF",
+          "points": 0,
+          "gap": "DNF"
+        },
+        {
+          "driver": "Bruno Guimaraes",
+          "team": "Mercedes",
+          "position": "DSQ",
+          "points": 0,
+          "gap": "DSQ"
+        },
+        {
+          "driver": "Nikita Sprite",
+          "team": "Visa Cash App RB",
+          "position": "DNF",
+          "points": 0,
+          "gap": "DNF"
+        },
+        {
+          "driver": "Zayats Burmaldayats",
+          "team": "Aston Martin",
+          "position": "DNF",
+          "points": 0,
+          "gap": "DNF"
+        },
+        {
+          "driver": "Steven Lindbald",
+          "team": "Red Bull Racing",
+          "position": "DNF",
+          "points": 0,
+          "gap": "DNF"
+        },
+        {
+          "driver": "Wang Kim",
+          "team": "McLaren",
+          "position": "DNF",
+          "points": 0,
+          "gap": "DNF"
+        },
+        {
+          "driver": "Bogdan Strolov",
+          "team": "Alpine",
+          "position": "DSQ",
+          "points": 0,
+          "gap": "DSQ"
+        },
+        {
+          "driver": "Dmitry Shelepa",
+          "team": "Haas",
+          "position": "DNF",
+          "points": 0,
+          "gap": "DNF"
+        }
+      ]
+    },
+    {
+      "round": 13,
+      "grandPrix": "Нидерланды",
+      "session": "race",
+      "results": [
+        {
+          "driver": "Vova Scott",
+          "team": "Kick Sauber",
+          "position": 1,
+          "points": 25,
+          "gap": "GAP"
+        },
+        {
+          "driver": "Sam Baker",
+          "team": "McLaren",
+          "position": 2,
+          "points": 18,
+          "gap": "+3.091"
+        },
+        {
+          "driver": "Sergey Nabokov",
+          "team": "Aston Martin",
+          "position": 3,
+          "points": 15,
+          "gap": "+1.211"
+        },
+        {
+          "driver": "Cristiano Ronaldo",
+          "team": "Williams",
+          "position": 4,
+          "points": 12,
+          "gap": "+14.728"
+        },
+        {
+          "driver": "Max Raze",
+          "team": "Red Bull Racing",
+          "position": 5,
+          "points": 10,
+          "gap": "+29.015"
+        },
+        {
+          "driver": "Yan Morel",
+          "team": "Haas",
+          "position": 6,
+          "points": 8,
+          "gap": "+29.077"
+        },
+        {
+          "driver": "Zayats Burmaldayats",
+          "team": "Aston Martin",
+          "position": 7,
+          "points": 6,
+          "gap": "+21.190"
+        },
+        {
+          "driver": "Esteban Ocon",
+          "team": "Alpine",
+          "position": 8,
+          "points": 4,
+          "gap": "+18.597"
+        },
+        {
+          "driver": "Rock Johnson",
+          "team": "Williams",
+          "position": 9,
+          "points": 2,
+          "gap": "+13.699"
+        },
+        {
+          "driver": "Timur Zaripov",
+          "team": "Visa Cash App RB",
+          "position": 10,
+          "points": 1,
+          "gap": "+1.526"
+        },
+        {
+          "driver": "Banana Leclerc",
+          "team": "McLaren",
+          "position": "DSQ",
+          "points": 0,
+          "gap": "DSQ"
+        },
+        {
+          "driver": "Steven Lindbald",
+          "team": "Red Bull Racing",
+          "position": "DNF",
+          "points": 0,
+          "gap": "DNF"
+        },
+        {
+          "driver": "Lewis Hamilton",
+          "team": "Mercedes",
+          "position": "DNF",
+          "points": 0,
+          "gap": "DNF"
+        },
+        {
+          "driver": "Nikita Sprite",
+          "team": "Visa Cash App RB",
+          "position": "DSQ",
+          "points": 0,
+          "gap": "DSQ"
+        },
+        {
+          "driver": "Shishka Hamilton",
+          "team": "Williams",
+          "position": "DSQ",
+          "points": 0,
+          "gap": "DSQ"
+        },
+        {
+          "driver": "Bogdan Strolov",
+          "team": "Alpine",
+          "position": "DNF",
+          "points": 0,
+          "gap": "DNF"
+        },
+        {
+          "driver": "Antonio Londyx",
+          "team": "Mercedes",
+          "position": "DNF",
+          "points": 0,
+          "gap": "DNF"
+        },
+        {
+          "driver": "Dmitry Shelepa",
+          "team": "Haas",
+          "position": "DNF",
+          "points": 0,
+          "gap": "DNF"
+        },
+        {
+          "driver": "Hasan Tigiev",
+          "team": "Aston Martin",
+          "position": "DNS",
+          "points": 0,
+          "gap": "DNS"
+        }
+      ]
+    },
+    {
+      "round": 14,
+      "grandPrix": "Италия",
+      "session": "sprint",
+      "results": [
+        {
+          "driver": "Lewis Hamilton",
+          "team": "Mercedes",
+          "position": 1,
+          "points": 8,
+          "gap": "GAP"
+        },
+        {
+          "driver": "Yan Morel",
+          "team": "Haas",
+          "position": 2,
+          "points": 7,
+          "gap": "+53.161"
+        },
+        {
+          "driver": "Nikita Sprite",
+          "team": "Visa Cash App RB",
+          "position": 3,
+          "points": 6,
+          "gap": "+2.419"
+        },
+        {
+          "driver": "Bruno Guimaraes",
+          "team": "Mercedes",
+          "position": 4,
+          "points": 5,
+          "gap": "+12.071"
+        },
+        {
+          "driver": "Hasan Tigiev",
+          "team": "Aston Martin",
+          "position": 5,
+          "points": 4,
+          "gap": "+28.632"
+        },
+        {
+          "driver": "Gleb Becker",
+          "team": "Kick Sauber",
+          "position": 6,
+          "points": 3,
+          "gap": "+6.964"
+        },
+        {
+          "driver": "Sergey Nabokov",
+          "team": "Aston Martin",
+          "position": 7,
+          "points": 2,
+          "gap": "+25.743"
+        },
+        {
+          "driver": "Banana Leclerc",
+          "team": "McLaren",
+          "position": 8,
+          "points": 1,
+          "gap": "+13.463"
+        },
+        {
+          "driver": "Mark Freynem",
+          "team": "Haas",
+          "position": "DNF",
+          "points": 0,
+          "gap": "DNF"
+        },
+        {
+          "driver": "Ayrton Senna",
+          "team": "Red Bull Racing",
+          "position": "DNF",
+          "points": 0,
+          "gap": "DNF"
+        },
+        {
+          "driver": "Antonio Londyx",
+          "team": "Mercedes",
+          "position": "DNF",
+          "points": 0,
+          "gap": "DNF"
+        },
+        {
+          "driver": "Zayats Burmaldayats",
+          "team": "Aston Martin",
+          "position": "DSQ",
+          "points": 0,
+          "gap": "DSQ"
+        },
+        {
+          "driver": "Cristiano Ronaldo",
+          "team": "Williams",
+          "position": "DNF",
+          "points": 0,
+          "gap": "DNF"
+        },
+        {
+          "driver": "Steven Lindbald",
+          "team": "Red Bull Racing",
+          "position": "DNF",
+          "points": 0,
+          "gap": "DNF"
+        },
+        {
+          "driver": "Bogdan Strolov",
+          "team": "Alpine",
+          "position": "DNF",
+          "points": 0,
+          "gap": "DNF"
+        },
+        {
+          "driver": "Timur Zaripov",
+          "team": "Visa Cash App RB",
+          "position": "DNF",
+          "points": 0,
+          "gap": "DNF"
+        },
+        {
+          "driver": "Sam Baker",
+          "team": "McLaren",
+          "position": "DNF",
+          "points": 0,
+          "gap": "DNF"
+        },
+        {
+          "driver": "Alexander Frame",
+          "team": "Ferrari",
+          "position": "DNF",
+          "points": 0,
+          "gap": "DNF"
+        },
+        {
+          "driver": "Esteban Ocon",
+          "team": "Alpine",
+          "position": "DNF",
+          "points": 0,
+          "gap": "DNF"
+        },
+        {
+          "driver": "Oscar Piastri",
+          "team": "Ferrari",
+          "position": "DNF",
+          "points": 0,
+          "gap": "DNF"
+        },
+        {
+          "driver": "Max Raze",
+          "team": "Red Bull Racing",
+          "position": "DNF",
+          "points": 0,
+          "gap": "DNF"
+        },
+        {
+          "driver": "Jorginho Ferreira",
+          "team": "Ferrari",
+          "position": "DSQ",
+          "points": 0,
+          "gap": "DSQ"
+        },
+        {
+          "driver": "Toni Martinez",
+          "team": "Alpine",
+          "position": "DSQ",
+          "points": 0,
+          "gap": "DSQ"
+        },
+        {
+          "driver": "Vova Scott",
+          "team": "Kick Sauber",
+          "position": "DNS",
+          "points": 0,
+          "gap": "DNS"
+        }
+      ]
+    },
+    {
+      "round": 15,
+      "grandPrix": "Сингапур",
+      "session": "race",
+      "results": [
+        {
+          "driver": "Cristiano Ronaldo",
+          "team": "Williams",
+          "position": 1,
+          "points": 25,
+          "gap": "GAP"
+        },
+        {
+          "driver": "Banana Leclerc",
+          "team": "McLaren",
+          "position": 2,
+          "points": 18,
+          "gap": "+42.413"
+        },
+        {
+          "driver": "Jorginho Ferreira",
+          "team": "Ferrari",
+          "position": 3,
+          "points": 15,
+          "gap": "+15.566"
+        },
+        {
+          "driver": "Toni Martinez",
+          "team": "Alpine",
+          "position": 4,
+          "points": 12,
+          "gap": "+36.147"
+        },
+        {
+          "driver": "Timur Zaripov",
+          "team": "Visa Cash App RB",
+          "position": 5,
+          "points": 10,
+          "gap": "+4.619"
+        },
+        {
+          "driver": "Hasan Tigiev",
+          "team": "Aston Martin",
+          "position": 6,
+          "points": 8,
+          "gap": "+1.415"
+        },
+        {
+          "driver": "Sergey Nabokov",
+          "team": "Aston Martin",
+          "position": 7,
+          "points": 6,
+          "gap": "+35.372"
+        },
+        {
+          "driver": "Nikita Sprite",
+          "team": "Visa Cash App RB",
+          "position": 8,
+          "points": 4,
+          "gap": "+19.939"
+        },
+        {
+          "driver": "Bruno Guimaraes",
+          "team": "Mercedes",
+          "position": 9,
+          "points": 2,
+          "gap": "+53.407"
+        },
+        {
+          "driver": "Lewis Hamilton",
+          "team": "Mercedes",
+          "position": 10,
+          "points": 1,
+          "gap": "+19.393"
+        },
+        {
+          "driver": "Dmitry Shelepa",
+          "team": "Haas",
+          "position": "DNF",
+          "points": 0,
+          "gap": "DNF"
+        },
+        {
+          "driver": "Ayrton Senna",
+          "team": "Red Bull Racing",
+          "position": "DNF",
+          "points": 0,
+          "gap": "DNF"
+        },
+        {
+          "driver": "Alexander Frame",
+          "team": "Ferrari",
+          "position": "DSQ",
+          "points": 0,
+          "gap": "DSQ"
+        },
+        {
+          "driver": "Gleb Becker",
+          "team": "Kick Sauber",
+          "position": "DSQ",
+          "points": 0,
+          "gap": "DSQ"
+        },
+        {
+          "driver": "Mark Freynem",
+          "team": "Haas",
+          "position": "DNF",
+          "points": 0,
+          "gap": "DNF"
+        },
+        {
+          "driver": "Max Raze",
+          "team": "Red Bull Racing",
+          "position": "DNF",
+          "points": 0,
+          "gap": "DNF"
+        },
+        {
+          "driver": "Yan Morel",
+          "team": "Haas",
+          "position": "DNF",
+          "points": 0,
+          "gap": "DNF"
+        },
+        {
+          "driver": "Zayats Burmaldayats",
+          "team": "Aston Martin",
+          "position": "DNF",
+          "points": 0,
+          "gap": "DNF"
+        },
+        {
+          "driver": "Steven Lindbald",
+          "team": "Red Bull Racing",
+          "position": "DNF",
+          "points": 0,
+          "gap": "DNF"
+        },
+        {
+          "driver": "Oscar Piastri",
+          "team": "Ferrari",
+          "position": "DNF",
+          "points": 0,
+          "gap": "DNF"
+        },
+        {
+          "driver": "Shishka Hamilton",
+          "team": "Williams",
+          "position": "DSQ",
+          "points": 0,
+          "gap": "DSQ"
+        }
+      ]
+    }
+  ]
+}

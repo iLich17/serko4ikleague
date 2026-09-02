@@ -24,6 +24,15 @@
     <div id="adminsList" class="news"></div>
     <div id="adminMsg" class="status"></div>
   </div>
+<div class="panel">
+<h2>🏁 Команды</h2>
+<p class="sub">Здесь можно менять фотографии команд прямо через сайт.</p>
+<div class="field"><label>Команда</label><select id="teamSelect" style="width:100%;border:1px solid #303038;background:#0d0d11;color:#fff;border-radius:10px;padding:12px;font:inherit"></select></div>
+<div class="field"><label>Новая фотография команды</label><input id="teamPhoto" type="file" accept="image/*"></div>
+<div class="buttons"><button class="btn primary" type="button" id="saveTeamPhoto">Сохранить фото команды</button></div>
+<div id="teamMsg" class="status"></div>
+<div id="teamsAdminList" class="news"></div>
+</div>
   <div class="panel">
     <h2>🏎️ Пилоты</h2>
     <p class="sub">Добавляй фотографии пилотов и убирай пилотов с публичного сайта. Исторические результаты не изменяются.</p>
@@ -63,7 +72,10 @@ async function deleteDriver(name){name=decodeURIComponent(name);if(!confirm('У�
 async function restoreDriver(name){name=decodeURIComponent(name);try{const fd=new FormData();fd.append('name',name);await api('/api/admin/drivers',{method:'POST',body:fd});$('driverMsg').textContent='Пилот возвращён на сайт';$('driverMsg').className='status success';await loadDriversAdmin()}catch(e){$('driverMsg').textContent=e.message;$('driverMsg').className='status error'}}
 $('saveDriverPhoto').onclick=async()=>{const name=$('driverSelect').value;const file=$('driverPhoto').files[0];if(!file){$('driverMsg').textContent='Выберите фотографию';$('driverMsg').className='status error';return}const fd=new FormData();fd.append('name',name);fd.append('photo',file);try{await api('/api/admin/drivers',{method:'POST',body:fd});$('driverPhoto').value='';$('driverMsg').textContent='Фотография сохранена';$('driverMsg').className='status success';await loadDriversAdmin()}catch(e){$('driverMsg').textContent=e.message;$('driverMsg').className='status error'}};
 $('deleteDriver').onclick=()=>{if($('driverSelect').value)deleteDriver(encodeURIComponent($('driverSelect').value))};
-async function loadManagement(){await loadUsers();await loadAdmins();await loadProtests();await loadDriversAdmin()}
+async function loadTeamsAdmin(){try{const d=await api('/api/admin/teams');$('teamSelect').innerHTML=d.teams.map(x=>`<option value="${esc(x.name)}">${esc(x.name)}</option>`).join('');$('teamsAdminList').innerHTML=d.teams.map(x=>`<article class="item"><div class="title">${esc(x.name)}</div><div class="meta">${x.photo?'Своя фотография':'Стандартная фотография'}</div>${x.photo?`<div class="thumbs"><img src="${esc(x.photo)}" alt=""></div>`:''}</article>`).join('')}catch(e){$('teamsAdminList').innerHTML='<div class="status error">'+esc(e.message)+'</div>'}}
+$('saveTeamPhoto').onclick=async()=>{const name=$('teamSelect').value;const f=$('teamPhoto').files[0];if(!f){$('teamMsg').textContent='Выберите фотографию';$('teamMsg').className='status error';return}const fd=new FormData();fd.append('name',name);fd.append('photo',f);try{await api('/api/admin/teams',{method:'POST',body:fd});$('teamMsg').textContent='Фото команды сохранено';$('teamMsg').className='status success';$('teamPhoto').value='';loadTeamsAdmin()}catch(e){$('teamMsg').textContent=e.message;$('teamMsg').className='status error'}}
+
+async function loadManagement(){await loadUsers();await loadAdmins();await loadProtests();await loadTeamsAdmin();await loadDriversAdmin()}
 
 async function loadProtests(){
   try{

@@ -29,11 +29,15 @@ PROTESTS_DIR.mkdir(parents=True, exist_ok=True)
 DRIVERS_FILE = data_file("drivers.json")
 DRIVER_PHOTOS_DIR = DATA_DIR / "driver_photos"
 DRIVER_PHOTOS_DIR.mkdir(parents=True, exist_ok=True)
+TEAM_PHOTOS_DIR = DATA_DIR / "team_photos"
+TEAM_PHOTOS_DIR.mkdir(parents=True, exist_ok=True)
+TEAMS_FILE = data_file("teams.json")
 NEWS_LOCK = threading.Lock()
 USERS_LOCK = threading.Lock()
 ADMINS_LOCK = threading.Lock()
 PROTESTS_LOCK = threading.Lock()
 DRIVERS_LOCK = threading.Lock()
+TEAMS_LOCK = threading.Lock()
 
 SESSION_TTL = 12 * 60 * 60
 SESSIONS = {}  # token -> {expires, nick}
@@ -157,6 +161,41 @@ def driver_public_list(include_inactive=False):
         })
     rows.sort(key=lambda x: x["name"].casefold())
     return rows
+
+
+def load_team_settings():
+    data = load_json(TEAMS_FILE, {})
+    return data if isinstance(data, dict) else {}
+
+
+def save_team_settings(data):
+    save_json(TEAMS_FILE, data)
+
+
+def team_names_from_results():
+    results = load_json(ROOT / "results.json", {})
+    names = set()
+    if isinstance(results, dict):
+        for race in results.get("races", []):
+            for row in race.get("results", []):
+                team = str(row.get("team", "")).strip()
+                if team:
+                    names.add(team)
+    names.update([
+        "McLaren", "Ferrari", "Mercedes", "Red Bull Racing", "Aston Martin",
+        "Williams", "Haas", "Alpine", "Visa Cash App RB", "Kick Sauber"
+    ])
+    return sorted(names, key=str.casefold)
+
+
+def team_public_list():
+    settings = load_team_settings()
+    return [{"name": n, "photo": settings.get(n, {}).get("photo", "")} for n in team_names_from_results()]
+
+
+def safe_team_photo_filename(name):
+    base = re.sub(r"[^A-Za-z0-9._-]+", "_", str(name)).strip("._-") or "team"
+    return base[:80]
 
 
 def safe_photo_filename(name):
@@ -388,6 +427,39 @@ class F1Handler(SimpleHTTPRequestHandler):
                 nick = str(u.get("nick", ""))
                 public.append({"nick": nick, "created_at": u.get("created_at", ""), "admin": nick.casefold() in admins})
             self._json_response(200, {"users": public})
+            return
+        if path == "/api/teams":
+            if not current_user(self) and not is_admin(self):
+                self._json_response(401, {"error": "Сначала зарегистрируйтесь или войдите"})
+                return
+            self._json_response(200, {"teams": team_public_list()})
+            return
+        if path == "/api/admin/teams":
+            if not is_admin(self):
+                self._json_response(401, {"error": "Требуется вход в админ-панель"})
+                return
+            self._json_response(200, {"teams": team_public_list()})
+            return
+        if path.startswith("/team-photos/"):
+            requested = path[len("/team-photos/"):].split("?", 1)[0]
+            if not requested or "/" in requested or "\\" in requested or ".." in requested:
+                self._json_response(404, {"error": "Файл не найден"})
+                return
+            file_path = (TEAM_PHOTOS_DIR / requested).resolve()
+            try:
+                if file_path.parent != TEAM_PHOTOS_DIR.resolve() or not file_path.is_file():
+                    self._json_response(404, {"error": "Файл не найден"})
+                    return
+                mime = mimetypes.guess_type(file_path.name)[0] or "application/octet-stream"
+                data = file_path.read_bytes()
+                self.send_response(200)
+                self.send_header("Content-Type", mime)
+                self.send_header("Content-Length", str(len(data)))
+                self.send_header("Cache-Control", "public, max-age=300")
+                self.end_headers()
+                self.wfile.write(data)
+            except OSError:
+                self._json_response(404, {"error": "Файл не найден"})
             return
         if path == "/api/drivers":
             if not current_user(self) and not is_admin(self):
@@ -852,6 +924,7 @@ def main():
     if not NEWS_FILE.exists(): save_news([])
     if not PROTESTS_FILE.exists(): save_protests([])
     driver_settings_with_stats()
+    if not TEAMS_FILE.exists(): save_team_settings({})
     server = ThreadingHTTPServer((HOST, PORT), F1Handler)
     print(f"F1 League server: http://{HOST}:{PORT}")
     print(f"Registration/login: http://127.0.0.1:{PORT}/auth")
