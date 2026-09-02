@@ -26,10 +26,14 @@ ADMINS_FILE = data_file("admins.json")
 PROTESTS_FILE = data_file("protests.json")
 PROTESTS_DIR = DATA_DIR / "protest_files"
 PROTESTS_DIR.mkdir(parents=True, exist_ok=True)
+DRIVERS_FILE = data_file("drivers.json")
+DRIVER_PHOTOS_DIR = DATA_DIR / "driver_photos"
+DRIVER_PHOTOS_DIR.mkdir(parents=True, exist_ok=True)
 NEWS_LOCK = threading.Lock()
 USERS_LOCK = threading.Lock()
 ADMINS_LOCK = threading.Lock()
 PROTESTS_LOCK = threading.Lock()
+DRIVERS_LOCK = threading.Lock()
 
 SESSION_TTL = 12 * 60 * 60
 SESSIONS = {}  # token -> {expires, nick}
@@ -92,6 +96,72 @@ def load_protests():
 
 def save_protests(data):
     save_json(PROTESTS_FILE, data)
+
+
+def load_driver_settings():
+    data = load_json(DRIVERS_FILE, {})
+    if isinstance(data, dict):
+        return data
+    if isinstance(data, list):
+        return {str(x.get("name")): x for x in data if isinstance(x, dict) and x.get("name")}
+    return {}
+
+
+def save_driver_settings(data):
+    save_json(DRIVERS_FILE, data)
+
+
+def is_driver_active(name):
+    item = load_driver_settings().get(str(name), {})
+    return bool(item.get("active", True))
+
+
+def driver_settings_with_stats():
+    settings = load_driver_settings()
+    # Keep settings compatible with the current results: create missing entries lazily.
+    seen = {}
+    results = load_json(ROOT / "results.json", {})
+    for race in results.get("races", []) if isinstance(results, dict) else []:
+        for row in race.get("results", []):
+            name = str(row.get("driver", "")).strip()
+            if not name:
+                continue
+            seen[name] = row.get("team", "")
+    changed = False
+    for name, team in seen.items():
+        if name not in settings:
+            settings[name] = {"name": name, "team": team, "photo": "", "active": True}
+            changed = True
+        elif not settings[name].get("team") and team:
+            settings[name]["team"] = team
+            changed = True
+        settings[name].setdefault("photo", "")
+        settings[name].setdefault("active", True)
+    if changed:
+        save_driver_settings(settings)
+    return settings
+
+
+def driver_public_list(include_inactive=False):
+    settings = driver_settings_with_stats()
+    rows = []
+    for name, item in settings.items():
+        active = bool(item.get("active", True))
+        if not include_inactive and not active:
+            continue
+        rows.append({
+            "name": name,
+            "team": item.get("team", ""),
+            "photo": item.get("photo", ""),
+            "active": active,
+        })
+    rows.sort(key=lambda x: x["name"].casefold())
+    return rows
+
+
+def safe_photo_filename(name):
+    base = re.sub(r"[^A-Za-z0-9._-]+", "_", str(name)).strip("._-") or "driver"
+    return base[:80]
 
 
 def parse_cookies(header):
@@ -290,7 +360,7 @@ class F1Handler(SimpleHTTPRequestHandler):
         if path == "/health":
             self._json_response(200, {"status": "ok", "service": "f1-league"})
             return
-        if path in ("/users.json", "/admins.json", "/news.json"):
+        if path in ("/users.json", "/admins.json", "/news.json", "/drivers.json"):
             self._json_response(403, {"error": "forbidden"})
             return
         if path == "/api/auth/me":
@@ -318,6 +388,39 @@ class F1Handler(SimpleHTTPRequestHandler):
                 nick = str(u.get("nick", ""))
                 public.append({"nick": nick, "created_at": u.get("created_at", ""), "admin": nick.casefold() in admins})
             self._json_response(200, {"users": public})
+            return
+        if path == "/api/drivers":
+            if not current_user(self) and not is_admin(self):
+                self._json_response(401, {"error": "Сначала зарегистрируйтесь или войдите"})
+                return
+            self._json_response(200, {"drivers": driver_public_list(False)})
+            return
+        if path == "/api/admin/drivers":
+            if not is_admin(self):
+                self._json_response(401, {"error": "Требуется вход в админ-панель"})
+                return
+            self._json_response(200, {"drivers": driver_public_list(True)})
+            return
+        if path.startswith("/driver-photos/"):
+            requested = path[len("/driver-photos/"):] .split("?",1)[0]
+            if not requested or "/" in requested or "\\" in requested or ".." in requested:
+                self._json_response(404, {"error":"Файл не найден"})
+                return
+            file_path = (DRIVER_PHOTOS_DIR / requested).resolve()
+            try:
+                if file_path.parent != DRIVER_PHOTOS_DIR.resolve() or not file_path.is_file():
+                    self._json_response(404, {"error":"Файл не найден"})
+                    return
+                mime = mimetypes.guess_type(file_path.name)[0] or "application/octet-stream"
+                data = file_path.read_bytes()
+                self.send_response(200)
+                self.send_header("Content-Type", mime)
+                self.send_header("Content-Length", str(len(data)))
+                self.send_header("Cache-Control", "public, max-age=300")
+                self.end_headers()
+                self.wfile.write(data)
+            except OSError:
+                self._json_response(404, {"error":"Файл не найден"})
             return
         if path == "/api/news":
             if not current_user(self) and not is_admin(self):
@@ -451,6 +554,52 @@ class F1Handler(SimpleHTTPRequestHandler):
             if path == "/api/auth/logout":
                 delete_user_session(self)
                 self._json_response(200, {"ok": True}, [("Set-Cookie", cookie("f1_user", "", 0))])
+                return
+
+            if path == "/api/admin/drivers":
+                if not is_admin(self):
+                    self._json_response(401, {"error": "Требуется вход в админ-панель"})
+                    return
+                fields, file_part = self._read_multipart(max_bytes=15 * 1024 * 1024)
+                name = fields.get("name", "").strip()
+                if not name:
+                    self._json_response(400, {"error": "Не указан пилот"})
+                    return
+                with DRIVERS_LOCK:
+                    settings = driver_settings_with_stats()
+                    # Match case-insensitively so the name is canonical.
+                    canonical = next((n for n in settings if n.casefold() == name.casefold()), None)
+                    if not canonical:
+                        self._json_response(404, {"error": "Пилот не найден в результатах"})
+                        return
+                    item = settings[canonical]
+                    item["active"] = True
+                    if file_part and file_part.get("data"):
+                        mime = file_part.get("mime", "")
+                        if not mime.startswith("image/"):
+                            self._json_response(400, {"error": "Фото пилота должно быть изображением"})
+                            return
+                        data = file_part["data"]
+                        if len(data) > 10 * 1024 * 1024:
+                            self._json_response(400, {"error": "Фото не должно превышать 10 МБ"})
+                            return
+                        ext = Path(file_part.get("filename") or "").suffix.lower()
+                        if ext not in {".jpg", ".jpeg", ".png", ".webp", ".gif"}:
+                            ext = ".jpg"
+                        base = safe_photo_filename(canonical)
+                        filename = base + ext
+                        # Remove an older photo for the same driver.
+                        old = str(item.get("photo", ""))
+                        if old.startswith("/driver-photos/"):
+                            old_file = (DRIVER_PHOTOS_DIR / Path(old).name).resolve()
+                            if old_file.parent == DRIVER_PHOTOS_DIR.resolve() and old_file.is_file() and old_file.name != filename:
+                                try: old_file.unlink()
+                                except OSError: pass
+                        target = DRIVER_PHOTOS_DIR / filename
+                        target.write_bytes(data)
+                        item["photo"] = "/driver-photos/" + filename
+                    save_driver_settings(settings)
+                self._json_response(200, {"ok": True, "driver": {"name": canonical, **settings[canonical]}})
                 return
 
             if path == "/api/protests":
@@ -645,6 +794,22 @@ class F1Handler(SimpleHTTPRequestHandler):
                 admins = [a for a in admins if a.casefold() != nick.casefold()]
                 save_admins(admins)
             self._json_response(200, {"ok": True, "admins": load_admins()}); return
+        if path.startswith("/api/admin/drivers/"):
+            if not is_admin(self):
+                self._json_response(401, {"error": "Требуется вход в админ-панель"})
+                return
+            name = unquote(path.rsplit("/", 1)[1]).strip()
+            with DRIVERS_LOCK:
+                settings = driver_settings_with_stats()
+                canonical = next((n for n in settings if n.casefold() == name.casefold()), None)
+                if not canonical:
+                    self._json_response(404, {"error": "Пилот не найден"})
+                    return
+                item = settings[canonical]
+                item["active"] = False
+                save_driver_settings(settings)
+            self._json_response(200, {"ok": True})
+            return
         if path.startswith("/api/admin/users/"):
             if not is_admin(self):
                 self._json_response(401, {"error": "Требуется вход в админ-панель"}); return
@@ -686,6 +851,7 @@ def main():
     if not ADMINS_FILE.exists(): save_admins(["admin"])
     if not NEWS_FILE.exists(): save_news([])
     if not PROTESTS_FILE.exists(): save_protests([])
+    driver_settings_with_stats()
     server = ThreadingHTTPServer((HOST, PORT), F1Handler)
     print(f"F1 League server: http://{HOST}:{PORT}")
     print(f"Registration/login: http://127.0.0.1:{PORT}/auth")
