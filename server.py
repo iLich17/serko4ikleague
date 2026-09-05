@@ -24,6 +24,7 @@ NEWS_FILE = data_file("news.json")
 USERS_FILE = data_file("users.json")
 ADMINS_FILE = data_file("admins.json")
 PROTESTS_FILE = data_file("protests.json")
+RESULTS_FILE = data_file("results.json")
 PROTESTS_DIR = DATA_DIR / "protest_files"
 PROTESTS_DIR.mkdir(parents=True, exist_ok=True)
 DRIVERS_FILE = data_file("drivers.json")
@@ -126,7 +127,7 @@ def driver_settings_with_stats():
     settings = load_driver_settings()
     # Keep settings compatible with the current results: create missing entries lazily.
     seen = {}
-    results = load_json(ROOT / "results.json", {})
+    results = load_json(RESULTS_FILE, {})
     for race in results.get("races", []) if isinstance(results, dict) else []:
         for row in race.get("results", []):
             name = str(row.get("driver", "")).strip()
@@ -176,7 +177,7 @@ def save_team_settings(data):
 
 
 def team_names_from_results():
-    results = load_json(ROOT / "results.json", {})
+    results = load_json(RESULTS_FILE, {})
     names = set()
     if isinstance(results, dict):
         for race in results.get("races", []):
@@ -211,7 +212,7 @@ def season_roster_base(season_id):
     if sid == "1":
         data = load_json(ROOT / "season1.json", {})
         return data.get("drivers", {}) if isinstance(data, dict) else {}
-    data = load_json(ROOT / "results.json", {})
+    data = load_json(RESULTS_FILE, {})
     result = {}
     if isinstance(data, dict):
         for race in data.get("races", []):
@@ -250,44 +251,25 @@ def season_roster_public(season_id):
     return rows
 
 def season_driver_team(season_id, name, round_no=None):
-    """Return the driver's team for a specific championship round.
-
-    The base `team` is the starting team for the season. Transfers are applied
-    only when their effective_round has been reached. This is deliberately
-    resolved from the persisted season_rosters.json on every call so that a
-    transfer made in the admin panel is immediately reflected when a result
-    is entered.
-    """
     base = season_roster_base(season_id)
-    item = next((v for k, v in base.items()
-                 if str(k).casefold() == str(name).casefold() and isinstance(v, dict)), None)
+    item = next((v for k, v in base.items() if str(k).casefold() == str(name).casefold() and isinstance(v, dict)), None)
     if not item:
         return ""
-
-    team = str(item.get("team", "")).strip()
-    transfers = item.get("transfers", [])
-    if not isinstance(transfers, list):
-        return team
-
-    # For a result, round_no is required. Without it, return the latest team.
-    target_round = None if round_no is None else max(1, int(round_no))
+    team = str(item.get("team", ""))
+    transfers = item.get("transfers", []) if isinstance(item.get("transfers", []), list) else []
     parsed = []
-    for index, tr in enumerate(transfers):
+    for tr in transfers:
         if not isinstance(tr, dict):
             continue
         try:
-            effective = max(1, int(tr.get("effective_round", 1)))
+            effective = int(tr.get("effective_round", 1))
         except (TypeError, ValueError):
             continue
-        to_team = str(tr.get("to_team", "")).strip()
-        if to_team:
-            parsed.append((effective, index, to_team))
-
-    # Preserve the admin-entered order if two transfers use the same round.
-    parsed.sort(key=lambda x: (x[0], x[1]))
-    for effective, _, to_team in parsed:
-        if target_round is None or target_round >= effective:
-            team = to_team
+        parsed.append((max(1, effective), str(tr.get("to_team", "")).strip()))
+    for effective, to_team in sorted(parsed):
+        if round_no is None or int(round_no) >= effective:
+            if to_team:
+                team = to_team
     return team
 
 def safe_team_photo_filename(name):
@@ -499,72 +481,22 @@ class F1Handler(SimpleHTTPRequestHandler):
         if path in ("/users.json", "/admins.json", "/news.json", "/drivers.json"):
             self._json_response(403, {"error": "forbidden"})
             return
+        if path == "/results.json":
+            data = load_json(RESULTS_FILE, {})
+            body = json.dumps(data, ensure_ascii=False).encode("utf-8")
+            self.send_response(200)
+            self.send_header("Content-Type", "application/json; charset=utf-8")
+            self.send_header("Cache-Control", "no-store, max-age=0")
+            self.send_header("Content-Length", str(len(body)))
+            self.end_headers()
+            self.wfile.write(body)
+            return
         if path == "/api/auth/me":
             nick = current_user(self)
             self._json_response(200, {"authenticated": bool(nick), "nick": nick})
             return
         if path == "/api/admin/me":
             self._json_response(200, {"authenticated": bool(current_admin(self)), "nick": current_admin(self)})
-            return
-        if path == "/api/admin/results":
-            if not is_admin(self):
-                self._json_response(401, {"error": "Требуется вход в админ-панель"})
-                return
-            try:
-                result_sets = {}
-                for sid, filename in (("1", "season1.json"), ("2", "results.json")):
-                    data = load_json(ROOT / filename, {})
-                    races = data.get("races", []) if isinstance(data, dict) else []
-                    result_sets[sid] = {
-                        "season": int(sid),
-                        "name": data.get("name", f"Сезон {sid}") if isinstance(data, dict) else f"Сезон {sid}",
-                        "races": races if isinstance(races, list) else []
-                    }
-                rosters = load_season_rosters()
-                public_rosters = {}
-                for sid in ("1", "2"):
-                    roster = rosters.get(sid, {})
-                    public_rosters[sid] = [
-                        {"name": str(name), "team": str(item.get("team", ""))}
-                        for name, item in roster.items() if isinstance(item, dict)
-                    ]
-                self._json_response(200, {"seasons": result_sets, "rosters": public_rosters})
-            except Exception as e:
-                self._json_response(500, {"error": "Не удалось загрузить результаты: " + str(e)})
-            return
-        if path == "/api/admin/stats":
-            if not is_admin(self):
-                self._json_response(401, {"error": "Требуется вход в админ-панель"})
-                return
-            try:
-                users = load_users()
-                admins = load_admins()
-                news = load_news()
-                protests = load_protests()
-                drivers = driver_public_list(True)
-                teams = team_public_list()
-                results_data = load_json(ROOT / "results.json", {})
-                season1_data = load_json(ROOT / "season1.json", {})
-                races = []
-                if isinstance(results_data, dict): races += results_data.get("races", [])
-                if isinstance(season1_data, dict): races += season1_data.get("races", [])
-                result_rows = sum(len(r.get("results", [])) for r in races if isinstance(r, dict))
-                total_points = sum(float(row.get("points", 0) or 0) for r in races if isinstance(r, dict) for row in r.get("results", []) if isinstance(row, dict))
-                self._json_response(200, {
-                    "users": len(users),
-                    "admins": len(admins),
-                    "drivers": len(drivers),
-                    "active_drivers": sum(1 for d in drivers if d.get("active")),
-                    "teams": len(teams),
-                    "races": len(races),
-                    "result_rows": result_rows,
-                    "points": total_points,
-                    "news": len(news),
-                    "protests": len(protests),
-                    "open_protests": sum(1 for p in protests if str(p.get("status", "")).casefold() in ("new", "новый", "pending", "на рассмотрении"))
-                })
-            except Exception as e:
-                self._json_response(500, {"error": "Не удалось собрать статистику: " + str(e)})
             return
         if path == "/api/admins":
             if not is_admin(self):
@@ -807,77 +739,33 @@ class F1Handler(SimpleHTTPRequestHandler):
                 if not is_admin(self):
                     self._json_response(401, {"error": "Требуется вход в админ-панель"})
                     return
-                data = self._read_json(512 * 1024)
-                if not isinstance(data, dict):
-                    self._json_response(400, {"error": "Некорректные данные"}); return
-                season_id = str(data.get("season_id", "")).strip()
-                try: round_no = int(data.get("round", 0))
-                except (TypeError, ValueError): round_no = 0
-                grand_prix = str(data.get("grandPrix", "")).strip()
-                session = str(data.get("session", "race")).strip().lower()
-                rows = data.get("results", [])
-                if season_id not in {"1", "2"}:
-                    self._json_response(400, {"error": "Выберите сезон"}); return
-                if round_no < 1:
-                    self._json_response(400, {"error": "Укажите номер этапа"}); return
-                if not grand_prix:
-                    self._json_response(400, {"error": "Укажите название Гран-при"}); return
-                if session not in {"race", "sprint"}:
-                    self._json_response(400, {"error": "Некорректный тип заезда"}); return
-                if not isinstance(rows, list) or not rows:
-                    self._json_response(400, {"error": "Добавьте хотя бы одного пилота"}); return
-
-                roster = season_roster_base(season_id)
-                canonical_by_fold = {str(n).casefold(): str(n) for n in roster}
-                cleaned = []
-                seen = set()
-                for i, row in enumerate(rows, 1):
-                    if not isinstance(row, dict):
-                        continue
-                    driver_raw = str(row.get("driver", "")).strip()
-                    if not driver_raw: continue
-                    driver = canonical_by_fold.get(driver_raw.casefold())
-                    if not driver:
-                        self._json_response(400, {"error": f"Пилот «{driver_raw}» не найден в составе сезона {season_id}"}); return
-                    key = driver.casefold()
-                    if key in seen:
-                        self._json_response(400, {"error": f"Пилот «{driver}» указан дважды"}); return
-                    seen.add(key)
-                    status = str(row.get("status", "FIN")).strip().upper() or "FIN"
-                    if status not in {"FIN", "DNF", "DNS", "DSQ"}:
-                        self._json_response(400, {"error": f"Некорректный статус у {driver}"}); return
-                    try:
-                        position = int(row.get("position", 0) or 0)
-                    except (TypeError, ValueError): position = 0
-                    try:
-                        points = float(row.get("points", 0) or 0)
-                    except (TypeError, ValueError): points = 0
-                    if points < 0: points = 0
-                    if status in {"DNS", "DNF", "DSQ"}: position = 0
-                    gap = str(row.get("gap", "")).strip()
-                    if status == "DNS": gap = "DNS"
-                    elif status == "DNF" and not gap: gap = "DNF"
-                    elif status == "DSQ": gap = "DSQ"
-                    team = season_driver_team(season_id, driver, round_no) or roster.get(driver, {}).get("team", "")
-                    cleaned.append({"driver": driver, "team": team, "position": position, "points": int(points) if points.is_integer() else points, "gap": gap, "status": status})
-
-                filename = "season1.json" if season_id == "1" else "results.json"
-                target = ROOT / filename
-                lock = SEASON_ROSTERS_LOCK if False else RESULTS_LOCK
-                # Results files are updated atomically under the general results lock.
-                with lock:
-                    data_file = load_json(target, {})
-                    if not isinstance(data_file, dict): data_file = {}
-                    races = data_file.get("races", [])
-                    if not isinstance(races, list): races = []
-                    duplicate = next((r for r in races if isinstance(r, dict) and int(r.get("round", 0) or 0) == round_no and str(r.get("session", "race")) == session), None)
-                    if duplicate:
-                        self._json_response(409, {"error": f"Для этапа {round_no} уже внесён {"спринт" if session == "sprint" else "заезд"}. Сначала удалите или отредактируйте его."}); return
-                    races.append({"round": round_no, "grandPrix": grand_prix, "session": session, "results": cleaned})
-                    races.sort(key=lambda r: (int(r.get("round", 0) or 0), 0 if r.get("session") == "sprint" else 1))
-                    data_file["races"] = races
-                    save_json(target, data_file)
-                self._json_response(201, {"ok": True, "race": races[-1] if races else None})
+                fields, file_part = self._read_multipart(max_bytes=25 * 1024 * 1024)
+                if not file_part or not file_part.get("data"):
+                    self._json_response(400, {"error": "Выберите файл results.json"})
+                    return
+                filename = str(file_part.get("filename") or "")
+                if Path(filename).suffix.lower() != ".json":
+                    self._json_response(400, {"error": "Можно загрузить только JSON-файл"})
+                    return
+                try:
+                    uploaded = json.loads(file_part["data"].decode("utf-8-sig"))
+                except (UnicodeDecodeError, json.JSONDecodeError):
+                    self._json_response(400, {"error": "Файл не является корректным JSON"})
+                    return
+                if not isinstance(uploaded, dict) or not isinstance(uploaded.get("races"), list):
+                    self._json_response(400, {"error": "Неверный формат: нужен объект с массивом races"})
+                    return
+                for i, race in enumerate(uploaded["races"], 1):
+                    if not isinstance(race, dict) or not isinstance(race.get("results"), list):
+                        self._json_response(400, {"error": f"Неверный формат этапа №{i}: отсутствует массив results"})
+                        return
+                try:
+                    with threading.Lock():
+                        save_json(RESULTS_FILE, uploaded)
+                except OSError as exc:
+                    self._json_response(500, {"error": f"Не удалось сохранить результаты: {exc}"})
+                    return
+                self._json_response(200, {"ok": True, "races": len(uploaded["races"])})
                 return
 
             if path == "/api/admin/transfers":
