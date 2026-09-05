@@ -16,26 +16,38 @@
   .thumbs img{width:calc(50% - 4px);height:auto;aspect-ratio:3/2}
   .item{padding:13px}
 }
+
+.admin-layout{display:grid;grid-template-columns:220px minmax(0,1fr);gap:18px;align-items:start}.admin-nav{position:sticky;top:16px;background:#15151a;border:1px solid #292930;border-radius:16px;padding:10px}.nav-title{font-size:12px;font-weight:900;color:#777d87;text-transform:uppercase;padding:10px 12px 6px}.nav-group{display:grid;gap:4px;margin-bottom:8px}.nav-link{display:block;padding:10px 12px;border-radius:9px;color:#bfc3ca;font-weight:700;font-size:14px}.nav-link:hover,.nav-link.active{background:#292930;color:#fff}.admin-content{min-width:0}.section-heading{margin:24px 0 10px;font-size:13px;font-weight:900;color:#777d87;text-transform:uppercase;letter-spacing:.08em}.section-heading:first-child{margin-top:0}@media(max-width:850px){.admin-layout{grid-template-columns:1fr}.admin-nav{position:static;display:flex;gap:5px;overflow-x:auto;padding:7px}.nav-title{display:none}.nav-group{display:flex;margin:0}.nav-link{white-space:nowrap}.admin-content .section-heading{margin-top:18px}}
 </style>
 </head><body>
 <header><div class="logo">F1<span>LEAGUE</span> · ADMIN</div><div><a class="back" href="/">← На сайт</a></div></header>
 <main class="wrap">
 <section id="login" class="panel login"><h1>Вход</h1><p class="sub">Только для пользователей из списка администраторов.</p><div class="field"><label>Ник</label><input id="nick" autocomplete="username"></div><div class="field"><label>Пароль</label><input id="password" type="password" autocomplete="current-password"></div><button class="btn primary" id="loginBtn">Войти</button><div id="loginMsg" class="status"></div></section>
 <section id="app" class="hidden">
-  <div class="panel"><div style="display:flex;justify-content:space-between;gap:15px;align-items:center;flex-wrap:wrap"><div><h1>Новости</h1><p class="sub">Создание, редактирование и удаление публикаций.</p><div id="adminWho" class="status"></div></div><button class="btn secondary" id="logoutBtn">Выйти</button></div></div>
-  <div class="panel">
+  <div class="panel" id="dashboard"><div style="display:flex;justify-content:space-between;gap:15px;align-items:center;flex-wrap:wrap"><div><h1>Админ-панель</h1><p class="sub">Управление F1 League: контент, чемпионат, пользователи и модерация.</p><div id="adminWho" class="status"></div></div><button class="btn secondary" id="logoutBtn">Выйти</button></div></div>
+  <div class="admin-layout">
+    <aside class="admin-nav">
+      <div class="nav-title">Контент</div><div class="nav-group"><a class="nav-link active" href="#news">📰 Новости</a><a class="nav-link" href="#teams">🏁 Команды</a><a class="nav-link" href="#drivers">🏎️ Пилоты</a></div>
+      <div class="nav-title">Чемпионат</div><div class="nav-group"><a class="nav-link" href="#results">🏆 Результаты</a><a class="nav-link" href="#transfers">🔄 Трансферы</a></div>
+      <div class="nav-title">Модерация</div><div class="nav-group"><a class="nav-link" href="#protests">⚖️ Протесты</a></div>
+      <div class="nav-title">Система</div><div class="nav-group"><a class="nav-link" href="#users">👥 Пользователи</a><a class="nav-link" href="#admins">🛡️ Администраторы</a></div>
+    </aside>
+    <div class="admin-content">
+      <div class="section-heading">Система</div>
+      <div class="panel" id="users">
     <h2>👥 Пользователи</h2>
     <p class="sub">Зарегистрированные пользователи сайта.</p>
     <div id="usersList" class="news"></div>
   </div>
-  <div class="panel">
+  <div class="panel" id="admins">
     <h2>🛡️ Администраторы</h2>
     <p class="sub">Только пользователи из этого списка могут публиковать и управлять новостями.</p>
     <div class="field"><label>Добавить зарегистрированного пользователя</label><div style="display:flex;gap:9px"><input id="adminNick" placeholder="Введите ник"><button class="btn primary" type="button" id="addAdmin">Добавить</button></div></div>
     <div id="adminsList" class="news"></div>
     <div id="adminMsg" class="status"></div>
   </div>
-<div class="panel">
+<div class="section-heading">Контент</div>
+<div class="panel" id="teams">
 <h2>🏁 Команды</h2>
 <p class="sub">Здесь можно менять фотографии команд прямо через сайт.</p>
 <div class="field"><label>Команда</label><select id="teamSelect" style="width:100%;border:1px solid #303038;background:#0d0d11;color:#fff;border-radius:10px;padding:12px;font:inherit"></select></div>
@@ -44,14 +56,15 @@
 <div id="teamMsg" class="status"></div>
 <div id="teamsAdminList" class="news"></div>
 </div>
-  <div class="panel">
+  <div class="section-heading">Чемпионат</div>
+  <div class="panel" id="results">
     <h2>🏁 Результаты гонок</h2>
     <p class="sub">Загрузите новый <b>results.json</b>. Файл проверяется перед сохранением, а старые результаты заменяются только после успешной проверки.</p>
     <div class="field"><label>Файл результатов</label><input id="resultsFile" type="file" accept="application/json,.json"></div>
     <div class="buttons"><button class="btn primary" type="button" id="uploadResults">Загрузить результаты</button></div>
     <div id="resultsMsg" class="status"></div>
   </div>
-  <div class="panel">
+  <div class="panel" id="drivers">
     <h2>🏎️ Пилоты</h2>
     <p class="sub">Добавляй фотографии пилотов и убирай пилотов с публичного сайта. Исторические результаты не изменяются.</p>
     <div class="field"><label>Пилот</label><select id="driverSelect" style="width:100%;border:1px solid #303038;background:#0d0d11;color:#fff;border-radius:10px;padding:12px;font:inherit"></select></div>
@@ -60,7 +73,7 @@
     <div id="driverMsg" class="status"></div>
     <div id="driversAdminList" class="news"></div>
   </div>
-  <div class="panel">
+  <div class="panel" id="transfers">
     <h2>🔄 Трансфер пилота</h2>
     <p class="sub">Переводи пилота между командами отдельно для каждого сезона. Укажи этап, с которого трансфер вступает в силу. Старые результаты сохраняются за прежней командой.</p>
     <div class="field"><label>Сезон</label><select id="transferSeason" style="width:100%;border:1px solid #303038;background:#0d0d11;color:#fff;border-radius:10px;padding:12px;font:inherit"><option value="1">Сезон 1</option><option value="2" selected>Сезон 2</option></select></div>
@@ -72,13 +85,17 @@
     <div id="transferMsg" class="status"></div>
     <div id="transfersList" class="news"></div>
   </div>
-  <div class="panel">
+  <div class="section-heading">Модерация</div>
+  <div class="panel" id="protests">
     <h2>⚖️ Протесты</h2>
     <p class="sub">Протесты доступны только администраторам.</p>
     <div id="protestsList" class="news"></div>
   </div>
-  <form class="panel" id="newsForm"><h2 id="formTitle">Новая новость</h2><div class="field"><label>Заголовок</label><input id="title" maxlength="160" required></div><div class="field"><label>Текст</label><textarea id="text" maxlength="4000"></textarea></div><div class="field"><label>Тег</label><input id="tag" maxlength="50" value="F1 LEAGUE"></div><div class="field"><label>Фотографии</label><input id="photos" type="file" accept="image/*" multiple></div><div id="previews" class="thumbs"></div><div class="buttons"><button class="btn primary" type="submit" id="saveBtn">Опубликовать</button><button class="btn secondary hidden" type="button" id="cancelEdit">Отмена</button></div><div id="formMsg" class="status"></div></form>
-  <div class="panel"><h2>Опубликованные</h2><div id="newsList" class="news"></div></div>
+  <div class="section-heading">Новости</div>
+  <form class="panel" id="news"><h2 id="formTitle">Новая новость</h2><div class="field"><label>Заголовок</label><input id="title" maxlength="160" required></div><div class="field"><label>Текст</label><textarea id="text" maxlength="4000"></textarea></div><div class="field"><label>Тег</label><input id="tag" maxlength="50" value="F1 LEAGUE"></div><div class="field"><label>Фотографии</label><input id="photos" type="file" accept="image/*" multiple></div><div id="previews" class="thumbs"></div><div class="buttons"><button class="btn primary" type="submit" id="saveBtn">Опубликовать</button><button class="btn secondary hidden" type="button" id="cancelEdit">Отмена</button></div><div id="formMsg" class="status"></div></form>
+  <div class="panel" id="published"><h2>Опубликованные</h2><div id="newsList" class="news"></div></div>
+    </div>
+  </div>
 </section>
 </main>
 <script>
@@ -215,5 +232,6 @@ document.addEventListener('click', async (e) => {
   }
 });
 
+document.querySelectorAll('.nav-link').forEach(a=>a.addEventListener('click',()=>{document.querySelectorAll('.nav-link').forEach(x=>x.classList.remove('active'));a.classList.add('active')}));
 check();
 </script></body></html>
