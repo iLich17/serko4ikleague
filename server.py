@@ -114,6 +114,19 @@ def load_driver_settings():
     return {}
 
 
+def _driver_number(value, fallback=0, minimum=0, maximum=99):
+    if value is None or str(value).strip() == "":
+        try:
+            return max(minimum, min(maximum, int(fallback or 0)))
+        except (TypeError, ValueError):
+            return minimum
+    try:
+        number = int(float(str(value).strip().replace(",", ".")))
+    except (TypeError, ValueError):
+        number = int(fallback or 0) if str(fallback or "").strip() else minimum
+    return max(minimum, min(maximum, number))
+
+
 def save_driver_settings(data):
     save_json(DRIVERS_FILE, data)
 
@@ -877,6 +890,15 @@ class F1Handler(SimpleHTTPRequestHandler):
                         return
                     item = settings[canonical]
                     item["active"] = True
+
+                    # Editable driver profile information/statistics. Values are kept
+                    # in drivers.json and exposed through /api/drivers.
+                    item["country"] = fields.get("country", item.get("country", "")).strip()[:80]
+                    item["key_strength"] = fields.get("key_strength", item.get("key_strength", "")).strip()[:120]
+                    item["market_value"] = _driver_number(fields.get("market_value"), item.get("market_value", 0), 0, 1000)
+                    for stat_key in ("overall", "race_pace", "cleanliness", "attack", "defense", "qualifying", "stability"):
+                        item[stat_key] = _driver_number(fields.get(stat_key), item.get(stat_key, 0), 0, 99)
+
                     if file_part and file_part.get("data"):
                         mime = file_part.get("mime", "")
                         if not mime.startswith("image/"):
