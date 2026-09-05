@@ -33,6 +33,9 @@
 .admin-section.hidden-section{display:none!important}
 @media(max-width:900px){.app-layout{grid-template-columns:1fr}.sidebar{position:static}.stat-grid{grid-template-columns:repeat(2,minmax(0,1fr))}.quick-grid{grid-template-columns:1fr}}
 @media(max-width:600px){.stat-grid{grid-template-columns:1fr 1fr}.stat-card{min-height:110px;padding:14px}.stat-value{font-size:25px}.quick-actions{grid-template-columns:1fr}}
+
+.results-toolbar,.result-list-head,.result-form-head{display:flex;justify-content:space-between;align-items:center;gap:15px}.result-filters{display:flex;gap:9px}.result-filters select,.form-grid-3 select,.result-table select,.result-table input{border:1px solid #303038;background:#0d0d11;color:#fff;border-radius:9px;padding:10px;font:inherit;outline:none}.form-grid-3{display:grid;grid-template-columns:1fr 1fr 1.2fr;gap:12px}.result-table-wrap{overflow-x:auto;border:1px solid #292930;border-radius:12px}.result-table{width:100%;border-collapse:collapse;min-width:850px}.result-table th{background:#0d0d11;color:#858b94;font-size:11px;text-transform:uppercase;letter-spacing:.04em;text-align:left;padding:11px;border-bottom:1px solid #292930}.result-table td{padding:8px;border-bottom:1px solid #222229}.result-table tr:last-child td{border-bottom:0}.result-table .driver-select{min-width:220px}.result-table .status-select{min-width:125px}.result-table .num{width:85px}.result-table .gap-input{min-width:150px}.row-number{font-weight:900;color:#777d86}.remove-row{border:0;background:#301414;color:#ff7770;border-radius:8px;padding:8px 10px;cursor:pointer;font-weight:800}.muted{color:#777d86;font-size:12px}.result-summary{display:flex;justify-content:space-between;gap:10px;color:#777d86;font-size:12px;margin:10px 0 16px}.badge{padding:8px 11px;border:1px solid #303038;background:#0d0d11;border-radius:999px;color:#cbd0d6;font-size:12px;font-weight:800}.results-list{display:grid;gap:12px}.race-card{border:1px solid #292930;border-radius:14px;background:#0f0f13;overflow:hidden}.race-card-head{display:flex;justify-content:space-between;gap:15px;align-items:center;padding:15px 16px;background:#141419;border-bottom:1px solid #292930}.race-title{font-weight:950;font-size:18px}.race-meta{font-size:12px;color:#858b94;margin-top:4px}.race-chip{font-size:11px;font-weight:900;padding:7px 9px;border-radius:999px;background:#26262d}.race-results{width:100%;border-collapse:collapse}.race-results th,.race-results td{padding:9px 12px;border-bottom:1px solid #202027;text-align:left;font-size:13px}.race-results th{color:#777d86;font-size:10px;text-transform:uppercase}.race-results tr:last-child td{border-bottom:0}.status-pill{display:inline-flex;padding:4px 7px;border-radius:6px;font-size:10px;font-weight:900;background:#202026}.status-pill.dnf,.status-pill.dns,.status-pill.dsq{background:#341818;color:#ff817a}.status-pill.fin{color:#8ee3a2}.race-actions{padding:12px 16px;border-top:1px solid #292930;display:flex;justify-content:flex-end}.empty-results{padding:35px;text-align:center;color:#777d86;border:1px dashed #303038;border-radius:12px}
+@media(max-width:700px){.results-toolbar,.result-list-head,.result-form-head{align-items:stretch;flex-direction:column}.result-filters{width:100%;display:grid;grid-template-columns:1fr 1fr}.result-filters select{width:100%}.form-grid-3{grid-template-columns:1fr}.result-summary{flex-direction:column}.race-card-head{align-items:flex-start;flex-direction:column}}
 </style>
 </head><body>
 <header><div class="logo">F1<span>LEAGUE</span> · ADMIN</div><div><a class="back" href="/">← На сайт</a></div></header>
@@ -86,7 +89,23 @@
     <div class="panel"><h2>🛡️ Администраторы</h2><p class="sub">Только пользователи из этого списка могут публиковать и управлять новостями.</p><div class="field"><label>Добавить зарегистрированного пользователя</label><div style="display:flex;gap:9px"><input id="adminNick" placeholder="Введите ник"><button class="btn primary" type="button" id="addAdmin">Добавить</button></div></div><div id="adminsList" class="news"></div><div id="adminMsg" class="status"></div></div>
   </div>
   <div class="admin-section" id="results">
-    <div class="panel"><h2>🏁 Результаты гонок</h2><p class="sub">Раздел для результатов гонок.</p><div class="quick-card" style="background:#0d0d11"><b>Статистика:</b> внесено <span id="resultRowsInline">—</span> результатов пилотов.</div></div>
+    <div class="results-toolbar panel">
+      <div><h2 style="margin:0 0 5px">🏁 Результаты гонок</h2><p class="sub" style="margin:0">Добавляй результаты по этапам и сразу контролируй уже внесённые заезды.</p></div>
+      <div class="result-filters"><select id="resultsSeasonFilter"><option value="2">Сезон 2</option><option value="1">Сезон 1</option></select><select id="resultsSessionFilter"><option value="all">Все заезды</option><option value="race">Гонка</option><option value="sprint">Спринт</option></select></div>
+    </div>
+    <form class="panel" id="resultForm">
+      <div class="form-grid-3">
+        <div class="field"><label>Сезон</label><select id="resultSeason" required><option value="2">Сезон 2</option><option value="1">Сезон 1</option></select></div>
+        <div class="field"><label>Этап</label><input id="resultRound" type="number" min="1" max="99" value="1" required></div>
+        <div class="field"><label>Тип заезда</label><select id="resultSession"><option value="race">🏁 Гонка</option><option value="sprint">⚡ Спринт</option></select></div>
+      </div>
+      <div class="field"><label>Гран-при</label><input id="resultGrandPrix" placeholder="Например: Италия" maxlength="80" required></div>
+      <div class="result-form-head"><div><h3 style="margin:0">Классификация</h3><span class="muted">Укажи пилотов, позиции, очки и статус.</span></div><button type="button" class="btn secondary" id="addResultRow">＋ Добавить пилота</button></div>
+      <div class="result-table-wrap"><table class="result-table"><thead><tr><th>#</th><th>Пилот</th><th>Статус</th><th>Позиция</th><th>Очки</th><th>Время / отставание</th><th></th></tr></thead><tbody id="resultRows"></tbody></table></div>
+      <div class="result-summary"><span id="resultRowCount">0 пилотов</span><span>DNS — не стартовал · DNF — не финишировал · DSQ — дисквалифицирован</span></div>
+      <div class="buttons"><button class="btn primary" type="submit">💾 Сохранить результаты</button><button class="btn secondary" type="button" id="clearResultForm">Очистить</button></div><div id="resultMsg" class="status"></div>
+    </form>
+    <div class="panel"><div class="result-list-head"><div><h2 style="margin:0 0 5px">Внесённые результаты</h2><p class="sub" style="margin:0">Каждый этап показан отдельной карточкой.</p></div><div id="resultStatsBadge" class="badge">—</div></div><div id="resultsList" class="results-list"></div></div>
   </div>
   <div class="admin-section" id="teams">
     <div class="panel"><h2>🏁 Команды</h2><p class="sub">Здесь можно менять фотографии команд прямо через сайт.</p><div class="field"><label>Команда</label><select id="teamSelect" style="width:100%;border:1px solid #303038;background:#0d0d11;color:#fff;border-radius:10px;padding:12px;font:inherit"></select></div><div class="field"><label>Новая фотография команды</label><input id="teamPhoto" type="file" accept="image/*"></div><div class="buttons"><button class="btn primary" type="button" id="saveTeamPhoto">Сохранить фото команды</button></div><div id="teamMsg" class="status"></div><div id="teamsAdminList" class="news"></div></div>
@@ -223,6 +242,36 @@ document.addEventListener('click', async (e) => {
 });
 
 
+let adminResultsData={seasons:{},rosters:{}};
+function resultStatusLabel(status){return status==='FIN'?'Финиш':status==='DNF'?'DNF':status==='DNS'?'DNS':'DSQ'}
+function resultRowTemplate(row={}){
+  const roster=adminResultsData.rosters[$('resultSeason').value]||[];
+  const selected=row.driver||'';
+  const options=roster.map(d=>`<option value="${esc(d.name)}" ${d.name===selected?'selected':''}>${esc(d.name)}${d.team?' · '+esc(d.team):''}</option>`).join('');
+  return `<tr class="result-entry"><td class="row-number"></td><td><select class="driver-select" required><option value="">Выберите пилота</option>${options}</select></td><td><select class="status-select"><option value="FIN" ${(!row.status||row.status==='FIN')?'selected':''}>Финиш</option><option value="DNF" ${row.status==='DNF'?'selected':''}>DNF</option><option value="DNS" ${row.status==='DNS'?'selected':''}>DNS</option><option value="DSQ" ${row.status==='DSQ'?'selected':''}>DSQ</option></select></td><td><input class="num position-input" type="number" min="0" max="99" value="${row.position||''}"></td><td><input class="num points-input" type="number" min="0" step="0.5" value="${row.points??0}"></td><td><input class="gap-input" value="${esc(row.gap||'')}" placeholder="GAP / +5.123"></td><td><button type="button" class="remove-row" title="Удалить">✕</button></td></tr>`;
+}
+function refreshResultRowNumbers(){document.querySelectorAll('#resultRows .result-entry').forEach((tr,i)=>tr.querySelector('.row-number').textContent=i+1);$('resultRowCount').textContent=`${document.querySelectorAll('#resultRows .result-entry').length} пилотов`}
+function addResultRow(row){$('resultRows').insertAdjacentHTML('beforeend',resultRowTemplate(row));refreshResultRowNumbers()}
+function resetResultForm(){ $('resultRows').innerHTML=''; $('resultGrandPrix').value=''; $('resultRound').value='1'; addResultRow(); addResultRow(); $('resultMsg').textContent=''; $('resultMsg').className='status' }
+function collectResultRows(){return [...document.querySelectorAll('#resultRows .result-entry')].map(tr=>({driver:tr.querySelector('.driver-select').value,status:tr.querySelector('.status-select').value,position:Number(tr.querySelector('.position-input').value||0),points:Number(tr.querySelector('.points-input').value||0),gap:tr.querySelector('.gap-input').value.trim()})).filter(x=>x.driver)}
+function renderResultsList(){
+ const season=$('resultsSeasonFilter').value, session=$('resultsSessionFilter').value;
+ let races=(adminResultsData.seasons[season]?.races||[]).filter(r=>session==='all'||r.session===session).slice().sort((a,b)=>(Number(b.round)||0)-(Number(a.round)||0));
+ $('resultStatsBadge').textContent=`${races.length} ${races.length===1?'заезд':'заездов'}`;
+ $('resultsList').innerHTML=races.length?races.map(r=>`<article class="race-card"><div class="race-card-head"><div><div class="race-title">${esc(r.grandPrix||'Без названия')}</div><div class="race-meta">Этап ${esc(r.round)} · Сезон ${esc(season)} · ${r.session==='sprint'?'Спринт':'Гонка'} · ${r.results?.length||0} пилотов</div></div><span class="race-chip">${r.session==='sprint'?'⚡ СПРИНТ':'🏁 ГОНКА'}</span></div><div style="overflow-x:auto"><table class="race-results"><thead><tr><th>№</th><th>Пилот</th><th>Команда</th><th>Статус</th><th>Очки</th><th>Отставание</th></tr></thead><tbody>${(r.results||[]).map((x,i)=>`<tr><td>${x.position&&x.position>0?esc(x.position):'—'}</td><td><b>${esc(x.driver||'—')}</b></td><td>${esc(x.team||'—')}</td><td><span class="status-pill ${(x.status||'FIN').toLowerCase()}">${resultStatusLabel(x.status||'FIN')}</span></td><td><b>${esc(x.points??0)}</b></td><td>${esc(x.gap||'—')}</td></tr>`).join('')}</tbody></table></div></article>`).join(''):'<div class="empty-results">В этом фильтре пока нет внесённых результатов.</div>';
+}
+async function loadAdminResults(){
+ try{adminResultsData=await api('/api/admin/results'); renderResultsList(); const season=$('resultSeason').value; if(!(adminResultsData.rosters[season]||[]).length) $('resultRows').innerHTML=''; }
+ catch(e){$('resultsList').innerHTML='<div class="status error">'+esc(e.message)+'</div>'}
+}
+function rebuildResultRows(){const old=collectResultRows();$('resultRows').innerHTML='';const roster=adminResultsData.rosters[$('resultSeason').value]||[]; if(old.length){old.forEach(x=>addResultRow(x))}else{addResultRow();addResultRow()} if(!roster.length)$('resultMsg').textContent='Для выбранного сезона состав пилотов не найден.'}
+document.addEventListener('click',e=>{if(e.target.closest('.remove-row')){e.target.closest('tr').remove();refreshResultRowNumbers()}});
+$('addResultRow').onclick=()=>addResultRow();
+$('clearResultForm').onclick=resetResultForm;
+$('resultSeason').onchange=()=>{rebuildResultRows()};
+$('resultsSeasonFilter').onchange=renderResultsList;
+$('resultsSessionFilter').onchange=renderResultsList;
+$('resultForm').onsubmit=async e=>{e.preventDefault();const rows=collectResultRows();if(!rows.length){$('resultMsg').textContent='Добавьте хотя бы одного пилота';$('resultMsg').className='status error';return}try{await api('/api/admin/results',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({season_id:$('resultSeason').value,round:Number($('resultRound').value),grandPrix:$('resultGrandPrix').value.trim(),session:$('resultSession').value,results:rows})});$('resultMsg').textContent='Результаты сохранены';$('resultMsg').className='status success';await loadAdminResults();$('resultsSeasonFilter').value=$('resultSeason').value;renderResultsList();resetResultForm();loadStats()}catch(err){$('resultMsg').textContent=err.message;$('resultMsg').className='status error'}};
 async function loadStats(){
   try{
     const d=await api('/api/admin/stats');
@@ -233,7 +282,7 @@ async function loadStats(){
     $('statsUpdated').textContent=new Date().toLocaleTimeString('ru-RU',{hour:'2-digit',minute:'2-digit'}); $('systemStatus').textContent='✓ Данные доступны, сервер отвечает корректно'; $('systemStatus').className='status success';
   }catch(e){$('systemStatus').textContent='Не удалось загрузить статистику: '+e.message;$('systemStatus').className='status error'}
 }
-function openSection(name){document.querySelectorAll('.admin-section').forEach(x=>x.classList.toggle('hidden-section',x.id!==name));document.querySelectorAll('.nav-btn').forEach(x=>x.classList.toggle('active',x.dataset.section===name));window.scrollTo({top:0,behavior:'smooth'});if(name==='dashboard')loadStats()}
+function openSection(name){document.querySelectorAll('.admin-section').forEach(x=>x.classList.toggle('hidden-section',x.id!==name));document.querySelectorAll('.nav-btn').forEach(x=>x.classList.toggle('active',x.dataset.section===name));window.scrollTo({top:0,behavior:'smooth'});if(name==='dashboard')loadStats();if(name==='results')loadAdminResults()}
 document.addEventListener('click',e=>{const b=e.target.closest('[data-section]');if(b&&b.dataset.section){openSection(b.dataset.section)}});
 
 check();
