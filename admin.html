@@ -45,6 +45,24 @@
 <div id="teamsAdminList" class="news"></div>
 </div>
   <div class="panel">
+    <h2>🏁 Результаты гонки</h2>
+    <p class="sub">Добавляй Гран-при и спринты прямо из админ-панели. После сохранения результаты автоматически появляются на сайте, в личном зачёте и Кубке конструкторов.</p>
+    <div class="field"><label>Сезон</label><select id="resultSeason" style="width:100%;border:1px solid #303038;background:#0d0d11;color:#fff;border-radius:10px;padding:12px;font:inherit"><option value="1">Сезон 1</option><option value="2" selected>Сезон 2</option></select></div>
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px">
+      <div class="field"><label>Этап</label><input id="resultRound" type="number" min="1" max="99" value="1" inputmode="numeric"></div>
+      <div class="field"><label>Сессия</label><select id="resultSession" style="width:100%;border:1px solid #303038;background:#0d0d11;color:#fff;border-radius:10px;padding:12px;font:inherit"><option value="race">Гран-при</option><option value="sprint">Спринт</option></select></div>
+    </div>
+    <div class="field"><label>Гран-при</label><input id="resultGrandPrix" maxlength="120" placeholder="Например: Италия"></div>
+    <div class="buttons" style="justify-content:space-between;align-items:center">
+      <div class="sub" style="margin:0">Пилотов: <b id="resultCount">0</b></div>
+      <button class="btn secondary" type="button" id="addResultRow">+ Добавить пилота</button>
+    </div>
+    <div id="resultRows"></div>
+    <div class="buttons"><button class="btn primary" type="button" id="saveResults">Сохранить результаты</button></div>
+    <div id="resultMsg" class="status"></div>
+    <div id="resultsAdminList" class="news"></div>
+  </div>
+  <div class="panel">
     <h2>🏎️ Пилоты</h2>
     <p class="sub">Добавляй фотографии пилотов и убирай пилотов с публичного сайта. Исторические результаты не изменяются.</p>
     <div class="field"><label>Пилот</label><select id="driverSelect" style="width:100%;border:1px solid #303038;background:#0d0d11;color:#fff;border-radius:10px;padding:12px;font:inherit"></select></div>
@@ -136,7 +154,151 @@ $('saveTransfer').onclick=async()=>{
   }catch(e){$('transferMsg').textContent=e.message;$('transferMsg').className='status error'}
 };
 
-async function loadManagement(){await loadUsers();await loadAdmins();await loadProtests();await loadTeamsAdmin();await loadDriversAdmin();await loadTransfersAdmin()}
+
+let resultDrivers=[];
+let resultRaces={};
+
+const resultTeams = ['McLaren','Ferrari','Mercedes','Red Bull Racing','Aston Martin','Williams','Haas','Alpine','Visa Cash App RB','Kick Sauber'];
+const sprintPoints = [8,7,6,5,4,3,2,1];
+const racePoints = [25,18,15,12,10,8,6,4,2,1];
+
+async function loadResultsAdmin(){
+  try{
+    const [driversData, resultsData] = await Promise.all([
+      api('/api/admin/drivers'),
+      api('/api/admin/results')
+    ]);
+    resultDrivers = (driversData.drivers || []).map(x=>x.name);
+    resultRaces = resultsData.results || {};
+    addResultRow();
+    renderResultsAdminList();
+  }catch(e){
+    $('resultMsg').textContent=e.message;
+    $('resultMsg').className='status error';
+  }
+}
+
+function resultRowTemplate(i){
+  return `<div class="item result-row" data-row="${i}" style="margin-top:12px">
+    <div style="display:grid;grid-template-columns:2fr 1fr 1fr 2fr auto;gap:9px;align-items:end">
+      <div class="field" style="margin:0"><label>Пилот</label><select class="rr-driver" style="width:100%;border:1px solid #303038;background:#0d0d11;color:#fff;border-radius:10px;padding:12px;font:inherit">${resultDrivers.map(n=>`<option value="${esc(n)}">${esc(n)}</option>`).join('')}</select></div>
+      <div class="field" style="margin:0"><label>Позиция</label><input class="rr-position" type="number" min="1" max="99" value="${i+1}"></div>
+      <div class="field" style="margin:0"><label>Очки</label><input class="rr-points" type="number" min="0" max="100" step="0.001" value="${getDefaultPoints(i)}"></div>
+      <div class="field" style="margin:0"><label>Время / отставание</label><input class="rr-gap" maxlength="80" value="${i===0?'GAP':''}" placeholder="+5.321"></div>
+      <button class="btn danger rr-delete" type="button" title="Удалить">✕</button>
+    </div>
+    <div style="margin-top:9px;display:flex;gap:8px;align-items:center;flex-wrap:wrap">
+      <label style="font-size:12px;color:#aaa">Статус</label>
+      <select class="rr-status" style="border:1px solid #303038;background:#0d0d11;color:#fff;border-radius:8px;padding:9px;font:inherit">
+        <option value="finished">Финишировал</option><option value="dnf">DNF — не финишировал</option><option value="dns">DNS — не стартовал</option><option value="dsq">DSQ — дисквалифицирован</option>
+      </select>
+      <span class="rr-team" style="font-size:12px;color:#777"></span>
+    </div>
+  </div>`;
+}
+function getDefaultPoints(i){
+  const session=$('resultSession')?.value || 'race';
+  return (session==='sprint'?sprintPoints[i]:racePoints[i]) ?? 0;
+}
+function addResultRow(){
+  if(!resultDrivers.length)return;
+  const wrap=$('resultRows');
+  const i=wrap.querySelectorAll('.result-row').length;
+  wrap.insertAdjacentHTML('beforeend', resultRowTemplate(i));
+  updateResultCount();
+  bindResultRow(wrap.lastElementChild);
+}
+function bindResultRow(row){
+  const driver=row.querySelector('.rr-driver');
+  const status=row.querySelector('.rr-status');
+  const position=row.querySelector('.rr-position');
+  const points=row.querySelector('.rr-points');
+  const gap=row.querySelector('.rr-gap');
+  const team=row.querySelector('.rr-team');
+  function update(){
+    const name=driver.value;
+    team.textContent='Команда: '+(resultDrivers.length ? 'определяется по составу сезона' : '—');
+    const st=status.value;
+    const finished=st==='finished';
+    position.disabled=!finished;
+    if(!finished)position.value='';
+    points.value=finished?points.value:0;
+    if(!finished)gap.value=st.toUpperCase();
+    if(finished && !gap.value && Number(position.value)===1)gap.value='GAP';
+  }
+  driver.onchange=update;
+  status.onchange=update;
+  position.onchange=()=>{ if(Number(position.value)===1 && status.value==='finished' && !gap.value)gap.value='GAP'; };
+  row.querySelector('.rr-delete').onclick=()=>{row.remove();updateResultCount();};
+  update();
+}
+function updateResultCount(){
+  const n=$('resultRows').querySelectorAll('.result-row').length;
+  $('resultCount').textContent=n;
+}
+$('addResultRow').onclick=addResultRow;
+$('resultSession').onchange=()=>{
+  $('resultRows').querySelectorAll('.result-row').forEach((row,i)=>{
+    if(row.querySelector('.rr-status').value==='finished')row.querySelector('.rr-points').value=getDefaultPoints(i);
+  });
+};
+function collectResultRows(){
+  const rows=[...$('resultRows').querySelectorAll('.result-row')];
+  if(!rows.length)throw new Error('Добавьте хотя бы одного пилота');
+  const seen=new Set();
+  return rows.map((row,i)=>{
+    const driver=row.querySelector('.rr-driver').value;
+    if(seen.has(driver))throw new Error('Пилот указан дважды: '+driver);
+    seen.add(driver);
+    const status=row.querySelector('.rr-status').value;
+    const position=row.querySelector('.rr-position').value;
+    const points=row.querySelector('.rr-points').value;
+    const gap=row.querySelector('.rr-gap').value.trim();
+    if(status==='finished' && !position)throw new Error('Укажите позицию для '+driver);
+    return {driver,status,position:status==='finished'?Number(position):null,points:Number(points||0),gap};
+  });
+}
+function resetResultForm(){
+  $('resultRows').innerHTML='';
+  $('resultRound').value=1;
+  $('resultGrandPrix').value='';
+  addResultRow();
+}
+$('saveResults').onclick=async()=>{
+  try{
+    const rows=collectResultRows();
+    const payload={
+      season_id:$('resultSeason').value,
+      round:Number($('resultRound').value),
+      grandPrix:$('resultGrandPrix').value.trim(),
+      session:$('resultSession').value,
+      results:rows
+    };
+    if(!payload.grandPrix)throw new Error('Укажите название Гран-при');
+    if(!payload.round || payload.round<1)throw new Error('Укажите номер этапа');
+    const d=await api('/api/admin/results',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(payload)});
+    $('resultMsg').textContent=`Сохранено: ${d.race.grandPrix} · этап ${d.race.round} · ${d.race.session==='sprint'?'спринт':'Гран-при'}`;
+    $('resultMsg').className='status success';
+    resetResultForm();
+    const fresh=await api('/api/admin/results'); resultRaces=fresh.results||{};
+    renderResultsAdminList();
+  }catch(e){
+    $('resultMsg').textContent=e.message;
+    $('resultMsg').className='status error';
+  }
+};
+function renderResultsAdminList(){
+  const sid=$('resultSeason').value;
+  const races=(resultRaces[sid]||[]).slice().sort((a,b)=>Number(b.round)-Number(a.round));
+  $('resultsAdminList').innerHTML=races.length ? races.map(r=>`<article class="item">
+    <div class="meta">Этап ${esc(r.round)} · ${esc(r.session==='sprint'?'Спринт':'Гран-при')}</div>
+    <div class="title">${esc(r.grandPrix)}</div>
+    <div class="meta">${(r.results||[]).length} участников · ${esc((r.results||[]).slice(0,3).map(x=>`${x.position}. ${x.driver}`).join(' · '))}</div>
+  </article>`).join('') : '<div class="status">Результатов для этого сезона пока нет.</div>';
+}
+$('resultSeason').onchange=()=>{renderResultsAdminList();};
+
+async function loadManagement(){await loadUsers();await loadAdmins();await loadProtests();await loadTeamsAdmin();await loadDriversAdmin();await loadTransfersAdmin();await loadResultsAdmin()}
 
 async function loadProtests(){
   try{
