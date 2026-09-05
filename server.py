@@ -250,25 +250,44 @@ def season_roster_public(season_id):
     return rows
 
 def season_driver_team(season_id, name, round_no=None):
+    """Return the driver's team for a specific championship round.
+
+    The base `team` is the starting team for the season. Transfers are applied
+    only when their effective_round has been reached. This is deliberately
+    resolved from the persisted season_rosters.json on every call so that a
+    transfer made in the admin panel is immediately reflected when a result
+    is entered.
+    """
     base = season_roster_base(season_id)
-    item = next((v for k, v in base.items() if str(k).casefold() == str(name).casefold() and isinstance(v, dict)), None)
+    item = next((v for k, v in base.items()
+                 if str(k).casefold() == str(name).casefold() and isinstance(v, dict)), None)
     if not item:
         return ""
-    team = str(item.get("team", ""))
-    transfers = item.get("transfers", []) if isinstance(item.get("transfers", []), list) else []
+
+    team = str(item.get("team", "")).strip()
+    transfers = item.get("transfers", [])
+    if not isinstance(transfers, list):
+        return team
+
+    # For a result, round_no is required. Without it, return the latest team.
+    target_round = None if round_no is None else max(1, int(round_no))
     parsed = []
-    for tr in transfers:
+    for index, tr in enumerate(transfers):
         if not isinstance(tr, dict):
             continue
         try:
-            effective = int(tr.get("effective_round", 1))
+            effective = max(1, int(tr.get("effective_round", 1)))
         except (TypeError, ValueError):
             continue
-        parsed.append((max(1, effective), str(tr.get("to_team", "")).strip()))
-    for effective, to_team in sorted(parsed):
-        if round_no is None or int(round_no) >= effective:
-            if to_team:
-                team = to_team
+        to_team = str(tr.get("to_team", "")).strip()
+        if to_team:
+            parsed.append((effective, index, to_team))
+
+    # Preserve the admin-entered order if two transfers use the same round.
+    parsed.sort(key=lambda x: (x[0], x[1]))
+    for effective, _, to_team in parsed:
+        if target_round is None or target_round >= effective:
+            team = to_team
     return team
 
 def safe_team_photo_filename(name):
