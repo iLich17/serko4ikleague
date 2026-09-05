@@ -40,7 +40,6 @@ DRIVERS_LOCK = threading.Lock()
 TEAMS_LOCK = threading.Lock()
 SEASON_ROSTERS_FILE = data_file("season_rosters.json")
 SEASON_ROSTERS_LOCK = threading.Lock()
-RESULTS_LOCK = threading.Lock()
 
 SESSION_TTL = 12 * 60 * 60
 SESSIONS = {}  # token -> {expires, nick}
@@ -203,27 +202,6 @@ def load_season_rosters():
 
 def save_season_rosters(data):
     save_json(SEASON_ROSTERS_FILE, data)
-
-def season_results_file(season_id):
-    sid = str(season_id)
-    if sid == "1":
-        return data_file("season1.json")
-    if sid == "2":
-        return data_file("results.json")
-    return None
-
-def load_season_results(season_id):
-    path = season_results_file(season_id)
-    if not path:
-        return {}
-    data = load_json(path, {})
-    return data if isinstance(data, dict) else {}
-
-def save_season_results(season_id, data):
-    path = season_results_file(season_id)
-    if not path:
-        raise ValueError("Неизвестный сезон")
-    save_json(path, data)
 
 def season_roster_base(season_id):
     sid = str(season_id)
@@ -509,6 +487,40 @@ class F1Handler(SimpleHTTPRequestHandler):
         if path == "/api/admin/me":
             self._json_response(200, {"authenticated": bool(current_admin(self)), "nick": current_admin(self)})
             return
+        if path == "/api/admin/stats":
+            if not is_admin(self):
+                self._json_response(401, {"error": "Требуется вход в админ-панель"})
+                return
+            try:
+                users = load_users()
+                admins = load_admins()
+                news = load_news()
+                protests = load_protests()
+                drivers = driver_public_list(True)
+                teams = team_public_list()
+                results_data = load_json(ROOT / "results.json", {})
+                season1_data = load_json(ROOT / "season1.json", {})
+                races = []
+                if isinstance(results_data, dict): races += results_data.get("races", [])
+                if isinstance(season1_data, dict): races += season1_data.get("races", [])
+                result_rows = sum(len(r.get("results", [])) for r in races if isinstance(r, dict))
+                total_points = sum(float(row.get("points", 0) or 0) for r in races if isinstance(r, dict) for row in r.get("results", []) if isinstance(row, dict))
+                self._json_response(200, {
+                    "users": len(users),
+                    "admins": len(admins),
+                    "drivers": len(drivers),
+                    "active_drivers": sum(1 for d in drivers if d.get("active")),
+                    "teams": len(teams),
+                    "races": len(races),
+                    "result_rows": result_rows,
+                    "points": total_points,
+                    "news": len(news),
+                    "protests": len(protests),
+                    "open_protests": sum(1 for p in protests if str(p.get("status", "")).casefold() in ("new", "новый", "pending", "на рассмотрении"))
+                })
+            except Exception as e:
+                self._json_response(500, {"error": "Не удалось собрать статистику: " + str(e)})
+            return
         if path == "/api/admins":
             if not is_admin(self):
                 self._json_response(401, {"error": "Требуется вход в админ-панель"})
@@ -550,17 +562,6 @@ class F1Handler(SimpleHTTPRequestHandler):
                 return
             result = {sid: season_roster_public(sid) for sid in ("1", "2")}
             self._json_response(200, {"rosters": result})
-            return
-
-        if path == "/api/admin/results":
-            if not is_admin(self):
-                self._json_response(401, {"error": "Требуется вход в админ-панель"})
-                return
-            result = {}
-            for sid in ("1", "2"):
-                data = load_season_results(sid)
-                result[sid] = data.get("races", []) if isinstance(data, dict) else []
-            self._json_response(200, {"results": result})
             return
 
         if path == "/api/admin/teams":
@@ -755,144 +756,6 @@ class F1Handler(SimpleHTTPRequestHandler):
             if path == "/api/auth/logout":
                 delete_user_session(self)
                 self._json_response(200, {"ok": True}, [("Set-Cookie", cookie("f1_user", "", 0))])
-                return
-
-            if path == "/api/admin/results":
-                if not is_admin(self):
-                    self._json_response(401, {"error": "Требуется вход в админ-панель"})
-                    return
-                data = self._read_json(2 * 1024 * 1024)
-                if not isinstance(data, dict):
-                    self._json_response(400, {"error": "Некорректные данные"})
-                    return
-
-                season_id = str(data.get("season_id", "")).strip()
-                if season_id not in {"1", "2"}:
-                    self._json_response(400, {"error": "Выберите сезон"})
-                    return
-
-                try:
-                    round_no = int(data.get("round"))
-                except (TypeError, ValueError):
-                    round_no = 0
-                if round_no < 1 or round_no > 99:
-                    self._json_response(400, {"error": "Номер этапа должен быть от 1 до 99"})
-                    return
-
-                grand_prix = str(data.get("grandPrix", "")).strip()[:120]
-                session = str(data.get("session", "race")).strip().lower()
-                if not grand_prix:
-                    self._json_response(400, {"error": "Укажите название Гран-при"})
-                    return
-                if session not in {"race", "sprint"}:
-                    self._json_response(400, {"error": "Сессия должна быть race или sprint"})
-                    return
-
-                incoming = data.get("results")
-                if not isinstance(incoming, list) or not incoming:
-                    self._json_response(400, {"error": "Добавьте хотя бы одного пилота"})
-                    return
-                if len(incoming) > 60:
-                    self._json_response(400, {"error": "Слишком много участников"})
-                    return
-
-                roster = season_roster_base(season_id)
-                canonical_drivers = {str(k).casefold(): str(k) for k in roster.keys()}
-                cleaned = []
-                seen = set()
-
-                for idx, row in enumerate(incoming, 1):
-                    if not isinstance(row, dict):
-                        self._json_response(400, {"error": f"Строка {idx}: некорректные данные"})
-                        return
-                    raw_driver = str(row.get("driver", "")).strip()
-                    driver = canonical_drivers.get(raw_driver.casefold())
-                    if not driver:
-                        self._json_response(400, {"error": f"Строка {idx}: пилот не найден в выбранном сезоне"})
-                        return
-                    if driver.casefold() in seen:
-                        self._json_response(400, {"error": f"Пилот {driver} указан дважды"})
-                        return
-                    seen.add(driver.casefold())
-
-                    team = season_driver_team(season_id, driver, round_no)
-                    if not team:
-                        team = str(row.get("team", "")).strip()[:100]
-                    if not team:
-                        self._json_response(400, {"error": f"Строка {idx}: не удалось определить команду"})
-                        return
-
-                    status = str(row.get("status", "finished")).strip().lower()
-                    status_map = {"finished": None, "dnf": "DNF", "dns": "DNS", "dsq": "DSQ"}
-                    if status not in status_map:
-                        self._json_response(400, {"error": f"Строка {idx}: неизвестный статус"})
-                        return
-
-                    position_raw = row.get("position")
-                    if status_map[status] is not None:
-                        position = status_map[status]
-                    else:
-                        try:
-                            position = int(position_raw)
-                        except (TypeError, ValueError):
-                            self._json_response(400, {"error": f"Строка {idx}: укажите позицию"})
-                            return
-                        if position < 1 or position > 99:
-                            self._json_response(400, {"error": f"Строка {idx}: некорректная позиция"})
-                            return
-
-                    try:
-                        points = float(row.get("points", 0))
-                    except (TypeError, ValueError):
-                        self._json_response(400, {"error": f"Строка {idx}: некорректные очки"})
-                        return
-                    if points < 0 or points > 100:
-                        self._json_response(400, {"error": f"Строка {idx}: очки должны быть от 0 до 100"})
-                        return
-                    points = int(points) if points.is_integer() else round(points, 3)
-
-                    gap = str(row.get("gap", "")).strip()[:80]
-                    if status_map[status] is not None:
-                        gap = status_map[status]
-                    elif not gap:
-                        gap = "GAP" if position == 1 else ""
-
-                    cleaned.append({
-                        "driver": driver,
-                        "team": team,
-                        "position": position,
-                        "points": points,
-                        "gap": gap
-                    })
-
-                with RESULTS_LOCK:
-                    results_data = load_season_results(season_id)
-                    races = results_data.get("races", [])
-                    if not isinstance(races, list):
-                        races = []
-                    duplicate = next(
-                        (r for r in races
-                         if isinstance(r, dict)
-                         and int(r.get("round", -1)) == round_no
-                         and str(r.get("session", "")).lower() == session),
-                        None
-                    )
-                    if duplicate:
-                        self._json_response(409, {"error": f"Этап {round_no} ({'Гран-при' if session == 'race' else 'спринт'}) уже существует. Удалите старый результат или выберите другой этап."})
-                        return
-
-                    race = {
-                        "round": round_no,
-                        "grandPrix": grand_prix,
-                        "session": session,
-                        "results": cleaned
-                    }
-                    races.append(race)
-                    races.sort(key=lambda r: (int(r.get("round", 0)), 0 if r.get("session") == "sprint" else 1))
-                    results_data["races"] = races
-                    save_season_results(season_id, results_data)
-
-                self._json_response(201, {"ok": True, "season_id": int(season_id), "race": race})
                 return
 
             if path == "/api/admin/transfers":

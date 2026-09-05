@@ -16,80 +16,90 @@
   .thumbs img{width:calc(50% - 4px);height:auto;aspect-ratio:3/2}
   .item{padding:13px}
 }
+
+/* Dashboard */
+.app-layout{display:grid;grid-template-columns:230px minmax(0,1fr);gap:22px;align-items:start}
+.sidebar{position:sticky;top:18px;background:#111116;border:1px solid #292930;border-radius:16px;padding:12px}
+.side-title{font-size:11px;text-transform:uppercase;letter-spacing:.12em;color:#737983;font-weight:900;padding:10px 12px}
+.nav-btn{display:flex;align-items:center;gap:10px;width:100%;border:0;background:transparent;color:#aeb4bd;padding:12px;border-radius:10px;font:inherit;font-weight:800;text-align:left;cursor:pointer}
+.nav-btn:hover{background:#1b1b21;color:#fff}.nav-btn.active{background:#e10600;color:#fff}
+.content{min-width:0}.dashboard-head{display:flex;justify-content:space-between;align-items:flex-end;gap:15px;margin-bottom:18px}
+.dashboard-head h1{margin:0}.dashboard-head .sub{margin:5px 0 0}
+.stat-grid{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:12px;margin-bottom:18px}
+.stat-card{background:linear-gradient(145deg,#18181e,#101014);border:1px solid #2a2a31;border-radius:15px;padding:18px;min-height:125px;position:relative;overflow:hidden}
+.stat-card:after{content:'';position:absolute;right:-35px;bottom:-45px;width:110px;height:110px;border-radius:50%;background:#e10600;opacity:.07}
+.stat-icon{font-size:24px}.stat-label{color:#8f959e;font-size:12px;font-weight:800;margin-top:12px}.stat-value{font-size:30px;font-weight:950;margin-top:4px}.stat-note{font-size:11px;color:#6f757e;margin-top:4px}
+.quick-grid{display:grid;grid-template-columns:1.2fr .8fr;gap:12px;margin-bottom:18px}.quick-card{background:#15151a;border:1px solid #292930;border-radius:15px;padding:18px}.quick-actions{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px}.quick-action{border:1px solid #303038;background:#0e0e12;border-radius:11px;padding:14px;color:#fff;text-align:left;cursor:pointer}.quick-action b{display:block;margin-bottom:4px}.quick-action span{font-size:12px;color:#858b94}
+.admin-section.hidden-section{display:none!important}
+@media(max-width:900px){.app-layout{grid-template-columns:1fr}.sidebar{position:static}.stat-grid{grid-template-columns:repeat(2,minmax(0,1fr))}.quick-grid{grid-template-columns:1fr}}
+@media(max-width:600px){.stat-grid{grid-template-columns:1fr 1fr}.stat-card{min-height:110px;padding:14px}.stat-value{font-size:25px}.quick-actions{grid-template-columns:1fr}}
 </style>
 </head><body>
 <header><div class="logo">F1<span>LEAGUE</span> · ADMIN</div><div><a class="back" href="/">← На сайт</a></div></header>
 <main class="wrap">
 <section id="login" class="panel login"><h1>Вход</h1><p class="sub">Только для пользователей из списка администраторов.</p><div class="field"><label>Ник</label><input id="nick" autocomplete="username"></div><div class="field"><label>Пароль</label><input id="password" type="password" autocomplete="current-password"></div><button class="btn primary" id="loginBtn">Войти</button><div id="loginMsg" class="status"></div></section>
 <section id="app" class="hidden">
-  <div class="panel"><div style="display:flex;justify-content:space-between;gap:15px;align-items:center;flex-wrap:wrap"><div><h1>Новости</h1><p class="sub">Создание, редактирование и удаление публикаций.</p><div id="adminWho" class="status"></div></div><button class="btn secondary" id="logoutBtn">Выйти</button></div></div>
-  <div class="panel">
-    <h2>👥 Пользователи</h2>
-    <p class="sub">Зарегистрированные пользователи сайта.</p>
-    <div id="usersList" class="news"></div>
+<div class="app-layout">
+<aside class="sidebar">
+  <div class="side-title">Навигация</div>
+  <button class="nav-btn active" data-section="dashboard">📊 Обзор</button>
+  <button class="nav-btn" data-section="news">📰 Новости</button>
+  <button class="nav-btn" data-section="results">🏁 Результаты</button>
+  <button class="nav-btn" data-section="teams">🏎️ Команды</button>
+  <button class="nav-btn" data-section="drivers">👤 Пилоты</button>
+  <button class="nav-btn" data-section="transfers">🔄 Трансферы</button>
+  <button class="nav-btn" data-section="protests">⚖️ Протесты</button>
+  <button class="nav-btn" data-section="users">👥 Пользователи</button>
+  <button class="nav-btn" data-section="admins">🛡️ Администраторы</button>
+</aside>
+<div class="content">
+<div id="dashboard" class="admin-section">
+  <div class="dashboard-head"><div><h1>Панель управления</h1><p class="sub">Краткая статистика F1 League и быстрый доступ к управлению.</p><div id="adminWho" class="status"></div></div><button class="btn secondary" id="logoutBtn">Выйти</button></div>
+  <div class="stat-grid">
+    <div class="stat-card"><div class="stat-icon">🏁</div><div class="stat-label">ГОНКИ</div><div class="stat-value" id="statRaces">—</div><div class="stat-note">внесено в сезоны</div></div>
+    <div class="stat-card"><div class="stat-icon">🏎️</div><div class="stat-label">КОМАНДЫ</div><div class="stat-value" id="statTeams">—</div><div class="stat-note">команд в чемпионате</div></div>
+    <div class="stat-card"><div class="stat-icon">👤</div><div class="stat-label">ПИЛОТЫ</div><div class="stat-value" id="statDrivers">—</div><div class="stat-note" id="statDriversNote">активных: —</div></div>
+    <div class="stat-card"><div class="stat-icon">⭐</div><div class="stat-label">ОЧКИ</div><div class="stat-value" id="statPoints">—</div><div class="stat-note">внесено результатов</div></div>
+    <div class="stat-card"><div class="stat-icon">📰</div><div class="stat-label">НОВОСТИ</div><div class="stat-value" id="statNews">—</div><div class="stat-note">опубликовано</div></div>
+    <div class="stat-card"><div class="stat-icon">👥</div><div class="stat-label">ПОЛЬЗОВАТЕЛИ</div><div class="stat-value" id="statUsers">—</div><div class="stat-note">зарегистрировано</div></div>
+    <div class="stat-card"><div class="stat-icon">🛡️</div><div class="stat-label">АДМИНИСТРАТОРЫ</div><div class="stat-value" id="statAdmins">—</div><div class="stat-note">имеют доступ</div></div>
+    <div class="stat-card"><div class="stat-icon">⚖️</div><div class="stat-label">ПРОТЕСТЫ</div><div class="stat-value" id="statProtests">—</div><div class="stat-note" id="statProtestsNote">всего</div></div>
   </div>
-  <div class="panel">
-    <h2>🛡️ Администраторы</h2>
-    <p class="sub">Только пользователи из этого списка могут публиковать и управлять новостями.</p>
-    <div class="field"><label>Добавить зарегистрированного пользователя</label><div style="display:flex;gap:9px"><input id="adminNick" placeholder="Введите ник"><button class="btn primary" type="button" id="addAdmin">Добавить</button></div></div>
-    <div id="adminsList" class="news"></div>
-    <div id="adminMsg" class="status"></div>
+  <div class="quick-grid">
+    <div class="quick-card"><h2 style="margin:0 0 5px">Быстрые действия</h2><p class="sub">Переход к самым частым операциям.</p><div class="quick-actions">
+      <button class="quick-action" data-section="results"><b>🏁 Добавить результат</b><span>Внести новый этап чемпионата</span></button>
+      <button class="quick-action" data-section="news"><b>📰 Создать новость</b><span>Опубликовать сообщение лиги</span></button>
+      <button class="quick-action" data-section="drivers"><b>👤 Управление пилотами</b><span>Фото и видимость пилотов</span></button>
+      <button class="quick-action" data-section="transfers"><b>🔄 Оформить трансфер</b><span>Изменить состав с нужного этапа</span></button>
+    </div></div>
+    <div class="quick-card"><h2 style="margin:0 0 5px">Система</h2><p class="sub">Состояние основных данных.</p><div id="systemStatus" class="status">Проверяем данные…</div><div class="status">Последнее обновление статистики: <span id="statsUpdated">—</span></div></div>
   </div>
-<div class="panel">
-<h2>🏁 Команды</h2>
-<p class="sub">Здесь можно менять фотографии команд прямо через сайт.</p>
-<div class="field"><label>Команда</label><select id="teamSelect" style="width:100%;border:1px solid #303038;background:#0d0d11;color:#fff;border-radius:10px;padding:12px;font:inherit"></select></div>
-<div class="field"><label>Новая фотография команды</label><input id="teamPhoto" type="file" accept="image/*"></div>
-<div class="buttons"><button class="btn primary" type="button" id="saveTeamPhoto">Сохранить фото команды</button></div>
-<div id="teamMsg" class="status"></div>
-<div id="teamsAdminList" class="news"></div>
 </div>
-  <div class="panel">
-    <h2>🏁 Результаты гонки</h2>
-    <p class="sub">Добавляй Гран-при и спринты прямо из админ-панели. После сохранения результаты автоматически появляются на сайте, в личном зачёте и Кубке конструкторов.</p>
-    <div class="field"><label>Сезон</label><select id="resultSeason" style="width:100%;border:1px solid #303038;background:#0d0d11;color:#fff;border-radius:10px;padding:12px;font:inherit"><option value="1">Сезон 1</option><option value="2" selected>Сезон 2</option></select></div>
-    <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px">
-      <div class="field"><label>Этап</label><input id="resultRound" type="number" min="1" max="99" value="1" inputmode="numeric"></div>
-      <div class="field"><label>Сессия</label><select id="resultSession" style="width:100%;border:1px solid #303038;background:#0d0d11;color:#fff;border-radius:10px;padding:12px;font:inherit"><option value="race">Гран-при</option><option value="sprint">Спринт</option></select></div>
-    </div>
-    <div class="field"><label>Гран-при</label><input id="resultGrandPrix" maxlength="120" placeholder="Например: Италия"></div>
-    <div class="buttons" style="justify-content:space-between;align-items:center">
-      <div class="sub" style="margin:0">Пилотов: <b id="resultCount">0</b></div>
-      <button class="btn secondary" type="button" id="addResultRow">+ Добавить пилота</button>
-    </div>
-    <div id="resultRows"></div>
-    <div class="buttons"><button class="btn primary" type="button" id="saveResults">Сохранить результаты</button></div>
-    <div id="resultMsg" class="status"></div>
-    <div id="resultsAdminList" class="news"></div>
+  <div class="admin-section" id="news">
+    <form class="panel" id="newsForm"><h2 id="formTitle">Новая новость</h2><div class="field"><label>Заголовок</label><input id="title" maxlength="160" required></div><div class="field"><label>Текст</label><textarea id="text" maxlength="4000"></textarea></div><div class="field"><label>Тег</label><input id="tag" maxlength="50" value="F1 LEAGUE"></div><div class="field"><label>Фотографии</label><input id="photos" type="file" accept="image/*" multiple></div><div id="previews" class="thumbs"></div><div class="buttons"><button class="btn primary" type="submit" id="saveBtn">Опубликовать</button><button class="btn secondary hidden" type="button" id="cancelEdit">Отмена</button></div><div id="formMsg" class="status"></div></form>
+    <div class="panel"><h2>Опубликованные</h2><div id="newsList" class="news"></div></div>
   </div>
-  <div class="panel">
-    <h2>🏎️ Пилоты</h2>
-    <p class="sub">Добавляй фотографии пилотов и убирай пилотов с публичного сайта. Исторические результаты не изменяются.</p>
-    <div class="field"><label>Пилот</label><select id="driverSelect" style="width:100%;border:1px solid #303038;background:#0d0d11;color:#fff;border-radius:10px;padding:12px;font:inherit"></select></div>
-    <div class="field"><label>Фотография пилота</label><input id="driverPhoto" type="file" accept="image/*"></div>
-    <div class="buttons"><button class="btn primary" type="button" id="saveDriverPhoto">Сохранить фото</button><button class="btn danger" type="button" id="deleteDriver">Убрать пилота с сайта</button></div>
-    <div id="driverMsg" class="status"></div>
-    <div id="driversAdminList" class="news"></div>
+  <div class="admin-section" id="users">
+    <div class="panel"><h2>👥 Пользователи</h2><p class="sub">Зарегистрированные пользователи сайта.</p><div id="usersList" class="news"></div></div>
   </div>
-  <div class="panel">
-    <h2>🔄 Трансфер пилота</h2>
-    <p class="sub">Переводи пилота между командами отдельно для каждого сезона. Укажи этап, с которого трансфер вступает в силу. Старые результаты сохраняются за прежней командой.</p>
-    <div class="field"><label>Сезон</label><select id="transferSeason" style="width:100%;border:1px solid #303038;background:#0d0d11;color:#fff;border-radius:10px;padding:12px;font:inherit"><option value="1">Сезон 1</option><option value="2" selected>Сезон 2</option></select></div>
-    <div class="field"><label>Пилот</label><select id="transferDriver" style="width:100%;border:1px solid #303038;background:#0d0d11;color:#fff;border-radius:10px;padding:12px;font:inherit"></select></div>
-    <div class="field"><label>Новая команда</label><select id="transferTeam" style="width:100%;border:1px solid #303038;background:#0d0d11;color:#fff;border-radius:10px;padding:12px;font:inherit"></select></div>
-    <div class="field"><label>С какого этапа действует</label><input id="transferRound" type="number" min="1" value="1" inputmode="numeric"></div>
-    <div id="transferCurrent" class="status"></div>
-    <div class="buttons"><button class="btn primary" type="button" id="saveTransfer">Оформить трансфер</button></div>
-    <div id="transferMsg" class="status"></div>
-    <div id="transfersList" class="news"></div>
+  <div class="admin-section" id="admins">
+    <div class="panel"><h2>🛡️ Администраторы</h2><p class="sub">Только пользователи из этого списка могут публиковать и управлять новостями.</p><div class="field"><label>Добавить зарегистрированного пользователя</label><div style="display:flex;gap:9px"><input id="adminNick" placeholder="Введите ник"><button class="btn primary" type="button" id="addAdmin">Добавить</button></div></div><div id="adminsList" class="news"></div><div id="adminMsg" class="status"></div></div>
   </div>
-  <div class="panel">
-    <h2>⚖️ Протесты</h2>
-    <p class="sub">Протесты доступны только администраторам.</p>
-    <div id="protestsList" class="news"></div>
+  <div class="admin-section" id="results">
+    <div class="panel"><h2>🏁 Результаты гонок</h2><p class="sub">Раздел для результатов гонок.</p><div class="quick-card" style="background:#0d0d11"><b>Статистика:</b> внесено <span id="resultRowsInline">—</span> результатов пилотов.</div></div>
   </div>
-  <form class="panel" id="newsForm"><h2 id="formTitle">Новая новость</h2><div class="field"><label>Заголовок</label><input id="title" maxlength="160" required></div><div class="field"><label>Текст</label><textarea id="text" maxlength="4000"></textarea></div><div class="field"><label>Тег</label><input id="tag" maxlength="50" value="F1 LEAGUE"></div><div class="field"><label>Фотографии</label><input id="photos" type="file" accept="image/*" multiple></div><div id="previews" class="thumbs"></div><div class="buttons"><button class="btn primary" type="submit" id="saveBtn">Опубликовать</button><button class="btn secondary hidden" type="button" id="cancelEdit">Отмена</button></div><div id="formMsg" class="status"></div></form>
-  <div class="panel"><h2>Опубликованные</h2><div id="newsList" class="news"></div></div>
+  <div class="admin-section" id="teams">
+    <div class="panel"><h2>🏁 Команды</h2><p class="sub">Здесь можно менять фотографии команд прямо через сайт.</p><div class="field"><label>Команда</label><select id="teamSelect" style="width:100%;border:1px solid #303038;background:#0d0d11;color:#fff;border-radius:10px;padding:12px;font:inherit"></select></div><div class="field"><label>Новая фотография команды</label><input id="teamPhoto" type="file" accept="image/*"></div><div class="buttons"><button class="btn primary" type="button" id="saveTeamPhoto">Сохранить фото команды</button></div><div id="teamMsg" class="status"></div><div id="teamsAdminList" class="news"></div></div>
+  </div>
+  <div class="admin-section" id="drivers">
+    <div class="panel"><h2>🏎️ Пилоты</h2><p class="sub">Добавляй фотографии пилотов и убирай пилотов с публичного сайта. Исторические результаты не изменяются.</p><div class="field"><label>Пилот</label><select id="driverSelect" style="width:100%;border:1px solid #303038;background:#0d0d11;color:#fff;border-radius:10px;padding:12px;font:inherit"></select></div><div class="field"><label>Фотография пилота</label><input id="driverPhoto" type="file" accept="image/*"></div><div class="buttons"><button class="btn primary" type="button" id="saveDriverPhoto">Сохранить фото</button><button class="btn danger" type="button" id="deleteDriver">Убрать пилота с сайта</button></div><div id="driverMsg" class="status"></div><div id="driversAdminList" class="news"></div></div>
+  </div>
+  <div class="admin-section" id="transfers">
+    <div class="panel"><h2>🔄 Трансфер пилота</h2><p class="sub">Переводи пилота между командами отдельно для каждого сезона. Укажи этап, с которого трансфер вступает в силу.</p><div class="field"><label>Сезон</label><select id="transferSeason" style="width:100%;border:1px solid #303038;background:#0d0d11;color:#fff;border-radius:10px;padding:12px;font:inherit"><option value="1">Сезон 1</option><option value="2" selected>Сезон 2</option></select></div><div class="field"><label>Пилот</label><select id="transferDriver" style="width:100%;border:1px solid #303038;background:#0d0d11;color:#fff;border-radius:10px;padding:12px;font:inherit"></select></div><div class="field"><label>Новая команда</label><select id="transferTeam" style="width:100%;border:1px solid #303038;background:#0d0d11;color:#fff;border-radius:10px;padding:12px;font:inherit"></select></div><div class="field"><label>С какого этапа действует</label><input id="transferRound" type="number" min="1" value="1" inputmode="numeric"></div><div id="transferCurrent" class="status"></div><div class="buttons"><button class="btn primary" type="button" id="saveTransfer">Оформить трансфер</button></div><div id="transferMsg" class="status"></div><div id="transfersList" class="news"></div></div>
+  </div>
+  <div class="admin-section" id="protests">
+    <div class="panel"><h2>⚖️ Протесты</h2><p class="sub">Протесты доступны только администраторам.</p><div id="protestsList" class="news"></div></div>
+  </div>
 </section>
 </main>
 <script>
@@ -100,7 +110,7 @@ async function compress(file){return new Promise((resolve,reject)=>{const fr=new
 function previews(){ $('previews').innerHTML=selectedImages.map(x=>`<img src="${x}" alt="">`).join('') }
 $('photos').onchange=async()=>{selectedImages=[];for(const f of [...$('photos').files]){if(f.type.startsWith('image/'))try{selectedImages.push(await compress(f))}catch{}}previews()};
 async function check(){try{const d=await api('/api/admin/me');if(d.authenticated)showApp()}catch{} }
-function showApp(){$('login').classList.add('hidden');$('app').classList.remove('hidden');loadNews();loadManagement();api('/api/admin/me').then(d=>{$('adminWho').textContent='Вы вошли как: '+(d.nick||'администратор')})}
+function showApp(){$('login').classList.add('hidden');$('app').classList.remove('hidden');openSection('dashboard');loadStats();loadNews();loadManagement();api('/api/admin/me').then(d=>{$('adminWho').textContent='Вы вошли как: '+(d.nick||'администратор')})}
 async function loadDriversAdmin(){
   try{
     const d=await api('/api/admin/drivers');
@@ -154,151 +164,7 @@ $('saveTransfer').onclick=async()=>{
   }catch(e){$('transferMsg').textContent=e.message;$('transferMsg').className='status error'}
 };
 
-
-let resultDrivers=[];
-let resultRaces={};
-
-const resultTeams = ['McLaren','Ferrari','Mercedes','Red Bull Racing','Aston Martin','Williams','Haas','Alpine','Visa Cash App RB','Kick Sauber'];
-const sprintPoints = [8,7,6,5,4,3,2,1];
-const racePoints = [25,18,15,12,10,8,6,4,2,1];
-
-async function loadResultsAdmin(){
-  try{
-    const [driversData, resultsData] = await Promise.all([
-      api('/api/admin/drivers'),
-      api('/api/admin/results')
-    ]);
-    resultDrivers = (driversData.drivers || []).map(x=>x.name);
-    resultRaces = resultsData.results || {};
-    addResultRow();
-    renderResultsAdminList();
-  }catch(e){
-    $('resultMsg').textContent=e.message;
-    $('resultMsg').className='status error';
-  }
-}
-
-function resultRowTemplate(i){
-  return `<div class="item result-row" data-row="${i}" style="margin-top:12px">
-    <div style="display:grid;grid-template-columns:2fr 1fr 1fr 2fr auto;gap:9px;align-items:end">
-      <div class="field" style="margin:0"><label>Пилот</label><select class="rr-driver" style="width:100%;border:1px solid #303038;background:#0d0d11;color:#fff;border-radius:10px;padding:12px;font:inherit">${resultDrivers.map(n=>`<option value="${esc(n)}">${esc(n)}</option>`).join('')}</select></div>
-      <div class="field" style="margin:0"><label>Позиция</label><input class="rr-position" type="number" min="1" max="99" value="${i+1}"></div>
-      <div class="field" style="margin:0"><label>Очки</label><input class="rr-points" type="number" min="0" max="100" step="0.001" value="${getDefaultPoints(i)}"></div>
-      <div class="field" style="margin:0"><label>Время / отставание</label><input class="rr-gap" maxlength="80" value="${i===0?'GAP':''}" placeholder="+5.321"></div>
-      <button class="btn danger rr-delete" type="button" title="Удалить">✕</button>
-    </div>
-    <div style="margin-top:9px;display:flex;gap:8px;align-items:center;flex-wrap:wrap">
-      <label style="font-size:12px;color:#aaa">Статус</label>
-      <select class="rr-status" style="border:1px solid #303038;background:#0d0d11;color:#fff;border-radius:8px;padding:9px;font:inherit">
-        <option value="finished">Финишировал</option><option value="dnf">DNF — не финишировал</option><option value="dns">DNS — не стартовал</option><option value="dsq">DSQ — дисквалифицирован</option>
-      </select>
-      <span class="rr-team" style="font-size:12px;color:#777"></span>
-    </div>
-  </div>`;
-}
-function getDefaultPoints(i){
-  const session=$('resultSession')?.value || 'race';
-  return (session==='sprint'?sprintPoints[i]:racePoints[i]) ?? 0;
-}
-function addResultRow(){
-  if(!resultDrivers.length)return;
-  const wrap=$('resultRows');
-  const i=wrap.querySelectorAll('.result-row').length;
-  wrap.insertAdjacentHTML('beforeend', resultRowTemplate(i));
-  updateResultCount();
-  bindResultRow(wrap.lastElementChild);
-}
-function bindResultRow(row){
-  const driver=row.querySelector('.rr-driver');
-  const status=row.querySelector('.rr-status');
-  const position=row.querySelector('.rr-position');
-  const points=row.querySelector('.rr-points');
-  const gap=row.querySelector('.rr-gap');
-  const team=row.querySelector('.rr-team');
-  function update(){
-    const name=driver.value;
-    team.textContent='Команда: '+(resultDrivers.length ? 'определяется по составу сезона' : '—');
-    const st=status.value;
-    const finished=st==='finished';
-    position.disabled=!finished;
-    if(!finished)position.value='';
-    points.value=finished?points.value:0;
-    if(!finished)gap.value=st.toUpperCase();
-    if(finished && !gap.value && Number(position.value)===1)gap.value='GAP';
-  }
-  driver.onchange=update;
-  status.onchange=update;
-  position.onchange=()=>{ if(Number(position.value)===1 && status.value==='finished' && !gap.value)gap.value='GAP'; };
-  row.querySelector('.rr-delete').onclick=()=>{row.remove();updateResultCount();};
-  update();
-}
-function updateResultCount(){
-  const n=$('resultRows').querySelectorAll('.result-row').length;
-  $('resultCount').textContent=n;
-}
-$('addResultRow').onclick=addResultRow;
-$('resultSession').onchange=()=>{
-  $('resultRows').querySelectorAll('.result-row').forEach((row,i)=>{
-    if(row.querySelector('.rr-status').value==='finished')row.querySelector('.rr-points').value=getDefaultPoints(i);
-  });
-};
-function collectResultRows(){
-  const rows=[...$('resultRows').querySelectorAll('.result-row')];
-  if(!rows.length)throw new Error('Добавьте хотя бы одного пилота');
-  const seen=new Set();
-  return rows.map((row,i)=>{
-    const driver=row.querySelector('.rr-driver').value;
-    if(seen.has(driver))throw new Error('Пилот указан дважды: '+driver);
-    seen.add(driver);
-    const status=row.querySelector('.rr-status').value;
-    const position=row.querySelector('.rr-position').value;
-    const points=row.querySelector('.rr-points').value;
-    const gap=row.querySelector('.rr-gap').value.trim();
-    if(status==='finished' && !position)throw new Error('Укажите позицию для '+driver);
-    return {driver,status,position:status==='finished'?Number(position):null,points:Number(points||0),gap};
-  });
-}
-function resetResultForm(){
-  $('resultRows').innerHTML='';
-  $('resultRound').value=1;
-  $('resultGrandPrix').value='';
-  addResultRow();
-}
-$('saveResults').onclick=async()=>{
-  try{
-    const rows=collectResultRows();
-    const payload={
-      season_id:$('resultSeason').value,
-      round:Number($('resultRound').value),
-      grandPrix:$('resultGrandPrix').value.trim(),
-      session:$('resultSession').value,
-      results:rows
-    };
-    if(!payload.grandPrix)throw new Error('Укажите название Гран-при');
-    if(!payload.round || payload.round<1)throw new Error('Укажите номер этапа');
-    const d=await api('/api/admin/results',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(payload)});
-    $('resultMsg').textContent=`Сохранено: ${d.race.grandPrix} · этап ${d.race.round} · ${d.race.session==='sprint'?'спринт':'Гран-при'}`;
-    $('resultMsg').className='status success';
-    resetResultForm();
-    const fresh=await api('/api/admin/results'); resultRaces=fresh.results||{};
-    renderResultsAdminList();
-  }catch(e){
-    $('resultMsg').textContent=e.message;
-    $('resultMsg').className='status error';
-  }
-};
-function renderResultsAdminList(){
-  const sid=$('resultSeason').value;
-  const races=(resultRaces[sid]||[]).slice().sort((a,b)=>Number(b.round)-Number(a.round));
-  $('resultsAdminList').innerHTML=races.length ? races.map(r=>`<article class="item">
-    <div class="meta">Этап ${esc(r.round)} · ${esc(r.session==='sprint'?'Спринт':'Гран-при')}</div>
-    <div class="title">${esc(r.grandPrix)}</div>
-    <div class="meta">${(r.results||[]).length} участников · ${esc((r.results||[]).slice(0,3).map(x=>`${x.position}. ${x.driver}`).join(' · '))}</div>
-  </article>`).join('') : '<div class="status">Результатов для этого сезона пока нет.</div>';
-}
-$('resultSeason').onchange=()=>{renderResultsAdminList();};
-
-async function loadManagement(){await loadUsers();await loadAdmins();await loadProtests();await loadTeamsAdmin();await loadDriversAdmin();await loadTransfersAdmin();await loadResultsAdmin()}
+async function loadManagement(){await loadUsers();await loadAdmins();await loadProtests();await loadTeamsAdmin();await loadDriversAdmin();await loadTransfersAdmin()}
 
 async function loadProtests(){
   try{
@@ -355,6 +221,20 @@ document.addEventListener('click', async (e) => {
     btn.textContent = 'Удалить протест';
   }
 });
+
+
+async function loadStats(){
+  try{
+    const d=await api('/api/admin/stats');
+    $('statRaces').textContent=d.races; $('statTeams').textContent=d.teams; $('statDrivers').textContent=d.drivers;
+    $('statDriversNote').textContent='активных: '+d.active_drivers; $('statPoints').textContent=Number.isInteger(d.points)?d.points:Number(d.points).toFixed(1);
+    $('statNews').textContent=d.news; $('statUsers').textContent=d.users; $('statAdmins').textContent=d.admins; $('statProtests').textContent=d.protests;
+    $('statProtestsNote').textContent='открытых: '+d.open_protests; $('resultRowsInline').textContent=d.result_rows;
+    $('statsUpdated').textContent=new Date().toLocaleTimeString('ru-RU',{hour:'2-digit',minute:'2-digit'}); $('systemStatus').textContent='✓ Данные доступны, сервер отвечает корректно'; $('systemStatus').className='status success';
+  }catch(e){$('systemStatus').textContent='Не удалось загрузить статистику: '+e.message;$('systemStatus').className='status error'}
+}
+function openSection(name){document.querySelectorAll('.admin-section').forEach(x=>x.classList.toggle('hidden-section',x.id!==name));document.querySelectorAll('.nav-btn').forEach(x=>x.classList.toggle('active',x.dataset.section===name));window.scrollTo({top:0,behavior:'smooth'});if(name==='dashboard')loadStats()}
+document.addEventListener('click',e=>{const b=e.target.closest('[data-section]');if(b&&b.dataset.section){openSection(b.dataset.section)}});
 
 check();
 </script></body></html>
