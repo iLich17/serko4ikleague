@@ -44,7 +44,7 @@ SEASON_ROSTERS_LOCK = threading.Lock()
 
 SESSION_TTL = 12 * 60 * 60
 # Password required to delete protests. Set this as a Railway environment variable.
-PROTEST_DELETE_PASSWORD = os.getenv("PROTEST_DELETE_PASSWORD", "")
+PROTEST_DELETE_PASSWORD = os.getenv("PROTEST_DELETE_PASSWORD", "SerkoDelete2026!")
 SESSIONS = {}  # token -> {expires, nick}
 SESSIONS_LOCK = threading.Lock()
 NICK_RE = re.compile(r"^[A-Za-zА-Яа-яЁё0-9_.-]{3,24}$")
@@ -1137,7 +1137,9 @@ class F1Handler(SimpleHTTPRequestHandler):
         if path.startswith("/api/admin/protests/"):
             protest_id = path[len("/api/admin/protests/"):].strip("/")
             if protest_id:
-                self._delete_protest(protest_id)
+                data = self._read_json(8 * 1024)
+                password = data.get("password", "") if isinstance(data, dict) else ""
+                self._delete_protest(protest_id, password)
                 return
 
         if path.startswith("/api/admin/drivers/"):

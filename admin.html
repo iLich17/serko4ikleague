@@ -195,7 +195,7 @@ async function loadProtests(){
         <div class="text"><b>Жалоба:</b>\n${esc(p.complaint||'')}</div>
         <div class="thumbs" style="margin-top:14px">${media}</div>
         <div class="meta" style="margin-top:10px">Файл: ${esc(p.evidence_name||'доказательство')}</div>
-        <button type="button" class="delete-protest" data-id="${esc(p.id)}" style="margin-top:14px;background:#d62828;color:#fff;border:0;border-radius:8px;padding:10px 16px;font-weight:700;cursor:pointer">Удалить протест</button>
+        <button type="button" class="delete-protest" data-id="${esc(p.id)}" onclick="deleteProtest(this)" style="margin-top:14px;background:#d62828;color:#fff;border:0;border-radius:8px;padding:10px 16px;font-weight:700;cursor:pointer">Удалить протест</button>
       </article>`;
     }).join('');
   }catch(e){
@@ -231,25 +231,29 @@ $('newsForm').onsubmit=async e=>{e.preventDefault();const now=new Date();const p
 async function loadNews(){try{const ns=await api('/api/news');$('newsList').innerHTML=ns.length?ns.map(n=>`<article class="item"><div class="meta">${esc(n.tag||'F1 LEAGUE')} · ${esc(n.date||'')}${n.time?' · '+esc(n.time):''}</div><div class="title">${esc(n.title)}</div><div class="text">${esc(n.text)}</div>${(n.images||[]).length?`<div class="thumbs">${n.images.map(x=>`<img src="${esc(x)}" alt="">`).join('')}</div>`:''}<div class="buttons" style="margin-top:12px"><button class="btn secondary" onclick="editNews(${Number(n.id)})">Редактировать</button><button class="btn danger" onclick="deleteNews(${Number(n.id)})">Удалить</button></div></article>`).join(''):'<div class="status">Новостей пока нет.</div>'}catch(e){$('newsList').innerHTML='<div class="status error">'+esc(e.message)+'</div>'}}
 async function editNews(id){const ns=await api('/api/news');const n=ns.find(x=>Number(x.id)===Number(id));if(!n)return;editingId=id;$('title').value=n.title||'';$('text').value=n.text||'';$('tag').value=n.tag||'F1 LEAGUE';selectedImages=[...(n.images||[])];previews();$('formTitle').textContent='Редактирование новости';$('saveBtn').textContent='Сохранить изменения';$('cancelEdit').classList.remove('hidden');scrollTo({top:0,behavior:'smooth'})}
 async function deleteNews(id){if(!confirm('Удалить эту новость?'))return;try{await api('/api/news/'+id,{method:'DELETE'});if(Number(editingId)===Number(id))reset();loadNews()}catch(e){alert(e.message)}}
-document.addEventListener('click', async (e) => {
-  const btn = e.target.closest('.delete-protest');
-  if (!btn) return;
+async function deleteProtest(btn) {
   const id = btn.dataset.id;
+  if (!id) { alert('Не найден ID протеста'); return; }
   if (!confirm('Удалить этот протест и прикреплённое доказательство? Это действие нельзя отменить.')) return;
   const password = prompt('Введите пароль для удаления протеста:');
   if (password === null) return;
-  if (!password) { alert('Пароль не введён'); return; }
+  if (!password.trim()) { alert('Пароль не введён'); return; }
+  const oldText = btn.textContent;
   btn.disabled = true;
   btn.textContent = 'Удаляем…';
   try {
-    await api('/api/admin/protests/' + encodeURIComponent(id) + '/delete', {method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({password})});
+    await api('/api/admin/protests/' + encodeURIComponent(id) + '/delete', {
+      method: 'POST',
+      headers: {'Content-Type': 'application/json'},
+      body: JSON.stringify({password: password})
+    });
     await loadProtests();
   } catch (err) {
     alert(err.message || 'Не удалось удалить протест');
     btn.disabled = false;
-    btn.textContent = 'Удалить протест';
+    btn.textContent = oldText;
   }
-});
+}
 
 document.querySelectorAll('.nav-link').forEach(a=>a.addEventListener('click',()=>{document.querySelectorAll('.nav-link').forEach(x=>x.classList.remove('active'));a.classList.add('active')}));
 check();
