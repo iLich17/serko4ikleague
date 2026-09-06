@@ -722,6 +722,13 @@ class F1Handler(SimpleHTTPRequestHandler):
             with PROTESTS_LOCK:
                 self._json_response(200, {"protests": load_protests()})
             return
+        if path == "/api/admin/live-race":
+            if not is_admin(self):
+                self._json_response(401, {"error": "Требуется вход в админ-панель"})
+                return
+            with LIVE_RACE_LOCK:
+                self._json_response(200, load_live_race())
+            return
         if path.startswith("/protest-files/"):
             if not is_admin(self):
                 self._json_response(403, {"error": "Доказательства доступны только администраторам"})
