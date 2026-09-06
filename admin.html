@@ -239,7 +239,7 @@ document.addEventListener('click', async (e) => {
   btn.disabled = true;
   btn.textContent = 'Удаляем…';
   try {
-    await api('/api/admin/protests/' + encodeURIComponent(id) + '/delete', {method:'POST'});
+    await api('/api/admin/protests/' + encodeURIComponent(id), {method:'DELETE'});
     await loadProtests();
   } catch (err) {
     alert(err.message || 'Не удалось удалить протест');

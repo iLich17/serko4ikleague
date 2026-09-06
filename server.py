@@ -706,6 +706,36 @@ class F1Handler(SimpleHTTPRequestHandler):
                 return self._redirect("/auth")
         return super().do_GET()
 
+    def _delete_protest(self, protest_id):
+        """Delete a protest; only the iL1CH admin is authorized."""
+        if not is_admin(self):
+            self._json_response(401, {"error": "Требуется вход в админ-панель"})
+            return
+        if (current_admin(self) or "").casefold() != "il1ch":
+            self._json_response(403, {"error": "Удалять протесты может только администратор iL1CH"})
+            return
+        protest_id = unquote(str(protest_id)).strip("/")
+        if not protest_id:
+            self._json_response(400, {"error": "Не указан протест"})
+            return
+        with PROTESTS_LOCK:
+            protests = load_protests()
+            target = next((p for p in protests if str(p.get("id")) == protest_id), None)
+            if not target:
+                self._json_response(404, {"error": "Протест не найден"})
+                return
+            evidence = str(target.get("evidence", ""))
+            if evidence.startswith("/protest-files/"):
+                filename = Path(unquote(evidence[len("/protest-files/"):])).name
+                file_path = (PROTESTS_DIR / filename).resolve()
+                if file_path.parent == PROTESTS_DIR.resolve() and file_path.is_file():
+                    try:
+                        file_path.unlink()
+                    except OSError:
+                        pass
+            save_protests([p for p in protests if str(p.get("id")) != protest_id])
+        self._json_response(200, {"ok": True, "id": protest_id})
+
     def do_POST(self):
         path = self.path.split("?", 1)[0]
         try:
@@ -981,33 +1011,7 @@ class F1Handler(SimpleHTTPRequestHandler):
                 return
 
             if path.startswith("/api/admin/protests/") and path.endswith("/delete"):
-                if not is_admin(self):
-                    self._json_response(401, {"error": "Требуется вход в админ-панель"})
-                    return
-                if (current_admin(self) or "").casefold() != "il1ch":
-                    self._json_response(403, {"error": "Удалять протесты может только администратор iL1CH"})
-                    return
-                protest_id = path[len("/api/admin/protests/"):-len("/delete")].strip("/")
-                if not protest_id:
-                    self._json_response(400, {"error": "Не указан протест"})
-                    return
-                with PROTESTS_LOCK:
-                    protests = load_protests()
-                    target = next((p for p in protests if str(p.get("id")) == protest_id), None)
-                    if not target:
-                        self._json_response(404, {"error": "Протест не найден"})
-                        return
-                    evidence = str(target.get("evidence", ""))
-                    filename = Path(evidence[len("/protest-files/"):]).name if evidence.startswith("/protest-files/") else ""
-                    if filename:
-                        file_path = (PROTESTS_DIR / filename).resolve()
-                        if file_path.parent == PROTESTS_DIR.resolve() and file_path.is_file():
-                            try:
-                                file_path.unlink()
-                            except OSError:
-                                pass
-                    save_protests([p for p in protests if str(p.get("id")) != protest_id])
-                self._json_response(200, {"ok": True})
+                self._delete_protest(path[len("/api/admin/protests/"):-len("/delete")])
                 return
 
             if path == "/api/admin/login":
@@ -1122,6 +1126,12 @@ class F1Handler(SimpleHTTPRequestHandler):
                 admins = [a for a in admins if a.casefold() != nick.casefold()]
                 save_admins(admins)
             self._json_response(200, {"ok": True, "admins": load_admins()}); return
+        if path.startswith("/api/admin/protests/"):
+            protest_id = path[len("/api/admin/protests/"):].strip("/")
+            if protest_id:
+                self._delete_protest(protest_id)
+                return
+
         if path.startswith("/api/admin/drivers/"):
             if not is_admin(self):
                 self._json_response(401, {"error": "Требуется вход в админ-панель"})
