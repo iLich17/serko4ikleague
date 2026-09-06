@@ -195,7 +195,7 @@ async function loadProtests(){
         <div class="text"><b>Жалоба:</b>\n${esc(p.complaint||'')}</div>
         <div class="thumbs" style="margin-top:14px">${media}</div>
         <div class="meta" style="margin-top:10px">Файл: ${esc(p.evidence_name||'доказательство')}</div>
-        ${window.currentAdminNick && window.currentAdminNick.toLowerCase() === 'il1ch' ? `<button type="button" class="delete-protest" data-id="${esc(p.id)}" style="margin-top:14px;background:#d62828;color:#fff;border:0;border-radius:8px;padding:10px 16px;font-weight:700;cursor:pointer">Удалить протест</button>` : ''}
+        <button type="button" class="delete-protest" data-id="${esc(p.id)}" style="margin-top:14px;background:#d62828;color:#fff;border:0;border-radius:8px;padding:10px 16px;font-weight:700;cursor:pointer">Удалить протест</button>
       </article>`;
     }).join('');
   }catch(e){
@@ -236,10 +236,13 @@ document.addEventListener('click', async (e) => {
   if (!btn) return;
   const id = btn.dataset.id;
   if (!confirm('Удалить этот протест и прикреплённое доказательство? Это действие нельзя отменить.')) return;
+  const password = prompt('Введите пароль для удаления протеста:');
+  if (password === null) return;
+  if (!password) { alert('Пароль не введён'); return; }
   btn.disabled = true;
   btn.textContent = 'Удаляем…';
   try {
-    await api('/api/admin/protests/' + encodeURIComponent(id) + '/delete', {method:'POST'});
+    await api('/api/admin/protests/' + encodeURIComponent(id) + '/delete', {method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({password})});
     await loadProtests();
   } catch (err) {
     alert(err.message || 'Не удалось удалить протест');

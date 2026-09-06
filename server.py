@@ -43,6 +43,8 @@ SEASON_ROSTERS_FILE = data_file("season_rosters.json")
 SEASON_ROSTERS_LOCK = threading.Lock()
 
 SESSION_TTL = 12 * 60 * 60
+# Password required to delete protests. Set this as a Railway environment variable.
+PROTEST_DELETE_PASSWORD = os.getenv("PROTEST_DELETE_PASSWORD", "")
 SESSIONS = {}  # token -> {expires, nick}
 SESSIONS_LOCK = threading.Lock()
 NICK_RE = re.compile(r"^[A-Za-zА-Яа-яЁё0-9_.-]{3,24}$")
@@ -706,13 +708,17 @@ class F1Handler(SimpleHTTPRequestHandler):
                 return self._redirect("/auth")
         return super().do_GET()
 
-    def _delete_protest(self, protest_id):
-        """Delete a protest; only the iL1CH admin is authorized."""
+    def _delete_protest(self, protest_id, password):
+        """Delete a protest after admin-session and separate deletion-password checks."""
         if not is_admin(self):
             self._json_response(401, {"error": "Требуется вход в админ-панель"})
             return
-        if (current_admin(self) or "").casefold() != "il1ch":
-            self._json_response(403, {"error": "Удалять протесты может только администратор iL1CH"})
+        if not PROTEST_DELETE_PASSWORD:
+            self._json_response(503, {"error": "Пароль удаления протестов не настроен. Установите PROTEST_DELETE_PASSWORD на сервере."})
+            return
+        supplied = str(password or "")
+        if not hmac.compare_digest(supplied, PROTEST_DELETE_PASSWORD):
+            self._json_response(403, {"error": "Неверный пароль удаления протеста"})
             return
         protest_id = unquote(str(protest_id)).strip("/")
         if not protest_id:
@@ -1011,7 +1017,9 @@ class F1Handler(SimpleHTTPRequestHandler):
                 return
 
             if path.startswith("/api/admin/protests/") and path.endswith("/delete"):
-                self._delete_protest(path[len("/api/admin/protests/"):-len("/delete")])
+                data = self._read_json(8 * 1024)
+                password = data.get("password", "") if isinstance(data, dict) else ""
+                self._delete_protest(path[len("/api/admin/protests/"):-len("/delete")], password)
                 return
 
             if path == "/api/admin/login":
