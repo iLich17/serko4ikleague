@@ -241,13 +241,13 @@ function liveGap(r){
 function renderLiveRace(d){
   const el=$('liveRaceTable'); if(!d||!d.rows||!d.rows.length){el.innerHTML='<div class="status">LIVE-разбор не запущен.</div>';return;}
   const status=d.status==='live'?'🔴 LIVE':'✅ FINAL';
-  el.innerHTML=`<div class="leader"><b>${esc(status)} · ${esc(String(d.round))}. ${esc(d.grandPrix||'')}</b> · ${sessionName(d.session)}</div><div class="table-wrap"><table><thead><tr><th>Поз.</th><th>Исх.</th><th>Пилот</th><th>Команда</th><th>Gap</th><th>Штраф</th><th>Итог</th><th></th></tr></thead><tbody>${d.rows.map(r=>`<tr><td class="position">${esc(r.position)}</td><td>${esc(r.original_position)}</td><td><b>${esc(r.driver)}</b>${r.penalty_reason?`<div class="meta">${esc(r.penalty_reason)}</div>`:''}</td><td>${esc(r.team)}</td><td>${esc(r.gap||'—')}</td><td><b>${Number(r.penalty||0)?'+'+Number(r.penalty||0)+' сек':'—'}</b></td><td>${esc(liveGap(r))}</td><td>${d.status==='live'&&r.gap_seconds!==null?`<button class="btn danger" style="padding:7px 10px" onclick="setLivePenalty('${encodeURIComponent(r.driver)}',${Number(r.penalty||0)})">${Number(r.penalty||0)>0?'Изменить / снять':'Штраф'}</button>`:''}</td></tr>`).join('')}</tbody></table></div>`;
+  el.innerHTML=`<div class="leader"><b>${esc(status)} · ${esc(String(d.round))}. ${esc(d.grandPrix||'')}</b> · ${sessionName(d.session)}</div><div class="table-wrap"><table><thead><tr><th>Поз.</th><th>Исх.</th><th>Пилот</th><th>Команда</th><th>Gap</th><th>Штраф</th><th>Итог</th><th></th></tr></thead><tbody>${d.rows.map(r=>`<tr><td class="position">${esc(r.position)}</td><td>${esc(r.original_position)}</td><td><b>${esc(r.driver)}</b>${r.penalty_reason?`<div class="meta">${esc(r.penalty_reason)}</div>`:''}</td><td>${esc(r.team)}</td><td>${esc(r.gap||'—')}</td><td><b>${Number(r.penalty||0)?(Number(r.penalty)>0?'+':'')+Number(r.penalty)+' сек':'—'}</b></td><td>${esc(liveGap(r))}</td><td>${d.status==='live'&&r.gap_seconds!==null?`<button class="btn danger" style="padding:7px 10px" onclick="setLivePenalty('${encodeURIComponent(r.driver)}',${Number(r.penalty||0)})">${Number(r.penalty||0)>0?'Изменить / снять':'Штраф'}</button>`:''}</td></tr>`).join('')}</tbody></table></div>`;
 }
 async function loadLiveRace(){try{renderLiveRace(await api('/api/admin/live-race'))}catch(e){$('liveRaceMsg').textContent=e.message;$('liveRaceMsg').className='status error'}}
 async function setLivePenalty(encoded,current){
-  const driver=decodeURIComponent(encoded); const value=prompt('Штраф в секундах для '+driver+' (0 = снять штраф):',String(current||0)); if(value===null)return;
-  const penalty=Number(value); if(!Number.isFinite(penalty)||penalty<0){alert('Введите число секунд, например 5 или 10');return;}
-  const reason=prompt('Причина штрафа (необязательно):','')||'';
+  const driver=decodeURIComponent(encoded); const value=prompt('Корректировка времени для '+driver+' в секундах (например +5, -5; 0 = снять):',String(current||0)); if(value===null)return;
+  const penalty=Number(value); if(!Number.isFinite(penalty)||penalty<-3600||penalty>3600){alert('Введите число от -3600 до +3600 секунд. Например: +5, -5 или 0.');return;}
+  const reason=prompt('Причина корректировки (необязательно):','')||'';
   try{const d=await api('/api/admin/live-race/penalty',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({driver,penalty,reason})});renderLiveRace(d)}catch(e){alert(e.message)}
 }
 let selectedLiveRaceFile=null;

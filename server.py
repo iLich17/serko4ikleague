@@ -1001,8 +1001,8 @@ class F1Handler(SimpleHTTPRequestHandler):
                 driver = str(data.get("driver", "")).strip() if isinstance(data, dict) else ""
                 try: penalty = float(data.get("penalty", 0))
                 except (TypeError, ValueError): penalty = None
-                if not driver or penalty is None or penalty < 0 or penalty > 3600:
-                    self._json_response(400, {"error": "Некорректный пилот или штраф"})
+                if not driver or penalty is None or penalty < -3600 or penalty > 3600:
+                    self._json_response(400, {"error": "Некорректный пилот или значение времени (от -3600 до +3600 сек)"})
                     return
                 live = load_live_race()
                 if live.get("status") != "live":
