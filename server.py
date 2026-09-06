@@ -582,9 +582,8 @@ class F1Handler(SimpleHTTPRequestHandler):
                 self._json_response(404, {"error": "Файл не найден"})
             return
         if path == "/api/drivers":
-            if not current_user(self) and not is_admin(self):
-                self._json_response(401, {"error": "Сначала зарегистрируйтесь или войдите"})
-                return
+            # Public driver profiles need their editable stats (OVR, market value, ratings)
+            # on the public site, so expose only the sanitized public driver list here.
             self._json_response(200, {"drivers": driver_public_list(False)})
             return
         if path == "/api/admin/drivers":
