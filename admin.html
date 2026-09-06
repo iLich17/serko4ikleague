@@ -64,6 +64,14 @@
     <div class="buttons"><button class="btn primary" type="button" id="uploadResults">Загрузить результаты</button></div>
     <div id="resultsMsg" class="status"></div>
   </div>
+  <div class="panel" id="live-race">
+    <h2>🔴 LIVE-разбор штрафов</h2>
+    <p class="sub">Загрузите JSON результатов после гонки. Некорректные значения gap не ломают таблицу: 1.08.346 автоматически распознаётся как 1:08.346, а GAP/Lap/DNF/DSQ остаются неклассифицируемыми.</p>
+    <div class="field"><label>JSON результатов гонки</label><input id="liveRaceFile" type="file" accept="application/json,.json"></div>
+    <div class="buttons"><button class="btn primary" type="button" id="uploadLiveRace">Запустить LIVE-разбор</button><button class="btn secondary" type="button" id="finalizeLiveRace">Зафиксировать итог</button></div>
+    <div id="liveRaceMsg" class="status"></div>
+    <div id="liveRaceTable" style="margin-top:15px"></div>
+  </div>
   <div class="panel" id="drivers">
     <h2>🏎️ Пилоты</h2>
     <p class="sub">Добавляй фотографии пилотов и убирай пилотов с публичного сайта. Исторические результаты не изменяются.</p>
@@ -118,7 +126,7 @@ async function compress(file){return new Promise((resolve,reject)=>{const fr=new
 function previews(){ $('previews').innerHTML=selectedImages.map(x=>`<img src="${x}" alt="">`).join('') }
 $('photos').onchange=async()=>{selectedImages=[];for(const f of [...$('photos').files]){if(f.type.startsWith('image/'))try{selectedImages.push(await compress(f))}catch{}}previews()};
 async function check(){try{const d=await api('/api/admin/me');if(d.authenticated)showApp()}catch{} }
-function showApp(){ $('login').classList.add('hidden'); $('app').classList.remove('hidden'); api('/api/admin/me').then(d=>{ window.currentAdminNick=d.nick||''; $('adminWho').textContent='Вы вошли как: '+(d.nick||'администратор'); loadNews(); loadManagement(); }); }
+function showApp(){ $('login').classList.add('hidden'); $('app').classList.remove('hidden'); api('/api/admin/me').then(d=>{ window.currentAdminNick=d.nick||''; $('adminWho').textContent='Вы вошли как: '+(d.nick||'администратор'); loadNews(); loadManagement(); loadLiveRace(); }); }
 let adminDrivers=[];
 function fillDriverEditor(){const x=adminDrivers.find(d=>d.name===$('driverSelect').value);if(!x)return;$('driverCountry').value=x.country||'';$('driverMarketValue').value=x.market_value??'';$('driverOverall').value=x.overall??'';$('driverRacePace').value=x.race_pace??'';$('driverCleanliness').value=x.cleanliness??'';$('driverAttack').value=x.attack??'';$('driverDefense').value=x.defense??'';$('driverQualifying').value=x.qualifying??'';$('driverStability').value=x.stability??'';$('driverKeyStrength').value=x.key_strength||'';}
 async function loadDriversAdmin(){
@@ -222,6 +230,28 @@ $('uploadResults').onclick=async()=>{
   }catch(e){msg.textContent=e.message;msg.className='status error'}
   finally{btn.disabled=false;btn.textContent='Загрузить результаты'}
 };
+function liveGap(r){
+  if(r.gap_seconds===null||r.gap_seconds===undefined)return r.gap||'—';
+  const v=Number(r.gap_seconds)+Number(r.penalty||0);
+  if(v===0)return 'GAP';
+  const m=Math.floor(v/60),sec=(v%60).toFixed(3).padStart(6,'0');
+  return m?`+${m}:${sec}`:`+${sec}`;
+}
+function renderLiveRace(d){
+  const el=$('liveRaceTable'); if(!d||!d.rows||!d.rows.length){el.innerHTML='<div class="status">LIVE-разбор не запущен.</div>';return;}
+  const status=d.status==='live'?'🔴 LIVE':'✅ FINAL';
+  el.innerHTML=`<div class="leader"><b>${esc(status)} · ${esc(String(d.round))}. ${esc(d.grandPrix||'')}</b> · ${sessionName(d.session)}</div><div class="table-wrap"><table><thead><tr><th>Поз.</th><th>Исх.</th><th>Пилот</th><th>Команда</th><th>Gap</th><th>Штраф</th><th>Итог</th><th></th></tr></thead><tbody>${d.rows.map(r=>`<tr><td class="position">${esc(r.position)}</td><td>${esc(r.original_position)}</td><td><b>${esc(r.driver)}</b>${r.penalty_reason?`<div class="meta">${esc(r.penalty_reason)}</div>`:''}</td><td>${esc(r.team)}</td><td>${esc(r.gap||'—')}</td><td><b>${Number(r.penalty||0)?'+'+Number(r.penalty||0)+' сек':'—'}</b></td><td>${esc(liveGap(r))}</td><td>${d.status==='live'&&r.gap_seconds!==null?`<button class="btn danger" style="padding:7px 10px" onclick="setLivePenalty('${encodeURIComponent(r.driver)}',${Number(r.penalty||0)})">Штраф</button>`:''}</td></tr>`).join('')}</tbody></table></div>`;
+}
+async function loadLiveRace(){try{renderLiveRace(await api('/api/admin/live-race'))}catch(e){$('liveRaceMsg').textContent=e.message;$('liveRaceMsg').className='status error'}}
+async function setLivePenalty(encoded,current){
+  const driver=decodeURIComponent(encoded); const value=prompt('Штраф в секундах для '+driver+' (0 = снять штраф):',String(current||0)); if(value===null)return;
+  const penalty=Number(value); if(!Number.isFinite(penalty)||penalty<0){alert('Введите число секунд, например 5 или 10');return;}
+  const reason=prompt('Причина штрафа (необязательно):','')||'';
+  try{const d=await api('/api/admin/live-race/penalty',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({driver,penalty,reason})});renderLiveRace(d)}catch(e){alert(e.message)}
+}
+$('uploadLiveRace').onclick=async()=>{const f=$('liveRaceFile').files[0],msg=$('liveRaceMsg');if(!f){msg.textContent='Выберите JSON-файл';msg.className='status error';return}const fd=new FormData();fd.append('results',f,f.name);try{const d=await api('/api/admin/live-race/upload',{method:'POST',body:fd});msg.textContent=`LIVE запущен: ${d.round}. ${d.grandPrix}, пилотов: ${d.rows}`;msg.className='status success';$('liveRaceFile').value='';renderLiveRace(await api('/api/admin/live-race'))}catch(e){msg.textContent=e.message;msg.className='status error'}};
+$('finalizeLiveRace').onclick=async()=>{if(!confirm('Зафиксировать текущие позиции и очки в results.json?'))return;try{const d=await api('/api/admin/live-race/finalize',{method:'POST'});$('liveRaceMsg').textContent=d.message;$('liveRaceMsg').className='status success';loadLiveRace()}catch(e){$('liveRaceMsg').textContent=e.message;$('liveRaceMsg').className='status error'}};
+
 $('loginBtn').onclick=async()=>{try{await api('/api/admin/login',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({nick:$('nick').value.trim(),password:$('password').value})});$('loginMsg').textContent='Вход выполнен';showApp()}catch(e){$('loginMsg').textContent=e.message;$('loginMsg').className='status error'}};
 $('password').onkeydown=e=>{if(e.key==='Enter')$('loginBtn').click()};$('nick').onkeydown=e=>{if(e.key==='Enter')$('loginBtn').click()};
 $('logoutBtn').onclick=async()=>{await api('/api/admin/logout',{method:'POST'});location.reload()};

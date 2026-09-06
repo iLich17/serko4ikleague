@@ -25,6 +25,8 @@ USERS_FILE = data_file("users.json")
 ADMINS_FILE = data_file("admins.json")
 PROTESTS_FILE = data_file("protests.json")
 RESULTS_FILE = data_file("results.json")
+LIVE_RACE_FILE = data_file("live_race.json")
+LIVE_RACE_LOCK = threading.Lock()
 PROTESTS_DIR = DATA_DIR / "protest_files"
 PROTESTS_DIR.mkdir(parents=True, exist_ok=True)
 DRIVERS_FILE = data_file("drivers.json")
@@ -97,6 +99,96 @@ def load_admins():
 def save_admins(data):
     save_json(ADMINS_FILE, data)
 
+
+def parse_gap_seconds(gap):
+    """Best-effort parser for race gaps. Returns seconds or None when not safely comparable."""
+    if gap is None:
+        return 0.0
+    raw = str(gap).strip().upper()
+    if raw in ("", "GAP"):
+        return 0.0
+    if raw in ("DNF", "DNS", "DSQ", "DID NOT FINISH", "DID NOT START", "DISQUALIFIED"):
+        return None
+    raw = raw.lstrip("+").strip()
+    if "LAP" in raw or "LAPS" in raw:
+        return None
+    # Normal decimal seconds: 5.291
+    if re.fullmatch(r"\d+(?:\.\d+)?", raw):
+        try: return float(raw)
+        except ValueError: return None
+    # Handles malformed-but-common F1 notation like 1.08.346 -> 1:08.346
+    parts = raw.split(".")
+    try:
+        if len(parts) == 3 and all(re.fullmatch(r"\d+", x) for x in parts):
+            h_or_m, sec, millis = map(int, parts)
+            if len(parts[1]) <= 2 and len(parts[2]) <= 3:
+                return h_or_m * 60 + sec + millis / (10 ** len(parts[2]))
+        if len(parts) == 2 and all(re.fullmatch(r"\d+", x) for x in parts):
+            # A value such as 1.08 is more safely treated as decimal seconds.
+            return float(raw)
+    except ValueError:
+        pass
+    return None
+
+
+def build_live_race(race):
+    rows = []
+    for idx, item in enumerate(race.get("results", [])):
+        item = dict(item) if isinstance(item, dict) else {}
+        pos = item.get("position")
+        rows.append({
+            "driver": str(item.get("driver", "")),
+            "team": str(item.get("team", "")),
+            "original_position": pos,
+            "position": pos,
+            "points": item.get("points", 0),
+            "original_points": item.get("points", 0),
+            "gap": item.get("gap", ""),
+            "gap_seconds": parse_gap_seconds(item.get("gap")),
+            "penalty": 0,
+            "penalty_reason": "",
+            "_order": idx,
+        })
+    return {"round": race.get("round"), "grandPrix": race.get("grandPrix", ""), "session": race.get("session", "race"), "status": "live", "rows": rows}
+
+
+def recalc_live_race(live):
+    rows = live.get("rows", [])
+    # Classified numeric-gap finishers can be reordered precisely. Non-comparable
+    # statuses (laps/DNF/DSQ) keep their relative order after classified drivers.
+    comparable = [r for r in rows if r.get("gap_seconds") is not None and str(r.get("position", "")).upper() not in ("DNF", "DNS", "DSQ")]
+    comparable.sort(key=lambda r: (float(r.get("gap_seconds", 0)) + float(r.get("penalty", 0)), int(r.get("_order", 0))))
+    others = [r for r in rows if r not in comparable]
+    others.sort(key=lambda r: int(r.get("_order", 0)))
+    ordered = comparable + others
+    # Original points table is used to award points according to the new finishing position.
+    points_by_pos = {}
+    for r in rows:
+        try:
+            p = int(r.get("original_position"))
+            if p > 0 and p not in points_by_pos:
+                points_by_pos[p] = r.get("original_points", 0)
+        except (TypeError, ValueError):
+            pass
+    for i, r in enumerate(ordered, 1):
+        old = str(r.get("original_position", "")).upper()
+        if r.get("gap_seconds") is not None and old not in ("DNF", "DNS", "DSQ"):
+            r["position"] = i
+            r["points"] = points_by_pos.get(i, 0)
+        else:
+            r["position"] = r.get("original_position")
+            r["points"] = r.get("original_points", 0)
+        r["effective_gap_seconds"] = (r.get("gap_seconds") + float(r.get("penalty", 0))) if r.get("gap_seconds") is not None else None
+    live["rows"] = ordered
+    return live
+
+
+def load_live_race():
+    return load_json(LIVE_RACE_FILE, {"status": "idle", "rows": []})
+
+
+def save_live_race(data):
+    save_json(LIVE_RACE_FILE, data)
 
 def load_protests():
     data = load_json(PROTESTS_FILE, [])
@@ -815,6 +907,89 @@ class F1Handler(SimpleHTTPRequestHandler):
                     self._json_response(500, {"error": f"Не удалось сохранить результаты: {exc}"})
                     return
                 self._json_response(200, {"ok": True, "races": len(uploaded["races"])})
+                return
+
+            if path == "/api/admin/live-race/upload":
+                if not is_admin(self):
+                    self._json_response(401, {"error": "Требуется вход в админ-панель"})
+                    return
+                fields, file_part = self._read_multipart(max_bytes=25 * 1024 * 1024)
+                if not file_part or not file_part.get("data"):
+                    self._json_response(400, {"error": "Выберите JSON-файл результатов"})
+                    return
+                try:
+                    uploaded = json.loads(file_part["data"].decode("utf-8-sig"))
+                except (UnicodeDecodeError, json.JSONDecodeError):
+                    self._json_response(400, {"error": "Файл не является корректным JSON"})
+                    return
+                races = uploaded.get("races") if isinstance(uploaded, dict) else None
+                if not isinstance(races, list) or not races:
+                    self._json_response(400, {"error": "Нужен объект с непустым массивом races"})
+                    return
+                valid = [r for r in races if isinstance(r, dict) and isinstance(r.get("results"), list)]
+                if not valid:
+                    self._json_response(400, {"error": "В JSON нет корректных этапов с results"})
+                    return
+                live = build_live_race(valid[-1])
+                recalc_live_race(live)
+                with LIVE_RACE_LOCK:
+                    save_live_race(live)
+                self._json_response(200, {"ok": True, "round": live["round"], "grandPrix": live["grandPrix"], "rows": len(live["rows"])})
+                return
+
+            if path == "/api/admin/live-race/penalty":
+                if not is_admin(self):
+                    self._json_response(401, {"error": "Требуется вход в админ-панель"})
+                    return
+                data = self._read_json(64 * 1024)
+                driver = str(data.get("driver", "")).strip() if isinstance(data, dict) else ""
+                try: penalty = float(data.get("penalty", 0))
+                except (TypeError, ValueError): penalty = None
+                if not driver or penalty is None or penalty < 0 or penalty > 3600:
+                    self._json_response(400, {"error": "Некорректный пилот или штраф"})
+                    return
+                live = load_live_race()
+                if live.get("status") != "live":
+                    self._json_response(400, {"error": "Лайв-разбор не активен"})
+                    return
+                target = next((r for r in live.get("rows", []) if str(r.get("driver", "")).casefold() == driver.casefold()), None)
+                if not target:
+                    self._json_response(404, {"error": "Пилот не найден"})
+                    return
+                target["penalty"] = penalty
+                target["penalty_reason"] = str(data.get("reason", "")).strip()[:200]
+                recalc_live_race(live)
+                with LIVE_RACE_LOCK: save_live_race(live)
+                self._json_response(200, live)
+                return
+
+            if path == "/api/admin/live-race/finalize":
+                if not is_admin(self):
+                    self._json_response(401, {"error": "Требуется вход в админ-панель"})
+                    return
+                live = load_live_race()
+                if not live.get("rows"):
+                    self._json_response(400, {"error": "Нет активной гонки"})
+                    return
+                results = load_json(RESULTS_FILE, {})
+                races = results.get("races", []) if isinstance(results, dict) else []
+                race = next((r for r in races if str(r.get("round")) == str(live.get("round")) and str(r.get("session")) == str(live.get("session"))), None)
+                if race is None:
+                    self._json_response(404, {"error": "Исходная гонка не найдена в results.json"})
+                    return
+                by_driver = {str(r.get("driver")): r for r in live.get("rows", [])}
+                for r in race.get("results", []):
+                    lr = by_driver.get(str(r.get("driver")))
+                    if lr:
+                        r["position"] = lr.get("position")
+                        r["points"] = lr.get("points", r.get("points", 0))
+                        if float(lr.get("penalty", 0)) > 0:
+                            r["penalty"] = lr["penalty"]
+                            r["penalty_reason"] = lr.get("penalty_reason", "")
+                save_json(RESULTS_FILE, results)
+                live["status"] = "final"
+                save_live_race(live)
+                self._json_response(200, {"ok": True, "message": "Результат гонки зафиксирован"})
                 return
 
             if path == "/api/admin/transfers":
