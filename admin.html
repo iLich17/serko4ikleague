@@ -249,7 +249,29 @@ async function setLivePenalty(encoded,current){
   const reason=prompt('Причина штрафа (необязательно):','')||'';
   try{const d=await api('/api/admin/live-race/penalty',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({driver,penalty,reason})});renderLiveRace(d)}catch(e){alert(e.message)}
 }
-$('uploadLiveRace').onclick=async()=>{const f=$('liveRaceFile').files[0],msg=$('liveRaceMsg');if(!f){msg.textContent='Выберите JSON-файл';msg.className='status error';return}const fd=new FormData();fd.append('results',f,f.name);try{const d=await api('/api/admin/live-race/upload',{method:'POST',body:fd});msg.textContent=`LIVE запущен: ${d.round}. ${d.grandPrix}, пилотов: ${d.rows}`;msg.className='status success';$('liveRaceFile').value='';renderLiveRace(await api('/api/admin/live-race'))}catch(e){msg.textContent=e.message;msg.className='status error'}};
+let selectedLiveRaceFile=null;
+$('liveRaceFile').addEventListener('change',e=>{
+  selectedLiveRaceFile=(e.target.files&&e.target.files.length)?e.target.files[0]:null;
+  const msg=$('liveRaceMsg');
+  if(selectedLiveRaceFile){msg.textContent='Выбран файл: '+selectedLiveRaceFile.name;msg.className='status';}
+});
+$('uploadLiveRace').onclick=async()=>{
+  const input=$('liveRaceFile');
+  const f=selectedLiveRaceFile || (input.files&&input.files[0]);
+  const msg=$('liveRaceMsg');
+  if(!f){msg.textContent='Выберите JSON-файл';msg.className='status error';return}
+  const name=String(f.name||'results.json');
+  if(!/\.json$/i.test(name)){msg.textContent='Выберите файл с расширением .json';msg.className='status error';return}
+  const fd=new FormData();fd.append('results',f,name);
+  const btn=$('uploadLiveRace');btn.disabled=true;btn.textContent='Запускаем…';
+  try{
+    const d=await api('/api/admin/live-race/upload',{method:'POST',body:fd});
+    msg.textContent=`LIVE запущен: ${d.round}. ${d.grandPrix}, пилотов: ${d.rows}`;msg.className='status success';
+    selectedLiveRaceFile=null;input.value='';
+    renderLiveRace(await api('/api/admin/live-race'))
+  }catch(e){msg.textContent=e.message;msg.className='status error'}
+  finally{btn.disabled=false;btn.textContent='Запустить LIVE-разбор'}
+};
 $('finalizeLiveRace').onclick=async()=>{if(!confirm('Зафиксировать текущие позиции и очки в results.json?'))return;try{const d=await api('/api/admin/live-race/finalize',{method:'POST'});$('liveRaceMsg').textContent=d.message;$('liveRaceMsg').className='status success';loadLiveRace()}catch(e){$('liveRaceMsg').textContent=e.message;$('liveRaceMsg').className='status error'}};
 
 $('loginBtn').onclick=async()=>{try{await api('/api/admin/login',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({nick:$('nick').value.trim(),password:$('password').value})});$('loginMsg').textContent='Вход выполнен';showApp()}catch(e){$('loginMsg').textContent=e.message;$('loginMsg').className='status error'}};
