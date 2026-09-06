@@ -313,12 +313,15 @@ def driver_public_list(include_inactive=False):
         if not include_inactive and not active:
             continue
         current_team = season_driver_team("2", name) or item.get("team", "")
-        rows.append({
-            "name": name,
-            "team": current_team,
-            "photo": item.get("photo", ""),
-            "active": active,
-        })
+        # Keep the complete editable profile in the public payload.  The
+        # frontend uses these fields for driver profiles/ratings as well as
+        # the short card data.
+        row = dict(item)
+        row["name"] = name
+        row["team"] = current_team
+        row["photo"] = item.get("photo", "")
+        row["active"] = active
+        rows.append(row)
     rows.sort(key=lambda x: x["name"].casefold())
     return rows
 
