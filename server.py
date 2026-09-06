@@ -103,29 +103,52 @@ def save_admins(data):
 def parse_gap_seconds(gap):
     """Best-effort parser for race gaps. Returns seconds or None when not safely comparable."""
     if gap is None:
-        return 0.0
+        return None
     raw = str(gap).strip().upper()
     if raw in ("", "GAP"):
         return 0.0
     if raw in ("DNF", "DNS", "DSQ", "DID NOT FINISH", "DID NOT START", "DISQUALIFIED"):
         return None
-    raw = raw.lstrip("+").strip()
-    if "LAP" in raw or "LAPS" in raw:
+    if "LAP" in raw:
         return None
-    # Normal decimal seconds: 5.291
+    raw = raw.lstrip("+").strip()
+
+    # Common exported format: "+3 secs.", "+10 sec", "+1.250 secs".
+    m = re.fullmatch(r"(\d+(?:\.\d+)?)\s*SEC(?:S|ONDS?)?\.?", raw)
+    if m:
+        try:
+            return float(m.group(1))
+        except ValueError:
+            return None
+
+    # Clock format: 1:08.346 or 0:45.110.
+    m = re.fullmatch(r"(\d+):(\d{1,2})(?:\.(\d{1,3}))?", raw)
+    if m:
+        try:
+            minutes = int(m.group(1))
+            seconds = int(m.group(2))
+            fraction = m.group(3) or ""
+            frac = int(fraction) / (10 ** len(fraction)) if fraction else 0.0
+            if seconds >= 60:
+                return None
+            return minutes * 60 + seconds + frac
+        except ValueError:
+            return None
+
+    # Plain decimal seconds: 5.291.
     if re.fullmatch(r"\d+(?:\.\d+)?", raw):
-        try: return float(raw)
-        except ValueError: return None
-    # Handles malformed-but-common F1 notation like 1.08.346 -> 1:08.346
+        try:
+            return float(raw)
+        except ValueError:
+            return None
+
+    # Malformed-but-common F1 notation like 1.08.346 -> 1:08.346.
     parts = raw.split(".")
     try:
         if len(parts) == 3 and all(re.fullmatch(r"\d+", x) for x in parts):
-            h_or_m, sec, millis = map(int, parts)
-            if len(parts[1]) <= 2 and len(parts[2]) <= 3:
-                return h_or_m * 60 + sec + millis / (10 ** len(parts[2]))
-        if len(parts) == 2 and all(re.fullmatch(r"\d+", x) for x in parts):
-            # A value such as 1.08 is more safely treated as decimal seconds.
-            return float(raw)
+            minutes, seconds, millis = map(int, parts)
+            if seconds < 60 and len(parts[2]) <= 3:
+                return minutes * 60 + seconds + millis / (10 ** len(parts[2]))
     except ValueError:
         pass
     return None
@@ -154,14 +177,37 @@ def build_live_race(race):
 
 def recalc_live_race(live):
     rows = live.get("rows", [])
-    # Classified numeric-gap finishers can be reordered precisely. Non-comparable
-    # statuses (laps/DNF/DSQ) keep their relative order after classified drivers.
-    comparable = [r for r in rows if r.get("gap_seconds") is not None and str(r.get("position", "")).upper() not in ("DNF", "DNS", "DSQ")]
-    comparable.sort(key=lambda r: (float(r.get("gap_seconds", 0)) + float(r.get("penalty", 0)), int(r.get("_order", 0))))
+
+    # Only classified finishers with a numeric gap participate in the live
+    # reordering. GAP is 0 seconds; DNF/DNS/DSQ/Laps stay non-comparable.
+    comparable = [
+        r for r in rows
+        if r.get("gap_seconds") is not None
+        and str(r.get("original_position", "")).upper() not in ("DNF", "DNS", "DSQ")
+    ]
+    comparable.sort(
+        key=lambda r: (
+            float(r.get("gap_seconds", 0)) + float(r.get("penalty", 0)),
+            int(r.get("_order", 0)),
+        )
+    )
     others = [r for r in rows if r not in comparable]
     others.sort(key=lambda r: int(r.get("_order", 0)))
+
+    # The smallest adjusted race time becomes the live leader. Displayed gaps
+    # are relative to that leader, so if the original P1 receives a penalty and
+    # another driver moves to P1, the table shows the correct new gaps.
+    leader_time = None
+    if comparable:
+        leader_time = min(
+            float(r.get("gap_seconds", 0)) + float(r.get("penalty", 0))
+            for r in comparable
+        )
+
     ordered = comparable + others
-    # Original points table is used to award points according to the new finishing position.
+
+    # Original points table is used to award points according to the new
+    # finishing position.
     points_by_pos = {}
     for r in rows:
         try:
@@ -170,15 +216,18 @@ def recalc_live_race(live):
                 points_by_pos[p] = r.get("original_points", 0)
         except (TypeError, ValueError):
             pass
+
     for i, r in enumerate(ordered, 1):
-        old = str(r.get("original_position", "")).upper()
-        if r.get("gap_seconds") is not None and old not in ("DNF", "DNS", "DSQ"):
+        if r in comparable:
             r["position"] = i
             r["points"] = points_by_pos.get(i, 0)
+            adjusted_absolute = float(r.get("gap_seconds", 0)) + float(r.get("penalty", 0))
+            r["effective_gap_seconds"] = adjusted_absolute - (leader_time or 0.0)
         else:
             r["position"] = r.get("original_position")
             r["points"] = r.get("original_points", 0)
-        r["effective_gap_seconds"] = (r.get("gap_seconds") + float(r.get("penalty", 0))) if r.get("gap_seconds") is not None else None
+            r["effective_gap_seconds"] = None
+
     live["rows"] = ordered
     return live
 
@@ -993,6 +1042,9 @@ class F1Handler(SimpleHTTPRequestHandler):
                         if float(lr.get("penalty", 0)) > 0:
                             r["penalty"] = lr["penalty"]
                             r["penalty_reason"] = lr.get("penalty_reason", "")
+                        else:
+                            r.pop("penalty", None)
+                            r.pop("penalty_reason", None)
                 save_json(RESULTS_FILE, results)
                 live["status"] = "final"
                 save_live_race(live)
