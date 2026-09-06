@@ -230,6 +230,7 @@ $('uploadResults').onclick=async()=>{
   }catch(e){msg.textContent=e.message;msg.className='status error'}
   finally{btn.disabled=false;btn.textContent='Загрузить результаты'}
 };
+function sessionName(s){return s==='sprint'?'Спринт':'Гран-при'}
 function liveGap(r){
   if(r.gap_seconds===null||r.gap_seconds===undefined)return r.gap||'—';
   const v=Number(r.gap_seconds)+Number(r.penalty||0);
