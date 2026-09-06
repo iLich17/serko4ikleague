@@ -175,18 +175,6 @@ def driver_public_list(include_inactive=False):
             "team": current_team,
             "photo": item.get("photo", ""),
             "active": active,
-            # Public profile statistics are intentionally read-only here;
-            # they are edited only through the authenticated admin endpoint.
-            "country": item.get("country", ""),
-            "market_value": item.get("market_value", 0),
-            "overall": item.get("overall", 0),
-            "race_pace": item.get("race_pace", 0),
-            "cleanliness": item.get("cleanliness", 0),
-            "attack": item.get("attack", 0),
-            "defense": item.get("defense", 0),
-            "qualifying": item.get("qualifying", 0),
-            "stability": item.get("stability", 0),
-            "key_strength": item.get("key_strength", ""),
         })
     rows.sort(key=lambda x: x["name"].casefold())
     return rows
@@ -594,8 +582,9 @@ class F1Handler(SimpleHTTPRequestHandler):
                 self._json_response(404, {"error": "Файл не найден"})
             return
         if path == "/api/drivers":
-            # Public driver profiles need their editable stats (OVR, market value, ratings)
-            # on the public site, so expose only the sanitized public driver list here.
+            if not current_user(self) and not is_admin(self):
+                self._json_response(401, {"error": "Сначала зарегистрируйтесь или войдите"})
+                return
             self._json_response(200, {"drivers": driver_public_list(False)})
             return
         if path == "/api/admin/drivers":
@@ -994,6 +983,9 @@ class F1Handler(SimpleHTTPRequestHandler):
             if path.startswith("/api/admin/protests/") and path.endswith("/delete"):
                 if not is_admin(self):
                     self._json_response(401, {"error": "Требуется вход в админ-панель"})
+                    return
+                if (current_admin(self) or "").casefold() != "il1ch":
+                    self._json_response(403, {"error": "Удалять протесты может только администратор iL1CH"})
                     return
                 protest_id = path[len("/api/admin/protests/"):-len("/delete")].strip("/")
                 if not protest_id:
