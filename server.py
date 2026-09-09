@@ -1184,17 +1184,21 @@ class F1Handler(SimpleHTTPRequestHandler):
                         ext = Path(file_part.get("filename") or "").suffix.lower()
                         if ext not in {".jpg", ".jpeg", ".png", ".webp", ".gif"}:
                             ext = ".jpg"
+                        # Use a unique filename on every upload. Reusing the same URL can
+                        # leave the previous image in the browser/proxy cache, making a
+                        # successfully uploaded replacement look like it did not change.
                         base = safe_photo_filename(canonical)
-                        filename = base + ext
-                        # Remove an older photo for the same driver.
+                        filename = f"{base}_{int(time.time() * 1000)}{ext}"
+                        # Remove the previous photo for the same driver after the new file
+                        # has been written successfully.
                         old = str(item.get("photo", ""))
-                        if old.startswith("/driver-photos/"):
-                            old_file = (DRIVER_PHOTOS_DIR / Path(old).name).resolve()
-                            if old_file.parent == DRIVER_PHOTOS_DIR.resolve() and old_file.is_file() and old_file.name != filename:
-                                try: old_file.unlink()
-                                except OSError: pass
                         target = DRIVER_PHOTOS_DIR / filename
                         target.write_bytes(data)
+                        if old.startswith("/driver-photos/"):
+                            old_file = (DRIVER_PHOTOS_DIR / Path(old).name).resolve()
+                            if old_file.parent == DRIVER_PHOTOS_DIR.resolve() and old_file.is_file() and old_file != target:
+                                try: old_file.unlink()
+                                except OSError: pass
                         item["photo"] = "/driver-photos/" + filename
                     save_driver_settings(settings)
                 self._json_response(200, {"ok": True, "driver": {"name": canonical, **settings[canonical]}})
